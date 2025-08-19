@@ -1,0 +1,33 @@
+// Power Options
+.powermenu {
+    background: rgba(colors.$background, 0.99);
+    padding: 5px;
+    border-radius: 25px;
+
+    button {
+        background-color: colors.$surface_container;
+        color: colors.$on_background;
+        margin: 2.5px;
+        font-size: 64pt;
+        padding: 70px 100px;
+        border-radius: 10px;
+        font-family: "Zed Sans";
+    }
+
+    button:first-child {
+        border-radius: 20px 10px 10px 20px;
+    }
+
+    button:last-child {
+        border-radius: 10px 20px 20px 10px;
+    }
+
+    button:hover {
+        background-color: colors.$surface_container_high;
+    }
+
+    button:focus {
+        background-color: colors.$primary;
+        color: colors.$on_primary;
+    }
+}

@@ -1,0 +1,20 @@
+{
+    "appearance": {
+        "wallpaper_path": "/home/debuggy/Pictures/Wallpapers/2025-08-11_17.41.23.png",
+        "color_scheme": "fruit-salad",
+        "bar_anchors": [
+            "left",
+            "right",
+            "bottom"
+        ],
+        "bar_margins": [
+            10,
+            10,
+            10,
+            10
+        ],
+        "style": "trislands",
+        "bar_side": "bottom",
+        "vertical": false
+    }
+}

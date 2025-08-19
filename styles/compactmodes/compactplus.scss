@@ -1,0 +1,29 @@
+@use "../../colors.scss";
+
+.left-widgets,
+.center-widgets,
+.right-widgets {
+    padding: 2px;
+    box, button:not(.workspace) {
+        border-radius: 5px;
+        background-color: transparent;
+    }
+}
+
+.timedate {
+    .time {
+        margin: 0px;
+    }
+}
+
+.winfo {
+    .title {
+        font-weight: 500;
+    }
+}
+
+.workspaces {
+    .workspace {
+        padding: 0px;
+    }
+}

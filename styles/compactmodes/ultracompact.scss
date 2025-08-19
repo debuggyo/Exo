@@ -1,0 +1,29 @@
+@use "../../colors.scss";
+
+.left-widgets,
+.center-widgets,
+.right-widgets {
+    padding: 0px;
+}
+
+.workspaces {
+    padding-left: 10px;
+    .workspace {
+        opacity: 0.5;
+        font-size: 0pt;
+        padding: 0px;
+        margin: -1px;
+        min-width: 6px;
+        min-height: 6px;
+        color: colors.$on_background;
+        background-color: colors.$on_background;
+        border-radius: 2rem;
+
+        &.active {
+            opacity: 1;
+            min-height: 10px;
+            min-width: 20px;
+            background-color: colors.$on_background;
+        }
+    }
+}

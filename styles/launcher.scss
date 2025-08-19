@@ -1,0 +1,57 @@
+// Launcher
+.launcher-window {
+    color: colors.$on_background;
+    padding: 5px;
+    padding-bottom: 0px;
+    background-color: colors.$background;
+    border-radius: 20px;
+
+    .launcher-search {
+        background-color: colors.$surface_container;
+        border-radius: 15px;
+
+        &:focus-visible {
+            outline-color: colors.$primary;
+            background-color: colors.$surface_container_high;
+        }
+    }
+
+    .outer-box {
+        border-radius: 15px 15px;
+
+        .inner-box {
+            .app-item {
+                border-radius: 5px;
+                background-color: colors.$surface_container;
+
+                &:first-child {
+                    border-top-left-radius: 15px;
+                    border-top-right-radius: 15px;
+                }
+
+                &:last-child {
+                    border-bottom-left-radius: 15px;
+                    border-bottom-right-radius: 15px;
+                }
+
+                &:hover {
+                    background-color: colors.$surface_container_high;
+                }
+
+                &:focus {
+                    outline: none;
+                    background-color: colors.$primary;
+                    border: none;
+                    .app-label {
+                        color: colors.$on_primary;
+                        font-weight: 600;
+                    }
+                }
+
+                .app-label {
+                    font-weight: 400;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,6 @@
+@use "../../colors.scss";
+
+.bar {
+    background-color: colors.$background;
+    border-radius: 0px;
+}

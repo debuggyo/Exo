@@ -1,0 +1,105 @@
+// -- Bar
+.bar {
+    color: colors.$on_background;
+}
+
+.left-widgets,
+.center-widgets,
+.right-widgets {
+    padding: 5px;
+    box,
+    button {
+        border-radius: 5px;
+        background-color: colors.$surface_container;
+
+        &:first-child {
+            border-top-left-radius: 20px;
+            border-bottom-left-radius: 20px;
+        }
+
+        &:last-child {
+            border-top-right-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+    }
+}
+
+// Window Info
+.winfo {
+    padding: 0px 15px 0px 10px;
+
+    .title {
+        font-weight: 700;
+        margin-bottom: -2px;
+    }
+
+    .app_id {
+        font-size: 8pt;
+        opacity: 0.8;
+    }
+}
+
+// Workspace
+.workspaces {
+    padding: 2px;
+    border-radius: 20px 5px 5px 20px;
+
+    .workspace {
+        padding: 0;
+        font-weight: 400;
+        font-size: 10pt;
+        background-color: colors.$surface_container_high;
+        color: colors.$on_background;
+        transition: 300ms cubic-bezier(0.19, 1, 0.22, 1);
+        min-width: 25px;
+        min-height: 21px;
+        border-radius: 5px;
+
+        &.active {
+            background-color: colors.$primary;
+            color: colors.$on_primary;
+            padding: 0px 10px;
+            font-weight: 700;
+            border-radius: 20px;
+        }
+
+        &.workspace:first-child {
+            border-top-left-radius: 20px;
+            border-bottom-left-radius: 20px;
+        }
+    }
+}
+
+// Time & Date
+.timedate {
+    padding: 0px 10px;
+    min-height: 0px;
+
+    .time {
+        font-weight: 700;
+        font-size: 10pt;
+        margin-bottom: -2px;
+    }
+
+    .date {
+        font-weight: 400;
+        font-size: 8pt;
+        opacity: 0.8;
+    }
+}
+
+// Tray
+.tray {
+    background-color: colors.$surface_container;
+    padding: 0px 15px;
+    min-width: 12px;
+
+    .tray-item {
+        padding: 0px;
+    }
+
+    .tray-icon {
+        margin: 0px;
+        padding: 0px;
+    }
+}

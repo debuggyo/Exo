@@ -1,0 +1,13 @@
+@use "../../colors.scss";
+
+.bar {
+    background-color: transparent;
+}
+
+.left-widgets,
+.center-widgets,
+.right-widgets {
+    background-color: colors.$surface;
+    border-radius: 20px;
+    min-width: 0px;
+}

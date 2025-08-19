@@ -1,0 +1,57 @@
+import os
+from user_settings import user_settings
+from ignis.css_manager import CssManager
+css_manager = CssManager.get_default()
+
+class Wallpaper:
+    def setWall(path):
+        schemes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot"]
+        colorScheme = user_settings.appearance.color_scheme
+        if user_settings.appearance.dark_mode:
+            mode = "dark"
+        else:
+            mode = "light"
+
+        if colorScheme in schemes:
+            print(f"Color Scheme: {colorScheme}")
+            print(f"Wallpaper: {path}")
+            os.system(f"matugen image -t scheme-{colorScheme} '{path}' -m '{mode}'")
+        else:
+            os.system(f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'")
+
+        user_settings.appearance.set_wallpaper_path(path)
+        css_manager.reload_all_css()
+
+    def setColors(colorScheme):
+        schemes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot"]
+        path = user_settings.appearance.wallpaper_path
+        if user_settings.appearance.dark_mode:
+            mode = "dark"
+        else:
+            mode = "light"
+
+        if colorScheme in schemes:
+            os.system(f"matugen image -t scheme-{colorScheme} '{path}' -m '{mode}'")
+        else:
+            os.system(f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'")
+
+        user_settings.appearance.set_color_scheme(colorScheme)
+        css_manager.reload_all_css()
+
+
+    def setDarkMode(active):
+        schemes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot"]
+        colorScheme = user_settings.appearance.color_scheme
+        path = user_settings.appearance.wallpaper_path
+        if active:
+            mode = "dark"
+        else:
+            mode = "light"
+
+        if colorScheme in schemes:
+            os.system(f"matugen image -t scheme-{colorScheme} '{path}' -m '{mode}'")
+        else:
+            os.system(f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'")
+
+        user_settings.appearance.set_dark_mode(active)
+        css_manager.reload_all_css()

@@ -1,0 +1,34 @@
+.notification, .notification-popup {
+    background-color: colors.$surface_container;
+    padding: 10px;
+    border-radius: 20px;
+
+    .notification-icon {
+        padding: 10px;
+        background-color: colors.$surface_container_high;
+        border-radius: 2rem;
+    }
+
+    .m3-button.notification-close, .m3-button.notification-action {
+        background-color: colors.$surface_container_high;
+        padding: 0px 12px;
+
+        &:hover {
+            background-color: colors.$surface_container_highest;
+        } 
+
+        .m3-button-icon {
+            min-height: 0px;        
+            color: colors.$on_background;
+        }
+    }
+
+    .notification-summary {
+        font-size: 12pt;
+        font-weight: 600;
+    }
+    
+    .notification-body {
+        color: colors.$on_surface_variant;
+    }
+}

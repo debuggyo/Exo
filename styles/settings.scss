@@ -1,0 +1,66 @@
+// Settings Window
+.settings-window {
+    padding: 0px 5px;
+    background-color: colors.$background;
+    color: colors.$on_background;
+
+    .settings-category {
+        background-color: colors.$surface_container;
+        margin: 0px;
+        padding: 10px;
+        border-radius: 10px;
+
+        &:first-child {
+            margin-top: 5px;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+        }
+
+        &:last-child {
+            margin-bottom: 5px;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+        }
+
+        .connected-button-group button:not(.active), .file-chooser-button {
+            background-color: colors.$surface_container_high;
+
+            &:hover {
+                background-color: colors.$surface_container_highest;
+            }
+        }
+    }
+
+    .wallpaper-preview {
+        border-radius: 10px;
+    }
+
+    .file-chooser-button {
+        margin-top: -15px;
+
+        border-radius: 0px 0px 20px 20px;
+        image {
+            margin-left: -15px;
+            opacity: 0;
+        }
+
+    }
+
+    .toggleable-option {
+        padding: 5px 5px 5px 15px;
+        border-radius: 15px;
+
+        label {
+            font-weight: 600;
+        }
+    }
+}
+
+.settings-category-label {
+    margin-left: 0.5rem;
+    font-size: 16pt;
+    font-weight: 600;
+    padding-bottom: 0.2rem;
+    margin-bottom: 0.2rem;
+    border-bottom: 2px solid colors.$surface_container_highest;
+}

@@ -1,0 +1,11 @@
+@use "../colors";
+@import "bar.scss";
+@import "settings.scss";
+@import "launcher.scss";
+@import "powermenu.scss";
+@import "notifications.scss";
+@import "m3.scss";
+
+*:focus {
+    outline-color: colors.$secondary;
+}
