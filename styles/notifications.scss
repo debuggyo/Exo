@@ -7,28 +7,44 @@
         padding: 10px;
         background-color: colors.$surface_container_high;
         border-radius: 2rem;
+        color: colors.$on_background;
     }
 
-    .m3-button.notification-close, .m3-button.notification-action {
+    .m3-button.notification-close {
         background-color: colors.$surface_container_high;
-        padding: 0px 12px;
+        padding: 0px;
+        min-width: 24px;
+        min-height: 24px;
 
         &:hover {
             background-color: colors.$surface_container_highest;
         } 
 
         .m3-button-icon {
-            min-height: 0px;        
+            font-size: 16px;
             color: colors.$on_background;
         }
     }
 
-    .notification-summary {
-        font-size: 12pt;
-        font-weight: 600;
+    .notification-info {
+        padding: 5px;
+        padding-left: 0px;
+        .notification-summary {
+            font-weight: 600;
+            color: colors.$on_surface;
+        }
+        .notification-seperator, .notification-age {
+            font-size: 8pt;
+            opacity: 0.75;
+        }
+        .notification-body {
+            color: colors.$on_surface_variant;
+        }
     }
-    
-    .notification-body {
-        color: colors.$on_surface_variant;
+
+    .notification-actions-container {
+        margin-left: -10px;
+        margin-top: 5px;
+        margin-bottom: -5px;
     }
 }

@@ -13,8 +13,7 @@
             10,
             10
         ],
-        "style": "trislands",
-        "bar_side": "bottom",
-        "vertical": false
+        "style": "connected",
+        "dark_mode": true
     }
 }

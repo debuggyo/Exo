@@ -2,10 +2,13 @@ import os
 from ignis import widgets, utils
 from user_settings import user_settings
 from .widgets import Clock, WindowInfo, Workspaces, Tray
+from modules.m3components import Button
 from ignis.css_manager import CssManager, CssInfoPath
+from ignis.window_manager import WindowManager
 from scripts.set_bar_styles import BarStyles  # only import class, no instance
 
 css_manager = CssManager.get_default()
+window_manager = WindowManager.get_default()
 
 class Bar:
     def __init__(self, monitor: int = 0):
@@ -61,15 +64,21 @@ class Bar:
         if compact_mode == 0:
             height = 40
         elif compact_mode == 1:
-            height = 20
+            height = 35
+            css_manager.apply_css(CssInfoPath(
+                name="compact",
+                path=os.path.expanduser("~/.config/ignis/styles/compactmodes/compact.scss"),
+                compiler_function=lambda path: utils.sass_compile(path=path),
+            ))
         elif compact_mode in (2, 3):
-            height = 0
+            height = 30
             css_manager.apply_css(CssInfoPath(
                 name="compactplus",
                 path=os.path.expanduser("~/.config/ignis/styles/compactmodes/compactplus.scss"),
                 compiler_function=lambda path: utils.sass_compile(path=path),
             ))
             if compact_mode == 3:
+                height = 25
                 css_manager.apply_css(CssInfoPath(
                     name="ultracompact",
                     path=os.path.expanduser("~/.config/ignis/styles/compactmodes/ultracompact.scss"),
@@ -123,6 +132,7 @@ class Bar:
                     halign="end",
                     child=[
                         widgets.Box(child=[widgets.Label(label="Goon Corner")], style="padding: 0px 15px;"),
+                        widgets.Button(child=widgets.Label(label="tune"), css_classes=["quickcenter-button"], on_click=lambda x: window_manager.toggle_window("QuickCenter")),
                         Tray(),
                     ],
                 ),

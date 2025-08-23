@@ -1,4 +1,5 @@
 from user_settings import user_settings
+from .send_notification import send_notification
 
 class BarStyles:
     bar_instance = None  # class-level reference to Bar
@@ -33,9 +34,9 @@ class BarStyles:
                 style = user_settings.appearance.style
                 anchors = [side] if style == "island" else (["top", "bottom", side] if vertical else ["left", "right", side])
 
-                win.anchor = None  # reset all previous anchors
-                win.anchor = anchors  # apply new anchors
-                win.margin_top, win.margin_left, win.margin_right, win.margin_bottom = BarStyles._compute_margins(side)
+                # win.anchor = None  # reset all previous anchors
+                # win.anchor = anchors  # apply new anchors
+                # win.margin_top, win.margin_left, win.margin_right, win.margin_bottom = BarStyles._compute_margins(side)
 
 
     @staticmethod

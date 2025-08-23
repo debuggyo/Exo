@@ -64,7 +64,7 @@ class PowerMenu(widgets.Window):
         )
         super().__init__(
             popup=True,
-            kb_mode="on_demand",
+            kb_mode="exclusive",
             namespace="PowerMenu",
             exclusivity="ignore",
             visible=False,

@@ -22,6 +22,10 @@ class UserSettings(OptionsManager):
         style: str = "floating"
         transparent: bool = False
         compact: int = 0
+        bar_corners: bool = True
+
+        # Misc
+        screen_corners: bool = True
 
     appearance = Appearance()
     # appearance.connect_option("bar_side", app.reload)

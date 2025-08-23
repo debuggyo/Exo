@@ -6,13 +6,16 @@
     padding: 0px;
 }
 
+.bar * {
+    font-weight: 400;
+}
+
 .workspaces {
     padding-left: 10px;
     .workspace {
         opacity: 0.5;
         font-size: 0pt;
         padding: 0px;
-        margin: -1px;
         min-width: 6px;
         min-height: 6px;
         color: colors.$on_background;

@@ -2,6 +2,7 @@ from ignis import widgets
 from ignis import utils
 from ignis.services.notifications import Notification, NotificationService
 from .notifications import ExoNotification
+from user_settings import user_settings
 
 notifications = NotificationService.get_default()
 
@@ -12,11 +13,16 @@ class Popup(widgets.Box):
         self._box = box
         self._window = window
 
+        if user_settings.appearance.bar_side == "bottom":
+            transition_type = "slide_up"
+        else:
+            transition_type = "slide_down"
+
         widget = ExoNotification(notification)
         widget.css_classes = ["notification-popup"]
-        self._inner = widgets.Revealer(transition_type="slide_left", child=widget)
-        self._outer = widgets.Revealer(transition_type="slide_down", child=self._inner)
-        super().__init__(child=[self._outer], halign="end", valign="fill")
+        self._inner = widgets.Revealer(transition_type="crossfade", child=widget, hexpand=True, halign="fill")
+        self._outer = widgets.Revealer(transition_type=transition_type, child=self._inner, hexpand=True, halign="fill")
+        super().__init__(child=[self._outer], halign="fill", valign="fill", hexpand=True)
 
         notification.connect("dismissed", lambda x: self.destroy())
 
@@ -53,7 +59,10 @@ class PopupBox(widgets.Box):
     def __on_notified(self, notification: Notification) -> None:
         self._window.visible = True
         popup = Popup(box=self, window=self._window, notification=notification)
-        self.prepend(popup)
+        if user_settings.appearance.bar_side == "top":
+            self.prepend(popup)
+        else:
+            self.append(popup)
         popup._outer.reveal_child = True
         utils.Timeout(
             popup._outer.transition_duration, popup._inner.set_reveal_child, True
@@ -63,7 +72,7 @@ class PopupBox(widgets.Box):
 class NotificationPopup(widgets.Window):
     def __init__(self, monitor: int):
         super().__init__(
-            anchor=["right", "top", "bottom"],
+            anchor=["right", user_settings.appearance.bar_side],
             monitor=monitor,
             namespace=f"notification",
             layer="top",
@@ -72,6 +81,7 @@ class NotificationPopup(widgets.Window):
             dynamic_input_region=True,
             css_classes=["rec-unset"],
             style="min-width: 29rem;",
-            margin_top=10,
-            margin_right=10,
+            margin_top=5,
+            margin_right=5,
+            margin_bottom=5,
         )

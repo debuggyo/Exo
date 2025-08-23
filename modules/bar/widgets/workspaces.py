@@ -17,7 +17,7 @@ class WorkspaceButton(widgets.Button):
             super().__init__(
                 css_classes=["workspace"],
                 on_click=lambda x: workspace.switch_to(),
-                child=widgets.Label(label=str(workspace.idx)),
+                child=widgets.Label(label=str(workspace.idx), halign="center", valign="center"),
                 valign=valign
             )
             if workspace.is_active:
@@ -40,6 +40,7 @@ class WorkspaceButton(widgets.Button):
 
 class Workspaces(widgets.Box):
     def __init__(self):
+        vertical = user_settings.appearance.vertical    
         if compact_mode == 3:
             spacing = 5
         else:
@@ -47,6 +48,7 @@ class Workspaces(widgets.Box):
         if niri.is_available:
             child = [
                 widgets.Box(
+                    vertical=vertical,
                     css_classes=["workspaces"],
                     spacing=spacing,
                     child=niri.bind_many(
@@ -60,6 +62,7 @@ class Workspaces(widgets.Box):
         elif hyprland.is_available:
             child = [
                 widgets.Box(
+                    vertical=vertical,
                     css_classes=["workspaces"],
                     spacing=spacing,
                     child=hyprland.bind_many(

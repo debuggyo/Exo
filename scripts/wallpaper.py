@@ -2,6 +2,7 @@ import os
 from user_settings import user_settings
 from ignis.css_manager import CssManager
 css_manager = CssManager.get_default()
+from .send_notification import send_notification
 
 class Wallpaper:
     def setWall(path):
@@ -19,6 +20,7 @@ class Wallpaper:
         else:
             os.system(f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'")
 
+        send_notification("Wallpaper Set!", str(os.path.basename(path)))
         user_settings.appearance.set_wallpaper_path(path)
         css_manager.reload_all_css()
 

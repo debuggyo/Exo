@@ -4,26 +4,24 @@
 .center-widgets,
 .right-widgets {
     padding: 2px;
-    box, button:not(.workspace) {
+    box, button:not(.active) {
         border-radius: 5px;
         background-color: transparent;
     }
 }
 
-.timedate {
-    .time {
-        margin: 0px;
-    }
-}
-
-.winfo {
-    .title {
-        font-weight: 500;
-    }
-}
-
 .workspaces {
     .workspace {
-        padding: 0px;
+        min-width: 21px;
+    }
+    .active {
+        padding: 0px 1px;
+    }
+}
+
+.quickcenter-button {
+    &:hover {
+        background-color: colors.$primary_container;
+        color: colors.$on_primary_container;
     }
 }
