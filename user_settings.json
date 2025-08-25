@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
     "appearance": {
         "wallpaper_path": "/home/debuggy/Pictures/Wallpapers/2025-08-11_17.41.23.png",
         "color_scheme": "content",
@@ -22,3 +23,7 @@
         "bar_centered": false
     }
 }
+=======
+
+}
+>>>>>>> eb510d0263cf54208a884ec35aaf49121847273c
