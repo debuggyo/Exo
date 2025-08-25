@@ -1,3 +1,5 @@
+@use "../colors.scss";
+
 // -- Bar
 .bar {
     color: colors.$on_background;
@@ -22,6 +24,10 @@
             border-bottom-right-radius: 20px;
         }
     }
+}
+
+.center-widgets {
+    margin: 0 1rem;
 }
 
 // Window Info
@@ -106,7 +112,7 @@
 // Quick Center Button
 .quickcenter-button {
     padding: 0px 10px;
-    font-family: "Material Symbols Rounded";
+    font-family: "Material Symbols Outlined";
     &:hover {
         background-color: colors.$primary_container;
         color: colors.$on_primary_container;

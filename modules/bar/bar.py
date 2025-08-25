@@ -3,9 +3,11 @@ from ignis import widgets, utils
 from user_settings import user_settings
 from .widgets import Clock, WindowInfo, Workspaces, Tray
 from modules.m3components import Button
+from modules.corners import Corners
 from ignis.css_manager import CssManager, CssInfoPath
 from ignis.window_manager import WindowManager
 from scripts.set_bar_styles import BarStyles  # only import class, no instance
+from scripts import apply_bar_css
 
 css_manager = CssManager.get_default()
 window_manager = WindowManager.get_default()
@@ -34,56 +36,25 @@ class Bar:
     def build(self):
         side = user_settings.appearance.bar_side
         vertical = user_settings.appearance.vertical
-        barstyle = user_settings.appearance.style
+        barstyle = user_settings.appearance.bar_separation
+        barfloating = user_settings.appearance.bar_floating
         compact_mode = user_settings.appearance.compact
 
         topmargin, leftmargin, rightmargin, bottommargin = self._compute_margins(side)  # compute margins
 
-        # apply style CSS
-        if barstyle == "connected":
-            topmargin = leftmargin = rightmargin = bottommargin = 0
-            css_manager.apply_css(CssInfoPath(
-                name="connected",
-                path=os.path.expanduser("~/.config/ignis/styles/barstyles/connected.scss"),
-                compiler_function=lambda path: utils.sass_compile(path=path),
-            ))
-        elif barstyle in ("floating", "island"):
-            css_manager.apply_css(CssInfoPath(
-                name="floating",
-                path=os.path.expanduser("~/.config/ignis/styles/barstyles/floating.scss"),
-                compiler_function=lambda path: utils.sass_compile(path=path),
-            ))
-        elif barstyle == "trislands":
-            css_manager.apply_css(CssInfoPath(
-                name="trislands",
-                path=os.path.expanduser("~/.config/ignis/styles/barstyles/trislands.scss"),
-                compiler_function=lambda path: utils.sass_compile(path=path),
-            ))
+        apply_bar_css()
 
-        # determine height
+        if not barfloating:
+            topmargin = leftmargin = rightmargin = bottommargin = 0
+
         if compact_mode == 0:
             height = 40
         elif compact_mode == 1:
             height = 35
-            css_manager.apply_css(CssInfoPath(
-                name="compact",
-                path=os.path.expanduser("~/.config/ignis/styles/compactmodes/compact.scss"),
-                compiler_function=lambda path: utils.sass_compile(path=path),
-            ))
-        elif compact_mode in (2, 3):
+        elif compact_mode == 2:
             height = 30
-            css_manager.apply_css(CssInfoPath(
-                name="compactplus",
-                path=os.path.expanduser("~/.config/ignis/styles/compactmodes/compactplus.scss"),
-                compiler_function=lambda path: utils.sass_compile(path=path),
-            ))
-            if compact_mode == 3:
-                height = 25
-                css_manager.apply_css(CssInfoPath(
-                    name="ultracompact",
-                    path=os.path.expanduser("~/.config/ignis/styles/compactmodes/ultracompact.scss"),
-                    compiler_function=lambda path: utils.sass_compile(path=path),
-                ))
+        elif compact_mode == 3:
+            height = 25
 
         # vertical CSS
         if vertical:
@@ -94,7 +65,7 @@ class Bar:
             ))
 
         # compute initial anchors
-        anchors = [side] if barstyle == "island" else (["top", "bottom", side] if vertical else ["left", "right", side])
+        anchors = [side] if user_settings.appearance.bar_centered else (["top", "bottom", side] if vertical else ["left", "right", side])
 
         # build Window
         self.__win = widgets.Window(

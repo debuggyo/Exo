@@ -51,11 +51,11 @@ class Button(widgets.Button):
         )
 
     @staticmethod
-    def connected_group(child, homogeneous: bool = False):
+    def connected_group(child, **kwargs):
         return widgets.Box(
             vertical=False,
             spacing=2,
-            homogeneous=homogeneous,
             css_classes=["connected-button-group"],
-            child=child
+            child=child,
+            **kwargs
         )

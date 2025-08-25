@@ -35,10 +35,6 @@ class WindowInfo:
             child.append(widgets.Box(vertical=True, valign="center", child=[self.title_label, self.appid_label],))
         elif user_settings.appearance.compact >= 1:
             child.append(self.title_label)
-        if user_settings.appearance.style == "island":
-            width = 200
-        else:
-            width = 0
 
         return widgets.Box(
             vertical=False,
@@ -47,6 +43,6 @@ class WindowInfo:
             valign="fill",
             vexpand=True,
             css_classes=["winfo"],
-            width_request=width,
+            width_request=200,
             child=child
         )

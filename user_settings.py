@@ -19,10 +19,11 @@ class UserSettings(OptionsManager):
         bar_anchors: TrackedList = TrackedList()
         bar_margins: TrackedList[int] = TrackedList([10, 10, 10, 10])  # top, left, right, bottom
         vertical: bool = False
-        style: str = "floating"
-        transparent: bool = False
         compact: int = 0
         bar_corners: bool = True
+        bar_floating: bool = False
+        bar_separation: str = "full"
+        bar_centered: bool = False
 
         # Misc
         screen_corners: bool = True

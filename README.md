@@ -4,9 +4,9 @@
 ## Dependencies
 * Niri or Hyprland
 * Ignis (git/dev)
-* Material Symbols Font
-* Matugen
 * Hyprlock
+* Matugen
+* Material Symbols Font
 
 ## Screenshots/Videos
 <img width="1920" height="1080" alt="Screenshot from 2025-08-19 18-53-31" src="https://github.com/user-attachments/assets/cd655499-0d40-47dc-bbf9-9a8bfd988a17" />

@@ -46,7 +46,7 @@ def make_toggle_buttons(items, get_value, set_value, on_any_click=None):
         buttons.append((btn, value))
 
     update_active()
-    return Button.connected_group([b for b, _ in buttons], homogeneous=True)
+    return Button.connected_group([b for b, _ in buttons], homogeneous=False, halign="start", hexpand=False)
 
 class SettingsRow(widgets.Box):
     def __init__(self, icon: str = None, title: str = None, description: str = None, child: list = None, vertical: bool = True, css_classes: list = [], **kwargs):
@@ -85,17 +85,31 @@ class SettingsRow(widgets.Box):
         )
 
 def SwitchRow(label: str, active, on_change, **kwargs):
-    return SettingsRow(
+    switch = widgets.Switch(
+        active=active,
+        valign="center",
+        halign="end",
+    )
+
+    row_content = SettingsRow(
         title=label,
         vertical=False,
         css_classes=["switch-row"],
         child=[
-            widgets.Switch(
-                active=active,
-                on_change=on_change,
-                valign="center",
-                halign="end",
-            )
+            switch
         ],
         **kwargs
+    )
+
+    def on_button_click(_):
+        new_active_state = not switch.active
+        on_change(switch, new_active_state)
+        switch.set_active(new_active_state)
+
+    return widgets.Button(
+        child=row_content,
+        on_click=on_button_click,
+        hexpand=True,
+        halign="fill",
+        css_classes=["row-button"]
     )

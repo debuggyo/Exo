@@ -1,42 +1,66 @@
 from ignis import widgets
 from ignis.services.niri import NiriService, NiriWorkspace
 from ignis.services.hyprland import HyprlandService, HyprlandWorkspace
-niri = NiriService.get_default()
-hyprland = HyprlandService.get_default()
 from user_settings import user_settings
+
+# Determine the active service and assign it to a single variable
+SERVICE = None
+if NiriService.get_default().is_available:
+    SERVICE = NiriService.get_default()
+elif HyprlandService.get_default().is_available:
+    SERVICE = HyprlandService.get_default()
+
 compact_mode = user_settings.appearance.compact
 
-class WorkspaceButton(widgets.Button):
-    if niri.is_available:
-        def __init__(self, workspace: NiriWorkspace) -> None:
-            if compact_mode == 3:
-                valign = "center"
-            else:
-                valign = "fill"
-
-            super().__init__(
-                css_classes=["workspace"],
-                on_click=lambda x: workspace.switch_to(),
-                child=widgets.Label(label=str(workspace.idx), halign="center", valign="center"),
-                valign=valign
-            )
+# Helper function to get the active workspace, abstracting the difference
+def get_active_workspace():
+    if not SERVICE:
+        return None
+    if isinstance(SERVICE, NiriService):
+        for workspace in SERVICE.workspaces:
             if workspace.is_active:
-                self.add_css_class("active")
-    elif hyprland.is_available:
-        def __init__(self, workspace: HyprlandWorkspace) -> None:
-            if compact_mode == 3:
-                valign = "center"
-            else:
-                valign = "fill"
+                return workspace
+        return None
+    elif isinstance(SERVICE, HyprlandService):
+        return SERVICE.active_workspace
+    return None
 
-            super().__init__(
-                css_classes=["workspace"],
-                on_click=lambda x: workspace.switch_to(),
-                child=widgets.Label(label=str(workspace.id)),
-                valign=valign
-            )
-            if workspace.id == hyprland.active_workspace.id:
+class WorkspaceButton(widgets.Button):
+    def __init__(self, workspace) -> None:
+        if compact_mode == 3:
+            valign = "center"
+        else:
+            valign = "fill"
+
+        # Determine the workspace ID property based on the service type
+        if isinstance(workspace, NiriWorkspace):
+            label_text = str(workspace.idx)
+        else:
+            # Assuming HyprlandWorkspace
+            label_text = str(workspace.id)
+
+        super().__init__(
+            css_classes=["workspace"],
+            on_click=lambda x: workspace.switch_to(),
+            child=widgets.Label(label=label_text, halign="center", valign="center"),
+            valign=valign
+        )
+        
+        # Use a single, unified binding mechanism
+        def update_css_classes(*args):
+            active_workspace = get_active_workspace()
+            if active_workspace and workspace.id == active_workspace.id:
                 self.add_css_class("active")
+            else:
+                self.remove_css_class("active")
+
+        if SERVICE:
+            # This handles both niri and hyprland updates.
+            # niri.workspaces changes when active workspace changes, so this works for both.
+            SERVICE.connect("notify::workspaces", update_css_classes)
+            if isinstance(SERVICE, HyprlandService):
+                SERVICE.connect("notify::active-workspace", update_css_classes)
+            update_css_classes() # Call once for initial state
 
 class Workspaces(widgets.Box):
     def __init__(self):
@@ -45,34 +69,22 @@ class Workspaces(widgets.Box):
             spacing = 5
         else:
             spacing = 2
-        if niri.is_available:
-            child = [
-                widgets.Box(
-                    vertical=vertical,
-                    css_classes=["workspaces"],
-                    spacing=spacing,
-                    child=niri.bind_many(
-                        ["workspaces"],
-                        transform=lambda workspaces, *_: [
-                            WorkspaceButton(i) for i in workspaces
-                        ]
-                    )
-                )
-            ]
-        elif hyprland.is_available:
-            child = [
-                widgets.Box(
-                    vertical=vertical,
-                    css_classes=["workspaces"],
-                    spacing=spacing,
-                    child=hyprland.bind_many(
-                        ["workspaces"],
-                        transform=lambda workspaces, *_: [
-                            WorkspaceButton(i) for i in workspaces
-                        ]
-                    )
-                )
-            ]
-        else:
-            child = []
-        super().__init__(child=child)
+        
+        self._workspace_box = widgets.Box(
+            vertical=vertical,
+            css_classes=["workspaces"],
+            spacing=spacing
+        )
+        
+        def update_workspaces(*args):
+            if SERVICE:
+                workspaces = SERVICE.workspaces
+                self._workspace_box.child = [WorkspaceButton(workspace) for workspace in workspaces]
+            else:
+                self._workspace_box.child = []
+
+        if SERVICE:
+            SERVICE.connect("notify::workspaces", update_workspaces)
+            update_workspaces() # initial state
+            
+        super().__init__(child=[self._workspace_box])

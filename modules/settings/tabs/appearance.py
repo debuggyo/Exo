@@ -1,4 +1,3 @@
-# appearance.py
 import os
 
 from ignis import widgets
@@ -16,13 +15,12 @@ class ColorCategory(widgets.Box):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
-            spacing=5,
+            spacing=2,
             child=[
-                CategoryLabel("Colors"),
+                CategoryLabel("Colors & Wallpaper"),
             ]
         )
 
-        # Create the main image widget for the wallpaper preview
         wallpaper_picture = widgets.Picture(
             height=400,
             vexpand=False,
@@ -31,25 +29,20 @@ class ColorCategory(widgets.Box):
             image=user_settings.appearance.bind("wallpaper_path")
         )
 
-        # Create a new, custom label to display the filename
-        # This label will be positioned at the bottom-left of the image
         wallpaper_filename_label = widgets.Label(
             label=os.path.basename(user_settings.appearance.wallpaper_path) or "Click to set wallpaper",
-            halign="start",  # Align to the left side of the overlay
-            valign="end",    # Align to the bottom of the overlay
+            halign="start",
+            valign="end",
             margin_start=10,
             margin_bottom=10,
             css_classes=["wallpaper-filename-label"],
         )
 
-        # This is the function that will be called when a file is selected
         def on_file_set_handler(dialog, file):
             path = file.get_path()
             Wallpaper.setWall(path)
-            # Update our custom label with the new filename
             wallpaper_filename_label.label = os.path.basename(path)
 
-        # Create the FileChooserButton with the dialog argument
         file_chooser_button = widgets.FileChooserButton(
             label=widgets.Label(label=''),  # Keep this empty label to avoid an error
             css_classes=["wallpaper-button-overlay"],
@@ -66,26 +59,21 @@ class ColorCategory(widgets.Box):
             )
         )
 
-        # The main Overlay widget that holds everything
         wallpaper_overlay = widgets.Overlay(
             css_classes=["wallpaper-overlay"],
             child=wallpaper_picture,
         )
-        
-        # Add the transparent button first, then add the label on top of it.
+
         wallpaper_overlay.add_overlay(file_chooser_button)
         wallpaper_overlay.add_overlay(wallpaper_filename_label)
 
-        # Add the fully constructed wallpaper row to the settings category
         self.append(SettingsRow(
             title="Wallpaper",
-            description="Choose your own wallpaper.",
             child=[wallpaper_overlay]
         ))
 
         self.append(SettingsRow(
-            title="Color Schemes",
-            description="Choose from 8 Material color schemes, in Light or Dark mode.",
+            title="Color Scheme",
             child=[
                 make_toggle_buttons(
                     [
@@ -100,7 +88,13 @@ class ColorCategory(widgets.Box):
                     ],
                     lambda: user_settings.appearance.color_scheme,
                     Wallpaper.setColors
-                ),
+                )
+            ]
+        ))
+
+        self.append(SettingsRow(
+            title="Theme",
+            child=[
                 make_toggle_buttons(
                     [
                         ("Light", False, "light_mode"),
@@ -114,19 +108,17 @@ class ColorCategory(widgets.Box):
 
 
 class BarStylesCategory(widgets.Box):
-    def __init__(self, show_reload_button):
+    def __init__(self):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
-            spacing=5,
+            spacing=2,
         )
 
-        self.append(CategoryLabel("Bar Styles"))
+        self.append(CategoryLabel("Bar"))
 
-        # Bar side
         self.append(SettingsRow(
-            title="Bar Side",
-            description="Choose where the bar is anchored on screen.",
+            title="Position",
             child=[
                 make_toggle_buttons(
                     [
@@ -137,34 +129,14 @@ class BarStylesCategory(widgets.Box):
                     ],
                     lambda: user_settings.appearance.bar_side,
                     BarStyles.setSide,
-                    on_any_click=show_reload_button
-                )
-            ]
-        ))
-
-        # Bar style
-        self.append(SettingsRow(
-            title="Bar Style",
-            description="Switch between different bar layouts.",
-            child=[
-                make_toggle_buttons(
-                    [
-                        ("Connected", "connected", "toolbar"),
-                        ("Floating", "floating", "sliders"),
-                        ("Trislands", "trislands", "more_horiz"),
-                        ("Island", "island", "commit"),
-                    ],
-                    lambda: user_settings.appearance.style,
-                    BarStyles.setStyle,
-                    on_any_click=show_reload_button
+                    on_any_click=None
                 )
             ]
         ))
 
         # Bar compactness
         self.append(SettingsRow(
-            title="Bar Size",
-            description="Adjust how compact the bar looks.",
+            title="Density",
             child=[
                 make_toggle_buttons(
                     [
@@ -175,18 +147,37 @@ class BarStylesCategory(widgets.Box):
                     ],
                     lambda: user_settings.appearance.compact,
                     BarStyles.setCompact,
-                    on_any_click=show_reload_button
+                    on_any_click=None
                 )
             ]
         ))
 
-        # Bar corners (only if style is connected)
-        if user_settings.appearance.style == "connected":
-            self.append(SwitchRow(
-                label="Bar Corners",
-                description="Enable rounded corners coming out of the bar.",
+        self.append(SwitchRow(
+                label="Floating Bar",
+                description="Make the bar float away from the edges of the screen.",
+                active=user_settings.appearance.bar_floating,
+                on_change=lambda x, active: BarStyles.setFloating(active)
+            ))
+
+        self.append(SwitchRow(
+                label="Separated Islands",
+                description="Seperate the bar into 3 separate 'islands'.",
+                active=user_settings.appearance.bar_separation,
+                on_change=lambda x, active: BarStyles.setSeparation(active)
+            ))
+
+        self.append(SwitchRow(
+                label="Extend to Edges",
+                description="Make the bar span the full width of the screen.",
+                active=(not user_settings.appearance.bar_centered),
+                on_change=lambda x, active: BarStyles.setBarCenter(not active)
+            ))
+
+        self.append(SwitchRow(
+                label="Rounded Bar Corners",
+                description="Add a curve outside the bar that warps around the screen.",
                 active=user_settings.appearance.bar_corners,
-                on_change=lambda x, active: user_settings.appearance.set_bar_corners(active)
+                on_change=lambda x, active: BarStyles.setBarCorners(active)
             ))
 
 
@@ -197,25 +188,25 @@ class MiscCategory(widgets.Box):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
-            spacing=5,
+            spacing=2,
             child=[
                 CategoryLabel("Miscellaneous"),
                 SwitchRow(
-                    label="Screen Corners",
-                    description="Enable rounded corners for the screen.",
+                    label="Rounded Screen Corners",
+                    description="Add rounded corners to the screen.",
                     active=self.screen_corners,
-                    on_change=lambda x, active: user_settings.appearance.set_screen_corners(active)
+                    on_change=lambda x, active: BarStyles.setScreenCorners(active)
                 )
             ]
         )
 
 
 class AppearanceTab(widgets.Box):
-    """Main tab with scrollable content."""
-    def __init__(self, show_reload_button):
-        super().__init__(vertical=True, spacing=2, css_classes=["settings-body"])
+
+    def __init__(self):
+        super().__init__(vertical=True, spacing=20, css_classes=["settings-body"], hexpand=False, halign="center", width_request=800)
         self.append(ColorCategory())
-        self.append(BarStylesCategory(show_reload_button))
+        self.append(BarStylesCategory())
         self.append(MiscCategory())
         self.hexpand = True
         self.vexpand = True

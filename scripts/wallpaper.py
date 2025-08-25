@@ -1,4 +1,6 @@
 import os
+import asyncio
+from ignis import utils
 from user_settings import user_settings
 from ignis.css_manager import CssManager
 css_manager = CssManager.get_default()
@@ -16,13 +18,13 @@ class Wallpaper:
         if colorScheme in schemes:
             print(f"Color Scheme: {colorScheme}")
             print(f"Wallpaper: {path}")
-            os.system(f"matugen image -t scheme-{colorScheme} '{path}' -m '{mode}'")
+            asyncio.create_task(utils.exec_sh_async(f"matugen image -t scheme-{colorScheme} '{path}' -m '{mode}'"))
         else:
-            os.system(f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'")
+            asyncio.create_task(utils.exec_sh_async(f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'"))
 
         send_notification("Wallpaper Set!", str(os.path.basename(path)))
         user_settings.appearance.set_wallpaper_path(path)
-        css_manager.reload_all_css()
+        utils.Timeout(ms=3000, target=lambda: css_manager.reload_all_css())
 
     def setColors(colorScheme):
         schemes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot"]
@@ -33,12 +35,12 @@ class Wallpaper:
             mode = "light"
 
         if colorScheme in schemes:
-            os.system(f"matugen image -t scheme-{colorScheme} '{path}' -m '{mode}'")
+            asyncio.create_task(utils.exec_sh_async(f"matugen image -t scheme-{colorScheme} '{path}' -m '{mode}'"))
         else:
-            os.system(f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'")
+            asyncio.create_task(utils.exec_sh_async(f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'"))
 
         user_settings.appearance.set_color_scheme(colorScheme)
-        css_manager.reload_all_css()
+        utils.Timeout(ms=3000, target=lambda: css_manager.reload_all_css())
 
 
     def setDarkMode(active):
@@ -51,9 +53,9 @@ class Wallpaper:
             mode = "light"
 
         if colorScheme in schemes:
-            os.system(f"matugen image -t scheme-{colorScheme} '{path}' -m '{mode}'")
+            asyncio.create_task(utils.exec_sh_async(f"matugen image -t scheme-{colorScheme} '{path}' -m '{mode}'"))
         else:
-            os.system(f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'")
+            asyncio.create_task(utils.exec_sh_async(f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'"))
 
         user_settings.appearance.set_dark_mode(active)
-        css_manager.reload_all_css()
+        utils.Timeout(ms=2000, target=lambda: css_manager.reload_all_css())

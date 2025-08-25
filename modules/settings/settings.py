@@ -1,4 +1,3 @@
-# settings.py
 from ignis import widgets
 from modules.m3components import Button
 from user_settings import user_settings
@@ -12,21 +11,10 @@ from ignis.app import IgnisApp
 
 
 class NavigationRail(widgets.Box):
-    def __init__(self, tabs, on_select, default="appearance", show_reload_button=None):
+    def __init__(self, tabs, on_select, default="appearance"):
         super().__init__(css_classes=["navigation-rail"], vertical=True, spacing=5)
         self.on_select = on_select
         self.buttons = {}
-        self.show_reload_button = show_reload_button
-
-        # Add the "Settings" label to the top of the rail
-        settings_label = widgets.Label(
-            label="settings",
-            css_classes=["settings-icon"],
-            margin_top=10,
-            margin_bottom=10,
-            halign="center",
-        )
-        self.prepend(settings_label)
 
         for key, (icon, label) in tabs.items():
             btn = Button.button(
@@ -54,36 +42,37 @@ class NavigationRail(widgets.Box):
 
 class Settings(widgets.RegularWindow):
     def __init__(self):
-        # Create reload button in settings window
         self.reload_button = Button.button(
-            css_classes=["reload-button"],
             icon="restart_alt",
             type="filled",
-            visible=False,
+            visible=True,
             shape="square",
-            on_click=lambda x: IgnisApp.get_initialized().reload()
+            on_click=lambda x: IgnisApp.get_initialized().reload(),
+            css_classes=["reload-button"],
         )
 
-        def show_reload_button():
-            self.reload_button.set_visible(True)
-
-        # Create content area (default to appearance)
         self.content_scroll = widgets.Scroll(
             hexpand=True,
             halign="fill",
-            child=AppearanceTab(show_reload_button),
+            child=AppearanceTab(),
         )
 
-        # Define available tabs
-        tabs = {
+        # Define available tabs as a member variable for access in switch_tab
+        self.tabs = {
             "appearance": ("palette", "Appearance"),
             "niri": ("settings", "Niri"),
             "hyprland": ("settings", "Hyprland"),
-            "about": ("info", "About"),
+            "about": ("info", "System"),
         }
 
-        # Create rail
-        rail = NavigationRail(tabs, on_select=self.switch_tab, default="appearance")
+        # Create the dynamic label for the active tab name
+        self.active_tab_label = widgets.Label(
+            label="",
+            css_classes=["active-tab-label"]
+        )
+
+        rail = NavigationRail(self.tabs, on_select=self.switch_tab, default="appearance")
+        rail.vexpand = True
 
         # Append reload button to the rail
         rail.append(widgets.Box(vexpand=True))
@@ -97,21 +86,39 @@ class Settings(widgets.RegularWindow):
             visible=False,
             title="Exo Settings",
             namespace="Settings",
-            resizable=False,
             child=widgets.Box(
+                vertical=True,
+                vexpand=True,
+                valign="fill",
                 child=[
-                    rail,
-                    self.content_scroll,
+                    # This is the new top bar area with the breadcrumb
+                    widgets.Box(
+                        css_classes=["header-bar"],
+                        spacing=5,
+                        child=[
+                            widgets.Label(label="settings", css_classes=["header-title-icon"]),
+                            widgets.Label(label="Exo Settings", css_classes=["header-title"]),
+                            widgets.Label(label=">", css_classes=["breadcrumb-separator"]),
+                            self.active_tab_label,
+                        ]
+                    ),
+                    widgets.Box(
+                        vexpand=True,
+                        child=[
+                            rail,
+                            self.content_scroll,
+                        ]
+                    )
                 ]
             ),
         )
 
     def switch_tab(self, key):
-        # Reset reload button visibility when switching tabs
-        self.reload_button.set_visible(False)
+        # Update the active tab label using the key
+        self.active_tab_label.label = self.tabs[key][1]
+        
         if key == "appearance":
-            # Pass the show_reload_button callback to AppearanceTab
-            self.content_scroll.set_child(AppearanceTab(lambda: self.reload_button.set_visible(True)))
+            self.content_scroll.set_child(AppearanceTab())
         elif key == "niri":
             self.content_scroll.set_child(NiriTab())
         elif key == "hyprland":

@@ -22,6 +22,20 @@ css_manager.apply_css(
         compiler_function=lambda path: utils.sass_compile(path=path)
     )
 )
+css_manager.apply_css(
+    CssInfoPath(
+        name="bar",
+        path=os.path.expanduser("~/.config/ignis/styles/bar.scss"),
+        compiler_function=lambda path: utils.sass_compile(path=path)
+    )
+)
+css_manager.apply_css(
+    CssInfoPath(
+        name="colors",
+        path=os.path.expanduser("~/.config/ignis/colors.scss"),
+        compiler_function=lambda path: utils.sass_compile(path=path)
+    )
+)
 
 # Create one global Bar and assign it to set_bar_styles.bar_instance
 bar = Bar()  # removed monitor=0

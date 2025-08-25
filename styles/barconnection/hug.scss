@@ -1,0 +1,16 @@
+@use "../../colors.scss";
+
+.bar {
+    border-radius: 0px;
+
+    .left-widgets {
+        border-bottom-right-radius: 20px;
+    }
+    .center-widgets {
+        border-bottom-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+    }
+    .right-widgets {
+        border-bottom-left-radius: 20px;
+    }
+}
