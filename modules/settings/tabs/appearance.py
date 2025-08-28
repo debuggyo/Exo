@@ -124,8 +124,8 @@ class BarStylesCategory(widgets.Box):
                     [
                         ("Top", "top", "align_vertical_top"),
                         ("Bottom", "bottom", "align_vertical_bottom"),
-                        ("Left", "left", "align_horizontal_left"),
-                        ("Right", "right", "align_horizontal_right"),
+                        # ("Left", "left", "align_horizontal_left"),
+                        # ("Right", "right", "align_horizontal_right"),
                     ],
                     lambda: user_settings.appearance.bar_side,
                     BarStyles.setSide,
@@ -183,6 +183,7 @@ class BarStylesCategory(widgets.Box):
 
 class MiscCategory(widgets.Box):
     screen_corners = user_settings.appearance.screen_corners
+    media_widget = user_settings.appearance.media_widget
 
     def __init__(self):
         super().__init__(
@@ -196,6 +197,12 @@ class MiscCategory(widgets.Box):
                     description="Add rounded corners to the screen.",
                     active=self.screen_corners,
                     on_change=lambda x, active: BarStyles.setScreenCorners(active)
+                ),
+                SwitchRow(
+                    label="Media Widget",
+                    description="Adds a media widget to the bar.",
+                    active=self.media_widget,
+                    on_change=lambda x, active: BarStyles.setMediaWidget(active)
                 )
             ]
         )

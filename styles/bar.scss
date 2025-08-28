@@ -1,15 +1,122 @@
 @use "../colors.scss";
 
+@keyframes rotation {
+    from {
+        transform: rotate(0deg);  
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}
+
 // -- Bar
 .bar {
+    background-color: colors.$background;
     color: colors.$on_background;
+
+    &.floating {
+        border-radius: 50rem;
+    }
+    
+    &.extrapadding {
+        .left-widgets {
+            padding-left: 1rem;
+        }
+        .right-widgets {
+            padding-right: 1rem;
+        }
+    }
+    
+    &.separated {
+        background-color: transparent;
+        .left-widgets, .center-widgets, .right-widgets {
+            background-color: colors.$background;
+        }
+        
+        &.top {
+            .left-widgets {border-bottom-right-radius: 20px;}
+            .center-widgets {
+                border-bottom-left-radius: 20px;
+                border-bottom-right-radius: 20px;
+            }
+            .right-widgets {border-bottom-left-radius: 20px;}
+        }
+        &.bottom {
+            .left-widgets {border-top-right-radius: 20px;}
+            .center-widgets {
+                border-top-left-radius: 20px;
+                border-top-right-radius: 20px;
+            }
+            .right-widgets {border-top-left-radius: 20px;}
+        }
+        &.floating {
+            .left-widgets, .center-widgets, .right-widgets{
+                border-radius: 50rem;
+            }
+        }
+    }
+    &.round {
+        &.top {
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            .left-widgets {border-bottom-left-radius: 20px;}
+            .right-widgets {border-bottom-right-radius: 20px;}
+        }
+        &.bottom {
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            .left-widgets {border-top-left-radius: 20px;}
+            .right-widgets {border-top-right-radius: 20px;}
+        }
+    }
+
+    &.compact {
+        .workspace.active {padding: 0px 5px;}
+    }
+    &.compact-plus {
+        .left-widgets, .center-widgets, .right-widgets {
+            box:not(.icon_container):not(.overlay-bg), button:not(.active) {
+                background-color: transparent;
+            }
+            padding: 2px 5px;
+        }
+        .workspace.active {padding: 0px 0px;}
+    }
+    &.ultracompact {
+        .left-widgets, .center-widgets, .right-widgets {
+            box:not(.icon_container):not(.overlay-bg), button:not(.workspace) {
+                background-color: transparent;
+            }
+            padding: 0px 5px;
+        }
+        .workspaces {
+            padding-left: 10px;
+            .workspace {
+                opacity: 0.5;
+                font-size: 0pt;
+                padding: 0px;
+                min-width: 6px;
+                min-height: 6px;
+                color: colors.$on_background;
+                background-color: colors.$on_background;
+                border-radius: 2rem;
+
+                &.active {
+                    opacity: 1;
+                    min-height: 10px;
+                    min-width: 20px;
+                    background-color: colors.$on_background;
+                }
+            }
+        }
+    }
 }
 
 .left-widgets,
 .center-widgets,
 .right-widgets {
     padding: 5px;
-    box,
+    box:not(.icon_container):not(.overlay-bg),
     button {
         border-radius: 5px;
         background-color: colors.$surface_container;
@@ -27,7 +134,7 @@
 }
 
 .center-widgets {
-    margin: 0 1rem;
+    margin: 0px 1rem;
 }
 
 // Window Info
@@ -36,7 +143,7 @@
 
     .title {
         font-weight: 500;
-        margin-bottom: -2px;
+        margin-bottom: -3px;
     }
 
     .app_id {
@@ -91,6 +198,67 @@
         font-size: 8pt;
         opacity: 0.8;
     }
+}
+
+// Time & Date
+.media {
+    padding: 0px;
+    padding-right: 10px;
+    min-height: 0px;
+
+    .icon_container {
+        border-radius: 15px;
+        min-width: 16px;
+        margin: 3px;
+        margin-right: 0px;
+    }
+
+    box:not(.is-paused) .icon_container {
+        animation: rotation 10s infinite linear;
+    }
+
+    .overlay-bg {
+        margin: 2px 0px;
+        border-radius: 20px;
+        margin-left: 2px;
+        background-color: rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        transition: 100ms;
+    }
+    
+    .overlay-icon {
+        margin-left: 4px;
+        opacity: 0;
+        transition: 100ms;
+    }
+
+    .title {
+        font-weight: 500;
+        margin-bottom: -3px;
+    }
+
+    .artist {
+        font-weight: 400;
+        font-size: 8pt;
+        opacity: 0.8;
+    }
+
+    .is-paused {
+        .overlay-bg, .overlay-icon {
+            opacity: 0.8;
+        }
+    }
+
+    &:hover {
+        .overlay-bg, .overlay-icon {
+            opacity: 1;
+        }
+
+        &:active .overlay-icon {
+            transform: scale(1.2);
+        }
+    }
+
 }
 
 // Tray

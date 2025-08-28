@@ -1,13 +1,12 @@
+# bar.py
 import os
 from ignis import widgets, utils
 from user_settings import user_settings
-from .widgets import Clock, WindowInfo, Workspaces, Tray
+from .widgets import Clock, WindowInfo, Workspaces, Tray, Media
 from modules.m3components import Button
 from modules.corners import Corners
-from ignis.css_manager import CssManager, CssInfoPath
+from ignis.css_manager import CssManager
 from ignis.window_manager import WindowManager
-from scripts.set_bar_styles import BarStyles  # only import class, no instance
-from scripts import apply_bar_css
 
 css_manager = CssManager.get_default()
 window_manager = WindowManager.get_default()
@@ -17,9 +16,9 @@ class Bar:
         self.monitor = monitor
         self.__win = None
         self.time_date = Clock()
+        self.media = Media()
         self.window_info = WindowInfo()
         self.workspaces = Workspaces()
-        BarStyles.set_bar_instance(self)  # register this Bar instance
 
     def _compute_margins(self, side: str):
         top, left, right, bottom = 5, 5, 5, 5
@@ -31,43 +30,29 @@ class Bar:
             right = 0
         elif side == "right":
             left = 0
-        return top, left, right, bottom  # return margins
+        return top, left, right, bottom
 
     def build(self):
         side = user_settings.appearance.bar_side
         vertical = user_settings.appearance.vertical
-        barstyle = user_settings.appearance.bar_separation
         barfloating = user_settings.appearance.bar_floating
         compact_mode = user_settings.appearance.compact
 
-        topmargin, leftmargin, rightmargin, bottommargin = self._compute_margins(side)  # compute margins
-
-        apply_bar_css()
+        topmargin, leftmargin, rightmargin, bottommargin = self._compute_margins(side)
 
         if not barfloating:
             topmargin = leftmargin = rightmargin = bottommargin = 0
 
-        if compact_mode == 0:
-            height = 40
-        elif compact_mode == 1:
+        height = 40
+        if compact_mode == 1:
             height = 35
         elif compact_mode == 2:
             height = 30
         elif compact_mode == 3:
             height = 25
 
-        # vertical CSS
-        if vertical:
-            css_manager.apply_css(CssInfoPath(
-                name="vertical",
-                path=os.path.expanduser("~/.config/ignis/styles/barstyles/vertical.scss"),
-                compiler_function=lambda path: utils.sass_compile(path=path),
-            ))
-
-        # compute initial anchors
         anchors = [side] if user_settings.appearance.bar_centered else (["top", "bottom", side] if vertical else ["left", "right", side])
 
-        # build Window
         self.__win = widgets.Window(
             namespace="Bar",
             monitor=self.monitor,
@@ -94,7 +79,7 @@ class Bar:
                     spacing=2,
                     css_classes=["center-widgets"],
                     halign="center",
-                    child=[Workspaces(), self.time_date.widget()],
+                    child=[self.media.widget(), self.workspaces.widget()],
                 ),
                 end_widget=widgets.Box(
                     vertical=False,
@@ -102,9 +87,10 @@ class Bar:
                     css_classes=["right-widgets"],
                     halign="end",
                     child=[
-                        widgets.Box(child=[widgets.Label(label="Goon Corner")], style="padding: 0px 15px;"),
-                        widgets.Button(child=widgets.Label(label="tune"), css_classes=["quickcenter-button"], on_click=lambda x: window_manager.toggle_window("QuickCenter")),
+                        # widgets.Box(child=[widgets.Label(label="Goon Corner")], style="padding: 0px 15px;"),
                         Tray(),
+                        widgets.Button(child=widgets.Label(label="tune"), css_classes=["quickcenter-button"], on_click=lambda x: window_manager.toggle_window("QuickCenter")),
+                        self.time_date.widget()
                     ],
                 ),
             ),
@@ -112,4 +98,4 @@ class Bar:
         return self.__win
 
     def get_window(self):
-        return self.__win  # safe accessor
+        return self.__win

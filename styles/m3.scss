@@ -25,6 +25,12 @@ $square-radius: 12px;
         outline-offset: 2px;
     }
 
+    &.icon-only {
+        .m3-button-icon {
+            font-variation-settings: "FILL" 1;
+        }
+    }
+
     /* -- TYPES -- */
     /* Elevated */
     &.elevated {
@@ -161,6 +167,10 @@ $square-radius: 12px;
         &:active {
             border-radius: 16px;
         }
+
+        &.icon-only {
+            padding: 0px 6px;
+        }
     }
 
     /* Small */
@@ -182,6 +192,10 @@ $square-radius: 12px;
         &:active {
             border-radius: 8px;
         }
+
+        &.icon-only {
+            padding: 0px 10px;
+        }
     }
 
     /* Medium */
@@ -202,6 +216,10 @@ $square-radius: 12px;
 
         &:active {
             border-radius: 12px;
+        }
+
+        &.icon-only {
+            padding: 0px 16px;
         }
     }
 
@@ -225,6 +243,10 @@ $square-radius: 12px;
         &:active {
             border-radius: 12px;
         }
+
+        &.icon-only {
+            padding: 0px 32px;
+        }
     }
 
     /* Extra Large */
@@ -247,6 +269,10 @@ $square-radius: 12px;
         &:active {
             border-radius: 16px;
         }
+
+        &.icon-only {
+            padding: 0px 48px;
+        }
     }
 
     /* -- SHAPES -- */
@@ -264,30 +290,22 @@ $square-radius: 12px;
             border-top-left-radius: 20px;
             border-bottom-left-radius: 20px;
         }
-        
+
         &:last-child {
             border-top-right-radius: 20px;
             border-bottom-right-radius: 20px;
         }
+
         &.active {
             border-radius: 50rem;
             background-color: colors.$primary;
             .m3-button-icon {
-                font-variation-settings: 'FILL' 1;
+                font-variation-settings: "FILL" 1;
             }
-            
+
             label {
                 color: colors.$on_primary;
                 font-weight: 500;
-            }
-        }
-    }
-
-    &:active {
-        .m3-button {
-            padding: 0px 16px;
-            &:active {
-                padding: 0px 22px;
             }
         }
     }

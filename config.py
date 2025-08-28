@@ -11,7 +11,8 @@ from modules import (
 )
 from ignis.css_manager import CssInfoPath, CssManager
 from ignis import utils
-from scripts import set_bar_styles  # import the whole module
+from scripts import BarStyles
+from scripts.apply_bar_css import apply_bar_css
 from user_settings import user_settings
 
 css_manager = CssManager.get_default()
@@ -37,10 +38,11 @@ css_manager.apply_css(
     )
 )
 
-# Create one global Bar and assign it to set_bar_styles.bar_instance
-bar = Bar()  # removed monitor=0
-set_bar_styles.bar_instance = bar
-bar.build()
+bar = Bar()
+BarStyles.set_bar_instance(bar)
+
+apply_bar_css(bar.build())
+
 if user_settings.appearance.screen_corners or user_settings.appearance.bar_corners:
     Corners.build()
 Settings()

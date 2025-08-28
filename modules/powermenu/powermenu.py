@@ -9,44 +9,13 @@ window_manager = WindowManager.get_default()
 def create_exec_task(cmd: str) -> None:
     asyncio.create_task(utils.exec_sh_async(cmd))
 
-class PowermenuButton(widgets.Button):
-    def __init__(self, icon_name: str, on_click: Callable) -> None:
+class PowerMenuButton(widgets.Button):
+    def __init__(self, icon_name: str, command) -> None:
         super().__init__(
             label=icon_name,
-            on_click=on_click,
-            css_classes=["power-option", "unset"],
+            on_click=lambda *args: create_exec_task(command),
+            css_classes=["power-option"],
         )
-
-
-class PowerOffButton(PowermenuButton):
-    def __init__(self):
-        super().__init__(
-            icon_name="󰐥",
-            on_click=lambda *args: create_exec_task("poweroff"),
-        )
-
-
-class RebootButton(PowermenuButton):
-    def __init__(self):
-        super().__init__(
-            icon_name="󰜉",
-            on_click=lambda *args: create_exec_task("reboot"),
-        )
-
-
-class LockButton(PowermenuButton):
-    def __init__(self):
-        super().__init__(
-            icon_name="󰌾", on_click=lambda *args: create_exec_task("hyprlock")
-        )
-
-class HyprlandExitButton(PowermenuButton):
-    def __init__(self):
-        super().__init__(
-            icon_name="󰗽",
-            on_click=lambda *args: create_exec_task("niri msg action quit || loginctl terminate-user ''"),
-        )
-
 
 class PowerMenu(widgets.Window):
     def __init__(self):
@@ -56,10 +25,10 @@ class PowerMenu(widgets.Window):
             halign="center",
             css_classes=["powermenu"],
             child=[
-                PowerOffButton(),
-                RebootButton(),
-                LockButton(),
-                HyprlandExitButton(),
+                PowerMenuButton("power_settings_new", "shutdown"),
+                PowerMenuButton("restart_alt", "reboot now"),
+                PowerMenuButton("lock", "hyprlock"),
+                PowerMenuButton("logout", "niri msg action quit || loginctl terminate-user ''"),
             ],
         )
         super().__init__(

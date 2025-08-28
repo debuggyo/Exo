@@ -44,11 +44,12 @@ class Settings(widgets.RegularWindow):
     def __init__(self):
         self.reload_button = Button.button(
             icon="restart_alt",
-            type="filled",
+            type="tonal",
             visible=True,
             shape="square",
             on_click=lambda x: IgnisApp.get_initialized().reload(),
             css_classes=["reload-button"],
+            tooltip_text="Reload Exo",
         )
 
         self.content_scroll = widgets.Scroll(

@@ -1,26 +1,8 @@
-import os
-from ignis import utils
 from user_settings import user_settings
-from ignis.css_manager import CssManager, CssInfoPath, CssInfoNotFoundError
-css_manager = CssManager.get_default()
 
-def apply_bar_css():
-    # A list of all possible CSS names this function can apply.
-    # This allows us to clear all of them before applying new ones.
-    all_possible_css_names = [
-        "hug", "extrapadding", "roundbar", "floating",
-        "full", "separated", "compact", "compactplus",
-        "ultracompact", "vertical"
-    ]
-
-    # Remove all possible CSS files, and handle the error if a file is not found.
-    for name in all_possible_css_names:
-        try:
-            css_manager.remove_css(name)
-        except CssInfoNotFoundError:
-            # This is expected behavior if the CSS file wasn't applied before.
-            # We can safely ignore this error and continue.
-            pass
+def apply_bar_css(window):
+    if not window:
+        return
 
     side = user_settings.appearance.bar_side
     vertical = user_settings.appearance.vertical
@@ -29,71 +11,37 @@ def apply_bar_css():
     centered = user_settings.appearance.bar_centered
     compact_mode = user_settings.appearance.compact
 
-    # Bar Connection
-    if floating:
-        css_manager.apply_css(CssInfoPath(
-            name="floating",
-            path=os.path.expanduser("~/.config/ignis/styles/barconnection/floating.scss"),
-            compiler_function=lambda path: utils.sass_compile(path=path),
-        ))
-    else:
-        topmargin = leftmargin = rightmargin = bottommargin = 0
-        css_manager.apply_css(CssInfoPath(
-            name="hug",
-            path=os.path.expanduser("~/.config/ignis/styles/barconnection/hug.scss"),
-            compiler_function=lambda path: utils.sass_compile(path=path),
-        ))
-        if not centered:
-            css_manager.apply_css(CssInfoPath(
-                name="extrapadding",
-                path=os.path.expanduser("~/.config/ignis/styles/barstyles/extrapadding.scss"),
-                compiler_function=lambda path: utils.sass_compile(path=path),
-            ))
-        elif centered:
-            css_manager.apply_css(CssInfoPath(
-                name="roundbar",
-                path=os.path.expanduser("~/.config/ignis/styles/barstyles/roundbar.scss"),
-                compiler_function=lambda path: utils.sass_compile(path=path),
-            ))
+    all_possible_classes = {
+        "hug", "extrapadding", "round", "floating", "full",
+        "separated", "compact", "compact-plus", "ultracompact",
+        "vertical", "top", "bottom", "left", "right"
+    }
+
+    for css_class in all_possible_classes:
+        window.remove_css_class(css_class)
     
-    # Bar Style
-    if separation:
-        css_manager.apply_css(CssInfoPath(
-            name="separated",
-            path=os.path.expanduser("~/.config/ignis/styles/barstyles/separated.scss"),
-            compiler_function=lambda path: utils.sass_compile(path=path),
-        ))
+    if floating:
+        window.add_css_class("floating")
     else:
-        css_manager.apply_css(CssInfoPath(
-            name="full",
-            path=os.path.expanduser("~/.config/ignis/styles/barstyles/full.scss"),
-            compiler_function=lambda path: utils.sass_compile(path=path),
-        ))
+        window.add_css_class("hug")
+        if not centered:
+            window.add_css_class("extrapadding")
+        elif centered:
+            window.add_css_class("round")
+    
+    if separation:
+        window.add_css_class("separated")
+    else:
+        window.add_css_class("full")
 
-    # determine height
     if compact_mode == 1:
-        css_manager.apply_css(CssInfoPath(
-            name="compact",
-            path=os.path.expanduser("~/.config/ignis/styles/compactmodes/compact.scss"),
-            compiler_function=lambda path: utils.sass_compile(path=path),
-        ))
-    if compact_mode in (2, 3):
-        css_manager.apply_css(CssInfoPath(
-            name="compactplus",
-            path=os.path.expanduser("~/.config/ignis/styles/compactmodes/compactplus.scss"),
-            compiler_function=lambda path: utils.sass_compile(path=path),
-        ))
-        if compact_mode == 3:
-            css_manager.apply_css(CssInfoPath(
-                name="ultracompact",
-                path=os.path.expanduser("~/.config/ignis/styles/compactmodes/ultracompact.scss"),
-                compiler_function=lambda path: utils.sass_compile(path=path),
-            ))
+        window.add_css_class("compact")
+    elif compact_mode == 2:
+        window.add_css_class("compact-plus")
+    elif compact_mode == 3:
+        window.add_css_class("ultracompact")
 
-    # vertical CSS
     if vertical:
-        css_manager.apply_css(CssInfoPath(
-            name="vertical",
-            path=os.path.expanduser("~/.config/ignis/styles/barstyles/vertical.scss"),
-            compiler_function=lambda path: utils.sass_compile(path=path),
-        ))
+        window.add_css_class("vertical")
+
+    window.add_css_class(side)

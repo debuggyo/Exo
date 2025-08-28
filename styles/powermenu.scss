@@ -11,7 +11,7 @@
         font-size: 64pt;
         padding: 70px 100px;
         border-radius: 10px;
-        font-family: "Zed Sans";
+        font-family: "Material Symbols Outlined";
     }
 
     button:first-child {
@@ -29,5 +29,6 @@
     button:focus {
         background-color: colors.$primary;
         color: colors.$on_primary;
+        font-variation-settings: 'FILL' 1;
     }
 }
