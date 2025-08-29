@@ -57,6 +57,9 @@ class PopupBox(widgets.Box):
         )
 
     def __on_notified(self, notification: Notification) -> None:
+        # Update window properties just before a new popup is added
+        self._window._update_window_properties()
+        
         self._window.visible = True
         popup = Popup(box=self, window=self._window, notification=notification)
         if user_settings.interface.bar.side == "top":
@@ -72,7 +75,8 @@ class PopupBox(widgets.Box):
 class NotificationPopup(widgets.Window):
     def __init__(self, monitor: int):
         super().__init__(
-            anchor=["right", user_settings.interface.bar.side],
+            # Initial anchor is set here
+            anchor=user_settings.interface.notifications.anchor,
             monitor=monitor,
             namespace=f"notification",
             layer="top",
@@ -82,6 +86,13 @@ class NotificationPopup(widgets.Window):
             css_classes=["rec-unset"],
             style="min-width: 29rem;",
             margin_top=5,
-            margin_right=5,
             margin_bottom=5,
+            margin_left=5,
+            margin_right=5,
         )
+        # Call the update method once at startup to ensure correct initial positioning
+        self._update_window_properties()
+    
+    def _update_window_properties(self):
+        self.set_anchor(None)
+        self.set_anchor(user_settings.interface.notifications.anchor)

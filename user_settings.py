@@ -36,10 +36,14 @@ class UserSettings(OptionsManager):
 
             modules = Modules()
 
+        class Notifications(OptionsGroup):
+            anchor: list = []
+
         class Misc(OptionsGroup):
             screen_corners: bool = True
 
         bar = Bar()
+        notifications = Notifications()
         misc = Misc()
     appearance = Appearance()
     interface = Interface()

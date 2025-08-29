@@ -1,5 +1,7 @@
 # set_bar_styles.py
 
+import os
+
 from ignis import widgets, utils
 from user_settings import user_settings
 from .send_notification import send_notification
@@ -14,10 +16,15 @@ def rebuild_corners():
 
 class BarStyles:
     bar_instance = None
+    _rounded_corners_row = None
 
     @classmethod
     def set_bar_instance(cls, bar):
         cls.bar_instance = bar
+        
+    @classmethod
+    def set_rounded_corners_row(cls, row_instance):
+        cls._rounded_corners_row = row_instance
 
     @staticmethod
     def _update_all_layouts():
@@ -197,6 +204,7 @@ class BarStyles:
         BarStyles.setSide(user_settings.interface.bar.side)
         rebuild_corners()
         BarStyles._update_all_layouts()
+        BarStyles._update_rounded_corners_visibility()
 
     @staticmethod
     def setBarCorners(enabled: bool):
@@ -215,8 +223,18 @@ class BarStyles:
         rebuild_corners()
         if BarStyles.bar_instance:
             apply_bar_css(BarStyles.bar_instance.get_window())
+        BarStyles._update_rounded_corners_visibility()
 
     @staticmethod
     def setMilitaryTime(enabled: bool):
         user_settings.interface.bar.modules.set_military_time(enabled)
         BarStyles._update_all_layouts()
+    
+    @staticmethod
+    def _update_rounded_corners_visibility():
+        if BarStyles._rounded_corners_row:
+            is_floating = user_settings.interface.bar.floating
+            is_centered = user_settings.interface.bar.centered
+            
+            # The condition for visibility is: not floating AND not centered
+            BarStyles._rounded_corners_row.visible = (not is_floating) and (not is_centered)

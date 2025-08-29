@@ -2,14 +2,14 @@ import os
 
 from ignis import widgets
 from modules.m3components import Button
-from scripts import Wallpaper, BarStyles
+from scripts import Wallpaper, BarStyles, send_notification
 from user_settings import user_settings
 from ..widgets import CategoryLabel, make_toggle_buttons, SwitchRow, SettingsRow
 from ignis.app import IgnisApp
 
 app = IgnisApp.get_initialized()
 
-class BarStylesCategory(widgets.Box):
+class BarCategory(widgets.Box):
     def __init__(self):
         super().__init__(
             css_classes=["settings-category"],
@@ -77,13 +77,54 @@ class BarStylesCategory(widgets.Box):
                 on_change=lambda x, active: BarStyles.setBarCenter(not active)
             ))
 
-        self.append(SwitchRow(
+        self._rounded_corners_row = SwitchRow(
                 label="Rounded Bar Corners",
                 description="Add a curve outside the bar that warps around the screen.",
                 active=user_settings.interface.bar.corners,
                 on_change=lambda x, active: BarStyles.setBarCorners(active)
-            ))
+            )
 
+        self.append(self._rounded_corners_row)
+        BarStyles.set_rounded_corners_row(self._rounded_corners_row)
+        BarStyles._update_rounded_corners_visibility()
+
+class NotificationsCategory(widgets.Box):
+    def __init__(self):
+        super().__init__(
+            css_classes=["settings-category"],
+            vertical=True,
+            spacing=2,
+        )
+        
+        self.append(CategoryLabel("Notifications"))
+
+        self.append(SettingsRow(
+            title="Popup Location",
+            description="Pick a location for your notification popups.",
+            child=[
+                make_toggle_buttons(
+                    [
+                        ("Top Left", ["top", "left"], "north_west"),
+                        ("Top Right", ["top", "right"], "north_east"),
+                        ("Bottom Left", ["bottom", "left"], "south_west"),
+                        ("Bottom Right", ["bottom", "right"], "south_east"),
+                    ],
+                    lambda: user_settings.interface.notifications.anchor,
+                    user_settings.interface.notifications.set_anchor,
+                    on_any_click=None
+                ),
+            ]
+        ))
+
+        self.append(SettingsRow(
+            title="Send a Test Notification",
+            child=[Button.button(
+                icon="notifications_unread",
+                label="Test Notification",
+                halign="start",
+                on_click=lambda x: send_notification("Test Notification", "This is a test notification!"),
+            )]
+        ))
 
 class MiscCategory(widgets.Box):
     screen_corners = user_settings.interface.misc.screen_corners
@@ -120,10 +161,10 @@ class MiscCategory(widgets.Box):
 
 
 class InterfaceTab(widgets.Box):
-
     def __init__(self):
         super().__init__(vertical=True, spacing=20, css_classes=["settings-body"], hexpand=False, halign="center", width_request=800)
-        self.append(BarStylesCategory())
+        self.append(BarCategory())
+        self.append(NotificationsCategory())
         self.append(MiscCategory())
         self.hexpand = True
         self.vexpand = True
