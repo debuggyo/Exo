@@ -1,4 +1,6 @@
 import os
+import threading
+from gi.repository import GLib, Gtk 
 
 from ignis import widgets
 from modules.m3components import Button
@@ -10,27 +12,28 @@ from ignis.app import IgnisApp
 app = IgnisApp.get_initialized()
 
 
-class ColorCategory(widgets.Box):
+class WallColorCategory(widgets.Box):
     def __init__(self):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
             spacing=2,
             child=[
-                CategoryLabel("Colors & Wallpaper"),
+                CategoryLabel("Wallpaper & Colors"),
             ]
         )
 
-        wallpaper_picture = widgets.Picture(
-            height=400,
+        self.wallpaper_picture = widgets.Picture(
+            height=450,
+            width=800,
             vexpand=False,
             content_fit="cover",
             css_classes=["wallpaper-preview"],
-            image=user_settings.appearance.bind("wallpaper_path")
+            image=user_settings.appearance.wallcolors.bind("wallpaper_path")
         )
 
-        wallpaper_filename_label = widgets.Label(
-            label=os.path.basename(user_settings.appearance.wallpaper_path) or "Click to set wallpaper",
+        self.wallpaper_filename_label = widgets.Label(
+            label=os.path.basename(user_settings.appearance.wallcolors.wallpaper_path) or "Click to set wallpaper",
             halign="start",
             valign="end",
             margin_start=10,
@@ -40,15 +43,14 @@ class ColorCategory(widgets.Box):
 
         def on_file_set_handler(dialog, file):
             path = file.get_path()
-            Wallpaper.setWall(path)
-            wallpaper_filename_label.label = os.path.basename(path)
+            self._set_and_update_wallpaper(path)
 
         file_chooser_button = widgets.FileChooserButton(
-            label=widgets.Label(label=''),  # Keep this empty label to avoid an error
+            label=widgets.Label(label=''),
             css_classes=["wallpaper-button-overlay"],
             dialog=widgets.FileDialog(
                 on_file_set=on_file_set_handler,
-                initial_path=user_settings.appearance.wallpaper_path,
+                initial_path=user_settings.appearance.wallcolors.wallpaper_path,
                 filters=[
                     widgets.FileFilter(
                         mime_types=["image/jpeg", "image/png", "image/webp", "image/gif"],
@@ -61,19 +63,55 @@ class ColorCategory(widgets.Box):
 
         wallpaper_overlay = widgets.Overlay(
             css_classes=["wallpaper-overlay"],
-            child=wallpaper_picture,
+            child=self.wallpaper_picture,
         )
 
         wallpaper_overlay.add_overlay(file_chooser_button)
-        wallpaper_overlay.add_overlay(wallpaper_filename_label)
+        wallpaper_overlay.add_overlay(self.wallpaper_filename_label)
 
         self.append(SettingsRow(
             title="Wallpaper",
+            description="Interface colors automatically match your wallpaper.",
             child=[wallpaper_overlay]
         ))
+        
+        self.thumbnail_overlays = []
+        
+        quick_select_container = widgets.Box(
+            vertical=True,
+            spacing=10,
+        )
+
+        folder_chooser_button = widgets.FileChooserButton(
+            label=widgets.Label(label="Select a Folder"),
+            css_classes=["folder-chooser-button"],
+            dialog=widgets.FileDialog(
+                select_folder=True,
+                initial_path=user_settings.appearance.wallcolors.quickselect_path,
+                on_file_set=self._on_quickselect_folder_selected,
+            )
+        )
+        quick_select_container.append(folder_chooser_button)
+
+        self.gallery_content_container = widgets.Box(
+            vertical=True,
+            halign="center",
+            valign="center",
+            css_classes=["wallpaper-gallery-container"],
+            width_request=800,
+        )
+        quick_select_container.append(self.gallery_content_container)
+        
+        loading_label = widgets.Label(label="Loading wallpapers...")
+        self.gallery_content_container.append(loading_label)
+
+        loader_thread = threading.Thread(target=self._find_and_create_gallery_async)
+        loader_thread.daemon = True
+        loader_thread.start()
 
         self.append(SettingsRow(
             title="Color Scheme",
+            description="Pick between a variety of palettes.",
             child=[
                 make_toggle_buttons(
                     [
@@ -86,7 +124,7 @@ class ColorCategory(widgets.Box):
                         ("Rainbow", "rainbow"),
                         ("Tonal Spot", "tonal-spot"),
                     ],
-                    lambda: user_settings.appearance.color_scheme,
+                    lambda: user_settings.appearance.wallcolors.color_scheme,
                     Wallpaper.setColors
                 )
             ]
@@ -94,126 +132,131 @@ class ColorCategory(widgets.Box):
 
         self.append(SettingsRow(
             title="Theme",
+            description="Pick between a light and a dark theme for the interface.",
             child=[
                 make_toggle_buttons(
                     [
                         ("Light", False, "light_mode"),
                         ("Dark", True, "dark_mode"),
                     ],
-                    lambda: user_settings.appearance.dark_mode,
+                    lambda: user_settings.appearance.wallcolors.dark_mode,
                     Wallpaper.setDarkMode
                 )
             ]
         ))
+        
+        self.append(SettingsRow(
+            title="Quick Select",
+            description="Browse local wallpapers for a quick change.",
+            child=[quick_select_container]
+        ))
 
+    def _set_and_update_wallpaper(self, path):
+        if path:
+            Wallpaper.setWall(path)
+            self.wallpaper_picture.image = path
+            self.wallpaper_filename_label.label = os.path.basename(path)
 
-class BarStylesCategory(widgets.Box):
-    def __init__(self):
-        super().__init__(
-            css_classes=["settings-category"],
-            vertical=True,
-            spacing=2,
+    def _on_thumbnail_clicked(self, path):
+        self._set_and_update_wallpaper(path)
+        self._update_selected_icons()
+
+    def _on_quickselect_folder_selected(self, dialog, file):
+        path = file.get_path()
+        if path:
+            user_settings.appearance.wallcolors.set_quickselect_path(path)
+            self._find_and_create_gallery_async()
+
+    def _find_and_create_gallery_async(self):
+        wallpaper_dir = user_settings.appearance.wallcolors.quickselect_path
+        if not wallpaper_dir or not os.path.isdir(os.path.expanduser(wallpaper_dir)):
+            wallpaper_dir = os.path.expanduser("~/Pictures/Wallpapers")
+            
+        if not os.path.isdir(wallpaper_dir) or not os.listdir(wallpaper_dir):
+            GLib.idle_add(self._replace_gallery_content, None)
+            return
+
+        supported_extensions = ('.png', '.jpg', '.jpeg', '.gif')
+        image_files = [os.path.join(wallpaper_dir, f) for f in os.listdir(wallpaper_dir) if f.lower().endswith(supported_extensions)]
+        image_files.sort()
+
+        if not image_files:
+            GLib.idle_add(self._replace_gallery_content, None)
+            return
+
+        gallery_grid = widgets.Grid(
+            halign="fill",
+            hexpand=True,
+            column_spacing=5,
+            row_spacing=5,
         )
-
-        self.append(CategoryLabel("Bar"))
-
-        self.append(SettingsRow(
-            title="Position",
-            child=[
-                make_toggle_buttons(
-                    [
-                        ("Top", "top", "align_vertical_top"),
-                        ("Bottom", "bottom", "align_vertical_bottom"),
-                        # ("Left", "left", "align_horizontal_left"),
-                        # ("Right", "right", "align_horizontal_right"),
-                    ],
-                    lambda: user_settings.appearance.bar_side,
-                    BarStyles.setSide,
-                    on_any_click=None
-                )
-            ]
-        ))
-
-        # Bar compactness
-        self.append(SettingsRow(
-            title="Density",
-            child=[
-                make_toggle_buttons(
-                    [
-                        ("Default", 0, "expand"),
-                        ("Compact", 1, "background_dot_large"),
-                        ("Compact+", 2, "background_dot_small"),
-                        ("Ultra Compact", 3, "background_grid_small"),
-                    ],
-                    lambda: user_settings.appearance.compact,
-                    BarStyles.setCompact,
-                    on_any_click=None
-                )
-            ]
-        ))
-
-        self.append(SwitchRow(
-                label="Floating Bar",
-                description="Make the bar float away from the edges of the screen.",
-                active=user_settings.appearance.bar_floating,
-                on_change=lambda x, active: BarStyles.setFloating(active)
-            ))
-
-        self.append(SwitchRow(
-                label="Separated Islands",
-                description="Seperate the bar into 3 separate 'islands'.",
-                active=user_settings.appearance.bar_separation,
-                on_change=lambda x, active: BarStyles.setSeparation(active)
-            ))
-
-        self.append(SwitchRow(
-                label="Extend to Edges",
-                description="Make the bar span the full width of the screen.",
-                active=(not user_settings.appearance.bar_centered),
-                on_change=lambda x, active: BarStyles.setBarCenter(not active)
-            ))
-
-        self.append(SwitchRow(
-                label="Rounded Bar Corners",
-                description="Add a curve outside the bar that warps around the screen.",
-                active=user_settings.appearance.bar_corners,
-                on_change=lambda x, active: BarStyles.setBarCorners(active)
-            ))
-
-
-class MiscCategory(widgets.Box):
-    screen_corners = user_settings.appearance.screen_corners
-    media_widget = user_settings.appearance.media_widget
-
-    def __init__(self):
-        super().__init__(
-            css_classes=["settings-category"],
-            vertical=True,
-            spacing=2,
-            child=[
-                CategoryLabel("Miscellaneous"),
-                SwitchRow(
-                    label="Rounded Screen Corners",
-                    description="Add rounded corners to the screen.",
-                    active=self.screen_corners,
-                    on_change=lambda x, active: BarStyles.setScreenCorners(active)
+        
+        temp_thumbnails = []
+        for i, file_path in enumerate(image_files):
+            thumbnail_button = widgets.Button(
+                on_click=lambda btn, path=file_path: self._on_thumbnail_clicked(path),
+                child=widgets.Picture(
+                    image=file_path,
+                    content_fit="cover",
+                    height=100,
+                    hexpand=True,
+                    halign="fill",
+                    css_classes=["wallpaper-thumbnail-image"]
                 ),
-                SwitchRow(
-                    label="Media Widget",
-                    description="Adds a media widget to the bar.",
-                    active=self.media_widget,
-                    on_change=lambda x, active: BarStyles.setMediaWidget(active)
-                )
-            ]
+                hexpand=True,
+                halign="fill",
+                css_classes=["wallpaper-thumbnail"]
+            )
+            
+            selected_icon = widgets.Label(
+                label="check",
+                style="font-family: 'Material Symbols Outlined';", 
+                css_classes=["selected-icon"],
+                visible=False,
+            )
+
+            thumbnail_overlay = widgets.Overlay(
+                css_classes=["wallpaper-thumbnail-overlay"],
+                child=thumbnail_button,
+            )
+            thumbnail_overlay.wallpaper_path = file_path
+            thumbnail_overlay.selected_icon = selected_icon
+
+            thumbnail_overlay.add_overlay(selected_icon)
+
+            gallery_grid.attach(thumbnail_overlay, i % 4, i // 4, 1, 1)
+            temp_thumbnails.append(thumbnail_overlay)
+
+        gallery_scroll = widgets.Scroll(
+            width_request=800,
+            height_request=300,
         )
+        gallery_scroll.set_child(gallery_grid)
+        
+        GLib.idle_add(self._replace_gallery_content, gallery_scroll, temp_thumbnails)
+
+    def _update_selected_icons(self):
+        current_path = user_settings.appearance.wallcolors.wallpaper_path
+        for overlay in self.thumbnail_overlays:
+            is_selected = overlay.wallpaper_path == current_path
+            selected_icon = overlay.selected_icon
+            selected_icon.visible = is_selected
+
+    def _replace_gallery_content(self, new_child, thumbnail_overlays=None):
+        if self.gallery_content_container.get_last_child():
+             self.gallery_content_container.remove(self.gallery_content_container.get_last_child())
+        
+        if new_child:
+            self.gallery_content_container.append(new_child)
+            if thumbnail_overlays:
+                self.thumbnail_overlays = thumbnail_overlays
+            self._update_selected_icons()
+        else:
+            self.gallery_content_container.append(widgets.Label(label="No wallpapers found in the directory.", css_classes=["message"]))
 
 
 class AppearanceTab(widgets.Box):
 
     def __init__(self):
         super().__init__(vertical=True, spacing=20, css_classes=["settings-body"], hexpand=False, halign="center", width_request=800)
-        self.append(ColorCategory())
-        self.append(BarStylesCategory())
-        self.append(MiscCategory())
-        self.hexpand = True
-        self.vexpand = True
+        self.append(WallColorCategory())

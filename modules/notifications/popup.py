@@ -13,7 +13,7 @@ class Popup(widgets.Box):
         self._box = box
         self._window = window
 
-        if user_settings.appearance.bar_side == "bottom":
+        if user_settings.interface.bar.side == "bottom":
             transition_type = "slide_up"
         else:
             transition_type = "slide_down"
@@ -59,7 +59,7 @@ class PopupBox(widgets.Box):
     def __on_notified(self, notification: Notification) -> None:
         self._window.visible = True
         popup = Popup(box=self, window=self._window, notification=notification)
-        if user_settings.appearance.bar_side == "top":
+        if user_settings.interface.bar.side == "top":
             self.prepend(popup)
         else:
             self.append(popup)
@@ -72,7 +72,7 @@ class PopupBox(widgets.Box):
 class NotificationPopup(widgets.Window):
     def __init__(self, monitor: int):
         super().__init__(
-            anchor=["right", user_settings.appearance.bar_side],
+            anchor=["right", user_settings.interface.bar.side],
             monitor=monitor,
             namespace=f"notification",
             layer="top",

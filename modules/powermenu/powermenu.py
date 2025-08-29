@@ -10,10 +10,10 @@ def create_exec_task(cmd: str) -> None:
     asyncio.create_task(utils.exec_sh_async(cmd))
 
 class PowerMenuButton(widgets.Button):
-    def __init__(self, icon_name: str, command) -> None:
+    def __init__(self, icon: str, command: str) -> None:
         super().__init__(
-            label=icon_name,
-            on_click=lambda *args: create_exec_task(command),
+            label=icon,
+            on_click=lambda x: create_exec_task(f'{command}'),
             css_classes=["power-option"],
         )
 
@@ -25,10 +25,10 @@ class PowerMenu(widgets.Window):
             halign="center",
             css_classes=["powermenu"],
             child=[
-                PowerMenuButton("power_settings_new", "shutdown"),
-                PowerMenuButton("restart_alt", "reboot now"),
-                PowerMenuButton("lock", "hyprlock"),
-                PowerMenuButton("logout", "niri msg action quit || loginctl terminate-user ''"),
+                PowerMenuButton(icon="power_settings_new", command="shutdown"),
+                PowerMenuButton(icon="restart_alt", command="reboot now"),
+                PowerMenuButton(icon="lock", command="hyprlock"),
+                PowerMenuButton(icon="logout", command="niri msg action quit || loginctl terminate-user ''"),
             ],
         )
         super().__init__(

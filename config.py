@@ -43,7 +43,7 @@ BarStyles.set_bar_instance(bar)
 
 apply_bar_css(bar.build())
 
-if user_settings.appearance.screen_corners or user_settings.appearance.bar_corners:
+if user_settings.interface.misc.screen_corners or user_settings.interface.bar.corners:
     Corners.build()
 Settings()
 Launcher()

@@ -1,4 +1,3 @@
-# bar.py
 import os
 from ignis import widgets, utils
 from user_settings import user_settings
@@ -7,6 +6,7 @@ from modules.m3components import Button
 from modules.corners import Corners
 from ignis.css_manager import CssManager
 from ignis.window_manager import WindowManager
+from scripts import BarStyles
 
 css_manager = CssManager.get_default()
 window_manager = WindowManager.get_default()
@@ -20,38 +20,29 @@ class Bar:
         self.window_info = WindowInfo()
         self.workspaces = Workspaces()
 
-    def _compute_margins(self, side: str):
-        top, left, right, bottom = 5, 5, 5, 5
-        if side == "top":
-            bottom = 0
-        elif side == "bottom":
-            top = 0
-        elif side == "left":
-            right = 0
-        elif side == "right":
-            left = 0
-        return top, left, right, bottom
-
     def build(self):
-        side = user_settings.appearance.bar_side
-        vertical = user_settings.appearance.vertical
-        barfloating = user_settings.appearance.bar_floating
-        compact_mode = user_settings.appearance.compact
-
-        topmargin, leftmargin, rightmargin, bottommargin = self._compute_margins(side)
-
-        if not barfloating:
-            topmargin = leftmargin = rightmargin = bottommargin = 0
+        side = user_settings.interface.bar.side
+        vertical = user_settings.interface.bar.vertical
+        compact_mode = user_settings.interface.bar.density
 
         height = 40
+        width = 40
         if compact_mode == 1:
             height = 35
+            width = 35
         elif compact_mode == 2:
             height = 30
+            width = 30
         elif compact_mode == 3:
             height = 25
+            width = 25
 
-        anchors = [side] if user_settings.appearance.bar_centered else (["top", "bottom", side] if vertical else ["left", "right", side])
+        anchors = [side] if user_settings.interface.bar.centered else (["top", "bottom", side] if vertical else ["left", "right", side])
+        
+        if vertical:
+            size_request = {"width_request": width}
+        else:
+            size_request = {"height_request": height}
 
         self.__win = widgets.Window(
             namespace="Bar",
@@ -59,11 +50,7 @@ class Bar:
             anchor=anchors,
             css_classes=["bar"],
             exclusivity="exclusive",
-            height_request=height,
-            margin_top=topmargin,
-            margin_left=leftmargin,
-            margin_right=rightmargin,
-            margin_bottom=bottommargin,
+            **size_request,
             child=widgets.CenterBox(
                 vertical=vertical,
                 css_classes=["bar-widgets"],
@@ -71,23 +58,19 @@ class Bar:
                     vertical=vertical,
                     spacing=2,
                     css_classes=["left-widgets"],
-                    halign="fill",
-                    child=[self.window_info.widget()],
+                    child=[self.window_info.widget(), self.media.widget()],
                 ),
                 center_widget=widgets.Box(
                     vertical=vertical,
                     spacing=2,
                     css_classes=["center-widgets"],
-                    halign="center",
-                    child=[self.media.widget(), self.workspaces.widget()],
+                    child=[self.workspaces.widget()],
                 ),
                 end_widget=widgets.Box(
-                    vertical=False,
+                    vertical=vertical,
                     spacing=2,
                     css_classes=["right-widgets"],
-                    halign="end",
                     child=[
-                        # widgets.Box(child=[widgets.Label(label="Goon Corner")], style="padding: 0px 15px;"),
                         Tray(),
                         widgets.Button(child=widgets.Label(label="tune"), css_classes=["quickcenter-button"], on_click=lambda x: window_manager.toggle_window("QuickCenter")),
                         self.time_date.widget()
@@ -95,6 +78,9 @@ class Bar:
                 ),
             ),
         )
+        
+        BarStyles.setFloating(user_settings.interface.bar.floating)
+
         return self.__win
 
     def get_window(self):

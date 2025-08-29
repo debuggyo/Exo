@@ -18,7 +18,7 @@ class QuickToggleCenter(widgets.Box):
             halign="center",
             spacing=2,
             child=[
-                QuickToggle("contrast", active=user_settings.appearance.dark_mode, on_click=lambda x: Wallpaper.setDarkMode(not user_settings.appearance.dark_mode), tooltip_text="Dark Mode"),
+                QuickToggle("contrast", active=user_settings.appearance.wallcolors.dark_mode, on_click=lambda x: Wallpaper.setDarkMode(not user_settings.appearance.wallcolors.dark_mode), tooltip_text="Dark Mode"),
                 QuickToggle("more_horiz", on_click=lambda x: self.open_gnome_settings(), tooltip_text="Open GNOME Settings", label="Misc")
             ]
         )

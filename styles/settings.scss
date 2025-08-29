@@ -3,7 +3,7 @@
     padding: 0px;
     background-color: colors.$surface;
     color: colors.$on_background;
-    min-width: 900px;
+    min-width: 950px;
 
     .header-bar {
         padding: 5px 1rem;
@@ -64,7 +64,7 @@
     }
     
     .settings-body {
-        padding: 10px;
+        padding: 20px 10px;
         .settings-category {
             margin: 0px;
             border-radius: 10px;
@@ -104,6 +104,25 @@
             border-radius: 50rem;
         }
         
+        .folder-chooser-button {
+            background-color: colors.$surface_container_high;
+            border-radius: 20px;
+        }
+
+        .wallpaper-gallery-container {
+            padding: 5px;
+            background-color: colors.$surface_container_high;
+            border-radius: 20px;
+
+            scrolledwindow viewport {
+                background-color: colors.$surface_container_high;
+            }
+
+            .wallpaper-thumbnail {
+                padding: 0px;
+            }
+        }
+
         scrolledwindow viewport {
             margin: 0px;
             border-radius: 15px;
@@ -113,34 +132,25 @@
 
 .settings-category-label {
     margin-left: 0.5rem;
-    font-size: 2rem;
+    font-size: 1.6rem;
     font-weight: 500;
 }
 
 .settings-row {
-    // background-color: colors.$surface-container;
-    padding: 5px 10px;
-    border-radius: 8px;
-    
-    &:nth-child(2) {
-        border-top-left-radius: 20px;
-        border-top-right-radius: 20px;
-    }
-    
-    &:last-child {
-        border-bottom-left-radius: 20px;
-        border-bottom-right-radius: 20px;
-    }    
+    min-width: 800px;
+    padding: 0.5rem 1rem;
+
     .settings-row-header {
         .settings-row-title {
             font-weight: 400;
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: colors.$on_surface;
         }
         .settings-row-description {
             font-weight: 400;
             font-size: 1rem;
             color: colors.$on_surface_variant;
+            opacity: 0.7;
         }
     }
     .switch-row {

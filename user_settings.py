@@ -11,25 +11,36 @@ class UserSettings(OptionsManager):
         super().__init__(file=os.path.expanduser("~/.config/ignis/user_settings.json"))
 
     class Appearance(OptionsGroup):
-        # Wallpaper / Colours
-        wallpaper_path: str = ""
-        color_scheme: str = "tonal_spot"
-        dark_mode: bool = True
+        class WallpaperColors(OptionsGroup):
+            # Wallpaper / Colours
+            quickselect_path: str = ""
+            wallpaper_path: str = ""
+            color_scheme: str = "tonal_spot"
+            dark_mode: bool = True
 
-        # Bar Styles
-        bar_side: str = "top"
-        vertical: bool = False
-        compact: int = 0
-        bar_corners: bool = True
-        bar_floating: bool = False
-        bar_separation: bool = False
-        bar_centered: bool = False
+        wallcolors = WallpaperColors()
 
-        # Misc
-        screen_corners: bool = True
-        media_widget: bool = True
+    class Interface(OptionsGroup):
+        class Bar(OptionsGroup):
+            side: str = "top"
+            vertical: bool = False
+            density: int = 0
+            corners: bool = True
+            floating: bool = False
+            separation: bool = False
+            centered: bool = False
 
+            class Modules(OptionsGroup):
+                media_widget: bool = True
+                military_time: bool = False
+
+            modules = Modules()
+
+        class Misc(OptionsGroup):
+            screen_corners: bool = True
+
+        bar = Bar()
+        misc = Misc()
     appearance = Appearance()
-    # appearance.connect_option("bar_side", app.reload)
-
+    interface = Interface()
 user_settings = UserSettings()

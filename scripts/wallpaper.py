@@ -9,8 +9,8 @@ from .send_notification import send_notification
 class Wallpaper:
     def setWall(path):
         schemes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot"]
-        colorScheme = user_settings.appearance.color_scheme
-        if user_settings.appearance.dark_mode:
+        colorScheme = user_settings.appearance.wallcolors.color_scheme
+        if user_settings.appearance.wallcolors.dark_mode:
             mode = "dark"
         else:
             mode = "light"
@@ -23,13 +23,13 @@ class Wallpaper:
             asyncio.create_task(utils.exec_sh_async(f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'"))
 
         send_notification("Wallpaper Set!", str(os.path.basename(path)))
-        user_settings.appearance.set_wallpaper_path(path)
+        user_settings.appearance.wallcolors.set_wallpaper_path(path)
         utils.Timeout(ms=3000, target=lambda: css_manager.reload_all_css())
 
     def setColors(colorScheme):
         schemes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot"]
-        path = user_settings.appearance.wallpaper_path
-        if user_settings.appearance.dark_mode:
+        path = user_settings.appearance.wallcolors.wallpaper_path
+        if user_settings.appearance.wallcolors.dark_mode:
             mode = "dark"
         else:
             mode = "light"
@@ -39,14 +39,14 @@ class Wallpaper:
         else:
             asyncio.create_task(utils.exec_sh_async(f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'"))
 
-        user_settings.appearance.set_color_scheme(colorScheme)
+        user_settings.appearance.wallcolors.set_color_scheme(colorScheme)
         utils.Timeout(ms=3000, target=lambda: css_manager.reload_all_css())
 
 
     def setDarkMode(active):
         schemes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot"]
-        colorScheme = user_settings.appearance.color_scheme
-        path = user_settings.appearance.wallpaper_path
+        colorScheme = user_settings.appearance.wallcolors.color_scheme
+        path = user_settings.appearance.wallcolors.wallpaper_path
         if active:
             mode = "dark"
         else:
@@ -57,5 +57,5 @@ class Wallpaper:
         else:
             asyncio.create_task(utils.exec_sh_async(f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'"))
 
-        user_settings.appearance.set_dark_mode(active)
+        user_settings.appearance.wallcolors.set_dark_mode(active)
         utils.Timeout(ms=2000, target=lambda: css_manager.reload_all_css())

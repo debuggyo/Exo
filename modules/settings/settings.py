@@ -3,6 +3,7 @@ from modules.m3components import Button
 from user_settings import user_settings
 from .tabs import (
     AppearanceTab,
+    InterfaceTab,
     NiriTab,
     HyprlandTab,
     AboutTab,
@@ -61,6 +62,7 @@ class Settings(widgets.RegularWindow):
         # Define available tabs as a member variable for access in switch_tab
         self.tabs = {
             "appearance": ("palette", "Appearance"),
+            "interface": ("tune", "Interface"),
             "niri": ("settings", "Niri"),
             "hyprland": ("settings", "Hyprland"),
             "about": ("info", "System"),
@@ -120,6 +122,8 @@ class Settings(widgets.RegularWindow):
         
         if key == "appearance":
             self.content_scroll.set_child(AppearanceTab())
+        elif key == "interface":
+            self.content_scroll.set_child(InterfaceTab())
         elif key == "niri":
             self.content_scroll.set_child(NiriTab())
         elif key == "hyprland":

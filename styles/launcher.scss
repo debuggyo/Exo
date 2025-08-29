@@ -5,14 +5,43 @@
     background-color: colors.$background;
     border-radius: 20px;
 
-    .launcher-search {
+    .search-bar-container {
+        background-color: colors.$surface_container;
+        border-radius: 50px;
+        padding: 0rem 1rem;
+
+        .launcher-search {
+            padding: 0.3rem 0.2rem;
+            background-color: transparent;
+            outline-width: 0px;
+        }
+
+        .search-icon {
+            font-family: "Material Symbols Outlined";
+            font-size: 14pt;
+        }
+
+        .clear-button {
+            margin: 5px 0px;
+        }
+    }
+    
+    .pinned-apps-container {
         background-color: colors.$surface_container;
         border-radius: 15px;
-        padding: 0.5rem 2rem;
+        padding: 0.5rem 1rem;
+        .icon {
+            font-family: "Material Symbols Outlined";
+            font-size: 16pt;
+            padding: 0px 10px;
+        }
 
-        &:focus, &:focus-visible {
-            outline: none;
-            background-color: colors.$surface_container_high;
+        .pinned-item {
+            background-color: transparent;
+            border-radius: 50rem;
+            &:hover {
+                background-color: colors.$primary_container;
+            }
         }
     }
 
@@ -20,41 +49,38 @@
         border-radius: 15px;
 
         .inner-box {
-            .app-row {
-                &.featured-app-row {
-                    .app-item {
-                        outline: none;
-                        background-color: colors.$surface_container;
-                        border: none;
-                        .app-label {
-                            color: colors.$on_surface;
-                        }
-                    }
-                }
-
+            .featured-app-row {
                 .app-item {
-                    border-radius: 5px;
+                    outline: none;
                     background-color: colors.$surface_container;
-                    padding: 8px 1rem;
-
-                    &:hover {
-                        background-color: colors.$surface_container_high;
-                    }
-
-                    &:focus {
-                        outline: none;
-                        background-color: colors.$surface_container_high;
-                        border: none;
-                        .app-label {
-                            color: colors.$on_surface;
-                        }
-                    }
-
+                    border: none;
                     .app-label {
-                        font-weight: 400;
+                        color: colors.$on_surface;
                     }
                 }
             }
+        }
+    }
+    .app-item {
+        border-radius: 5px;
+        background-color: colors.$surface_container;
+        padding: 8px 1rem;
+    
+        &:hover {
+            background-color: colors.$surface_container_high;
+        }
+    
+        &:focus {
+            outline: none;
+            background-color: colors.$surface_container_high;
+            border: none;
+            .app-label {
+                color: colors.$on_surface;
+            }
+        }
+    
+        .app-label {
+            font-weight: 400;
         }
     }
 }

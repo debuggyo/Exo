@@ -53,10 +53,20 @@ class WorkspaceButton(widgets.Button):
         self.update_layout()
 
     def update_layout(self):
-        if user_settings.appearance.compact == 3:
-            self.set_valign("center")
+        vertical = user_settings.interface.bar.vertical    
+        compact_mode = user_settings.interface.bar.density
+        if vertical:
+            self.set_halign("center")
+            if compact_mode == 3:
+                self.set_valign("center")
+            else:
+                self.set_valign("fill")
         else:
-            self.set_valign("fill")
+            self.set_valign("center")
+            if compact_mode == 3:
+                self.set_halign("center")
+            else:
+                self.set_halign("fill")
 
 class Workspaces(widgets.Box):
     def __init__(self):
@@ -86,8 +96,8 @@ class Workspaces(widgets.Box):
         self.update_layout()
 
     def update_layout(self):
-        vertical = user_settings.appearance.vertical    
-        compact_mode = user_settings.appearance.compact
+        vertical = user_settings.interface.bar.vertical    
+        compact_mode = user_settings.interface.bar.density
         
         if compact_mode == 3:
             spacing = 5

@@ -4,12 +4,12 @@ def apply_bar_css(window):
     if not window:
         return
 
-    side = user_settings.appearance.bar_side
-    vertical = user_settings.appearance.vertical
-    separation = user_settings.appearance.bar_separation
-    floating = user_settings.appearance.bar_floating
-    centered = user_settings.appearance.bar_centered
-    compact_mode = user_settings.appearance.compact
+    side = user_settings.interface.bar.side
+    vertical = user_settings.interface.bar.vertical
+    separation = user_settings.interface.bar.separation
+    floating = user_settings.interface.bar.floating
+    centered = user_settings.interface.bar.centered
+    compact_mode = user_settings.interface.bar.density
 
     all_possible_classes = {
         "hug", "extrapadding", "round", "floating", "full",
