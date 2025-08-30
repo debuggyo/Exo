@@ -1,10 +1,10 @@
-# Exo
- A Material 3 inspired desktop shell for Niri and Hyprland created with Ignis.
+![Exo](https://github.com/user-attachments/assets/ca159dea-aa7c-4d52-bc65-9129a8c1becf)
+
+A Material 3 inspired desktop shell for Niri and Hyprland created with Ignis.
 
 ## Dependencies
 * Niri or Hyprland
 * Ignis (git/dev) _(`python-ignis-git` on the AUR)_
-* `hyprlock`
 * `gpu-screen-recorder` _(optional for screen recording)_
 * Material Symbols Font
 
@@ -24,6 +24,8 @@ In your Niri or Hyprland config add the following keybinds, bind them to anythin
 | Opens Power Menu                   | `ignis open-window PowerMenu`              |
 | Record the screen                  | `ignis run-command recorder-record-screen` |
 | Record with options _(Niri only)_  | `ignis run-command recorder-record-portal` |
+
+Set up matugen (see below) and run `matugen image /path/to/wallpaper` to set a wallpaper and color scheme before starting ignis.
 
 Add `ignis init` to auto start in your Niri/Hyprland config and you're ready to go!
 
@@ -63,3 +65,10 @@ https://github.com/user-attachments/assets/c6b4ffcb-1be7-4a95-b03d-33bfe748756d
 
 https://github.com/user-attachments/assets/78e35d82-5fe9-4986-b545-80fc59bc4784
 
+
+## Credits
+
+* [Ignis](https://github.com/ignis-sh/ignis)
+* [linkfrg's dotfiles](https://github.com/linkfrg/dotfiles)
+* [Material 3 Guidelines](https://m3.material.io/)
+* 
