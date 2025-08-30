@@ -306,7 +306,7 @@
 
     &.recording-active {
         background-color: colors.$error_container;
-        color: colors.$error;
+        color: colors.$on_error_container;
     }
 
     &.paused {
@@ -322,6 +322,12 @@
 
     * {
         background-color: transparent;
+    }
+}
+
+.compact-plus {
+    #recording-indicator {
+        border-radius: 50rem;
     }
 }
 

@@ -20,7 +20,6 @@ def _on_recording_started(service):
     global last_recording_path
     if recording_indicator_instance:
         recording_indicator_instance.set_paused(False)
-        # Check the user setting before starting the timer
         if user_settings.interface.bar.modules.recording_indicator != "never":
             recording_indicator_instance.start_timer()
             
@@ -34,7 +33,6 @@ def _on_recording_stopped(service):
         send_notification("Recording Stopped", f"Recording saved to: {last_recording_path}")
     last_recording_path = None
     
-# We will use this function to manually update the indicator's pause state
 def _update_pause_state():
     if recording_indicator_instance:
         recording_indicator_instance.set_paused(recorder.is_paused)
@@ -76,7 +74,6 @@ def _record_source(source: str, *args: str, **kwargs):
     
     asyncio.create_task(_start_recording_task(source=source, file_path=file_path, **kwargs))
 
-# Expose public functions that call the recorder and update the indicator's state
 def stop_recording():
     if recorder.active:
         recorder.stop_recording()

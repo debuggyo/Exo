@@ -58,7 +58,6 @@ class SettingsRow(widgets.Box):
         if description:
             header.append( widgets.Label(label=description, css_classes=["settings-row-description"], halign="start") )
 
-        # child widgets go here
         children = child or []
 
         classes=["settings-row"]

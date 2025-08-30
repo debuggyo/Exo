@@ -59,7 +59,6 @@ class Settings(widgets.RegularWindow):
             child=AppearanceTab(),
         )
 
-        # Define available tabs as a member variable for access in switch_tab
         self.tabs = {
             "appearance": ("palette", "Appearance"),
             "interface": ("tune", "Interface"),
@@ -68,7 +67,6 @@ class Settings(widgets.RegularWindow):
             "about": ("info", "System"),
         }
 
-        # Create the dynamic label for the active tab name
         self.active_tab_label = widgets.Label(
             label="",
             css_classes=["active-tab-label"]
@@ -77,7 +75,6 @@ class Settings(widgets.RegularWindow):
         rail = NavigationRail(self.tabs, on_select=self.switch_tab, default="appearance")
         rail.vexpand = True
 
-        # Append reload button to the rail
         rail.append(widgets.Box(vexpand=True))
         rail.append(self.reload_button)
         
@@ -94,7 +91,6 @@ class Settings(widgets.RegularWindow):
                 vexpand=True,
                 valign="fill",
                 child=[
-                    # This is the new top bar area with the breadcrumb
                     widgets.Box(
                         css_classes=["header-bar"],
                         spacing=5,
@@ -117,7 +113,6 @@ class Settings(widgets.RegularWindow):
         )
 
     def switch_tab(self, key):
-        # Update the active tab label using the key
         self.active_tab_label.label = self.tabs[key][1]
         
         if key == "appearance":
