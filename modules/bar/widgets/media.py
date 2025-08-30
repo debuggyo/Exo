@@ -20,20 +20,17 @@ class Player(widgets.Box):
         self.update_tooltip()
 
     def update_tooltip(self):
-        # Set tooltip only if the labels are not shown
         if not self._show_labels:
             tooltip_text = f"{self.player.title}\nby {self.player.artist}"
             if self.get_parent():
                 self.get_parent().set_tooltip_text(tooltip_text)
         else:
-            # Clear the tooltip if labels are visible
             if self.get_parent():
                 self.get_parent().set_tooltip_text("")
 
     def update_layout(self):
         vertical = user_settings.interface.bar.vertical
         
-        # Check if labels should be shown based on the initial setting and layout
         if self._show_labels and not vertical:
             self.labels_box.set_visible(True)
             if user_settings.interface.bar.density > 0:
@@ -169,7 +166,6 @@ class Media:
 
     def update_layout(self):
         if self.main_box:
-            # Set the orientation based on user settings
             if user_settings.interface.bar.vertical:
                 self.main_box.set_orientation(Gtk.Orientation.VERTICAL)
                 self.main_box.width_request = -1

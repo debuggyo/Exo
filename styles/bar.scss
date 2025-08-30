@@ -299,44 +299,69 @@
     }
 }
 
+#recording-indicator {
+    padding: 0px 10px;
+
+    font-weight: 400;
+
+    &.recording-active {
+        background-color: colors.$error_container;
+        color: colors.$error;
+    }
+
+    &.paused {
+        background-color: colors.$tertiary_container;
+        color: colors.$on_tertiary_container;
+    }
+
+    .recording-icon {
+        font-family: "Material Symbols Outlined";
+        font-size: 12pt;
+        font-weight: 600;
+    }
+
+    * {
+        background-color: transparent;
+    }
+}
+
 // Vertical Bar
 .vertical {
     .left-widgets, .center-widgets, .right-widgets {
         box:not(.icon_container):not(.overlay-bg),
         button {
             border-radius: 5px;
-            background-color: colors.$surface_container;
-
+            
             &:first-child {
                 border-top-left-radius: 20px;
                 border-top-right-radius: 20px;
             }
-
+            
             &:last-child {
                 border-bottom-left-radius: 20px;
                 border-bottom-right-radius: 20px;
             }
         }
     }
-
+    
     .workspaces {
         .workspace.active {
             padding: 10px 0px;
         }
     }   
-
+    
     .center-widgets {
         margin: 1rem 0px;
     }
-
+    
     .media {
         padding: 5px 0px;
     }
-
+    
     .winfo {
         padding: 8px 0px;
     }
-
+    
     .timedate {
         padding: 10px 0px;
         .date {
@@ -344,13 +369,17 @@
             font-size: 10pt;
         }
     }
-
+    
     .quickcenter-button {
         padding: 5px 0px;
         &:hover {
             background-color: colors.$primary_container;
             color: colors.$on_primary_container;
         }
+    }
+    
+    #recording-indicator {
+        padding: 5px 0px;
     }
 
     &.separated {

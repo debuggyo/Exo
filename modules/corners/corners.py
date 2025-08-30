@@ -81,17 +81,14 @@ class Corners:
         is_not_floating_and_uncentered = not user_settings.interface.bar.floating and not bar_centered
         if is_not_floating_and_uncentered and user_settings.interface.bar.corners:
             if bar_vertical:
-                # Correct anchor order for vertical bar: [vertical, horizontal]
                 cls.bar(["top", bar_side])
                 cls.bar(["bottom", bar_side])
             else:
-                # Correct anchor order for horizontal bar: [vertical, horizontal]
                 cls.bar([bar_side, "left"])
                 cls.bar([bar_side, "right"])
 
     @classmethod
     def destroy_all(cls):
-        """Destroys all tracked corner windows."""
         for window in cls._windows:
             window.destroy()
         cls._windows.clear()

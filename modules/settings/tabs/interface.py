@@ -37,7 +37,6 @@ class BarCategory(widgets.Box):
             ]
         ))
 
-        # Bar compactness
         self.append(SettingsRow(
             title="Density",
             description="Pick between 4 different density options.",
@@ -149,6 +148,22 @@ class MiscCategory(widgets.Box):
                     description="Adds a media widget to the bar.",
                     active=self.media_widget,
                     on_change=lambda x, active: BarStyles.setMediaWidget(active)
+                ),
+                SettingsRow(
+                    title="Recording Indicator",
+                    description="Show a recording indicator in the bar when recording with Exo.",
+                    child=[
+                        make_toggle_buttons(
+                            [
+                                ("Always", "always", "visibility"),
+                                ("When Recording", "recording", "screen_record"),
+                                ("Never", "never", "visibility_off"),
+                            ],
+                            lambda: user_settings.interface.bar.modules.recording_indicator,
+                            BarStyles.setRecordingIndicator,
+                            on_any_click=None
+                        ),
+                    ]
                 ),
                 SwitchRow(
                     label="Military Time",

@@ -33,6 +33,7 @@ class UserSettings(OptionsManager):
             class Modules(OptionsGroup):
                 media_widget: bool = True
                 military_time: bool = False
+                recording_indicator: str = "recording"
 
             modules = Modules()
 

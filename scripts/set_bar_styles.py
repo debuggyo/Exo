@@ -1,5 +1,3 @@
-# set_bar_styles.py
-
 import os
 
 from ignis import widgets, utils
@@ -34,6 +32,8 @@ class BarStyles:
             BarStyles.bar_instance.media.update_layout()
             BarStyles.bar_instance.workspaces.update_layout()
             BarStyles.bar_instance.media.update_visibility()
+            BarStyles.bar_instance.recording_indicator.update_layout()
+
 
     @staticmethod
     def _compute_margins(side: str, floating: bool):
@@ -63,7 +63,6 @@ class BarStyles:
             
         win = bar.get_window()
 
-        # Update orientation classes
         win.remove_css_class("horizontal")
         win.remove_css_class("vertical")
         if vertical:
@@ -71,18 +70,15 @@ class BarStyles:
         else:
             win.add_css_class("horizontal")
 
-        # Update side classes
         win.remove_css_class("top")
         win.remove_css_class("bottom")
         win.remove_css_class("left")
         win.remove_css_class("right")
         win.add_css_class(side)
         
-        # Compute margins
         floating = user_settings.interface.bar.floating
         win.margin_top, win.margin_left, win.margin_right, win.margin_bottom = BarStyles._compute_margins(side, floating)
         
-        # Get dynamic size based on density
         width = 40; height = 40
         compact_mode = user_settings.interface.bar.density
         if compact_mode == 1:
@@ -92,7 +88,6 @@ class BarStyles:
         elif compact_mode == 3:
             width = 25; height = 25
         
-        # Set window size and anchors
         win.set_width_request(width if vertical else -1)
         win.set_height_request(height if not vertical else -1)
         
@@ -101,7 +96,6 @@ class BarStyles:
         win.anchor = None
         win.anchor = anchors
         
-        # Update CenterBox and its children
         center_box = win.child
         start_box = center_box.get_start_widget()
         center_box_inner = center_box.get_center_widget()
@@ -109,7 +103,6 @@ class BarStyles:
 
         center_box.vertical = vertical
         
-        # CenterBox should always fill its parent container
         center_box.halign = "fill"
         center_box.valign = "fill"
         
@@ -117,7 +110,6 @@ class BarStyles:
         if center_box_inner: center_box_inner.vertical = vertical
         if end_box: end_box.vertical = vertical
         
-        # Change alignment based on orientation
         if vertical:
             if start_box:
                 start_box.halign = "fill"
@@ -134,7 +126,7 @@ class BarStyles:
                 end_box.valign = "end"
                 end_box.hexpand = True
                 end_box.vexpand = False
-        else: # horizontal
+        else:
             if start_box:
                 start_box.halign = "start"
                 start_box.valign = "fill"
@@ -154,7 +146,6 @@ class BarStyles:
         BarStyles._update_all_layouts()
         rebuild_corners()
 
-        # Force CSS update after all properties have been changed
         apply_bar_css(win)
 
     @staticmethod
@@ -189,6 +180,12 @@ class BarStyles:
         user_settings.interface.bar.modules.set_media_widget(enabled)
         if BarStyles.bar_instance:
             BarStyles.bar_instance.media.update_visibility()
+
+    @staticmethod
+    def setRecordingIndicator(mode: str):
+        user_settings.interface.bar.modules.set_recording_indicator(mode)
+        if BarStyles.bar_instance and BarStyles.bar_instance.recording_indicator:
+            BarStyles.bar_instance.recording_indicator.update_visibility()
 
     @staticmethod
     def setSeparation(enabled: bool):
@@ -236,5 +233,4 @@ class BarStyles:
             is_floating = user_settings.interface.bar.floating
             is_centered = user_settings.interface.bar.centered
             
-            # The condition for visibility is: not floating AND not centered
             BarStyles._rounded_corners_row.visible = (not is_floating) and (not is_centered)

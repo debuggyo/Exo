@@ -5,7 +5,6 @@ from modules.m3components import Button
 
 
 def relative_time(timestamp: float) -> str:
-    """Convert a POSIX timestamp into a simplified relative string."""
     diff = int(time.time() - timestamp)
 
     if diff < 60:
@@ -24,7 +23,7 @@ class ExoNotification(widgets.Box):
 
         self._age_label = widgets.Label(
             css_classes=["notification-age"],
-            label="",  # will be updated
+            label="",
             halign="start",
             ellipsize="end"
         )
@@ -103,17 +102,14 @@ class ExoNotification(widgets.Box):
             ],
         )
 
-        # Initial label text
         self._update_age_label()
 
-        # Poll every 60 seconds (60,000 ms)
         self._poll = utils.Poll(timeout=60_000, callback=self._on_poll)
 
     def _on_poll(self, poll: utils.Poll | None = None):
         """Update the label on each poll tick."""
         self._update_age_label()
 
-        # Optionally, stop polling after one day to clean up
         if time.time() - self._timestamp >= 86400 and poll is not None:
             poll.cancel()
 

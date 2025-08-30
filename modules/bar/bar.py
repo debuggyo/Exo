@@ -7,6 +7,8 @@ from modules.corners import Corners
 from ignis.css_manager import CssManager
 from ignis.window_manager import WindowManager
 from scripts import BarStyles
+from scripts.recorder import set_indicator
+from .widgets.recording_indicator import RecordingIndicator
 
 css_manager = CssManager.get_default()
 window_manager = WindowManager.get_default()
@@ -19,6 +21,8 @@ class Bar:
         self.media = Media()
         self.window_info = WindowInfo()
         self.workspaces = Workspaces()
+        self.recording_indicator = RecordingIndicator()
+        set_indicator(self.recording_indicator)
 
     def build(self):
         side = user_settings.interface.bar.side
@@ -71,6 +75,7 @@ class Bar:
                     spacing=2,
                     css_classes=["right-widgets"],
                     child=[
+                        self.recording_indicator.widget(),
                         Tray(),
                         widgets.Button(child=widgets.Label(label="tune"), css_classes=["quickcenter-button"], on_click=lambda x: window_manager.toggle_window("QuickCenter")),
                         self.time_date.widget()

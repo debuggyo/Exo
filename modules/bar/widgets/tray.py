@@ -46,10 +46,8 @@ class Tray(widgets.Box):
     def __setup(self):
         self.update_visibility()
 
-        # Connect to the "added" signal which is known to work.
         system_tray.connect("added", self.handle_added)
 
-        # Append any existing items on startup
         for item in system_tray.items:
             self.append(TrayItem(item, on_removed_callback=self.handle_item_removed))
 
@@ -57,9 +55,7 @@ class Tray(widgets.Box):
         self.set_visible(len(system_tray.items) > 0)
         
     def handle_added(self, _, item):
-        # Create a new TrayItem and pass the parent's update method as a callback
         self.append(TrayItem(item, on_removed_callback=self.handle_item_removed))
 
     def handle_item_removed(self):
-        # This callback is triggered by a child TrayItem when it's removed
         self.update_visibility()
