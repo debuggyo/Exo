@@ -29,7 +29,7 @@ In your Niri or Hyprland config add the following keybinds, bind them to anythin
 
 Set up matugen (see below) and run `matugen image /path/to/wallpaper` to set a wallpaper and color scheme before starting ignis.
 
-Add `ignis init` to auto start in your Niri/Hyprland config and you're ready to go!
+Add `ignis init` and `swww-daemon` to auto start in your Niri/Hyprland config and you're ready to go!
 
 ### Matugen
 In `~/.config/matugen/templates/` _(create if it doesn't exist)_ create a new file called `colors.scss` with the following contents:
