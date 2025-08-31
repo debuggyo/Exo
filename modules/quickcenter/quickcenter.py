@@ -1,24 +1,16 @@
 from ignis import widgets
 from .widgets import NotificationCenter
 from modules.m3components import NavigationRail
-from .networkbox import NetworkBox
-from .bluetoothbox import BluetoothBox
 import os
 
 class QuickCenter(widgets.Window):
     def __init__(self):
         self.content_stack = widgets.Stack(vexpand=True)
         self.notification_center = NotificationCenter()
-        self.network_box = NetworkBox()
-        self.bluetooth_box = BluetoothBox()
         self.content_stack.add_named(self.notification_center, "notifications")
-        self.content_stack.add_named(self.network_box, "network")
-        self.content_stack.add_named(self.bluetooth_box, "bluetooth")
 
         self.tabs = {
             "notifications": ("notifications", "Notifications"),
-            "network": ("network_wifi", "Network"),
-            "bluetooth": ("bluetooth", "Bluetooth"),
         }
 
         self.navigation_rail = NavigationRail(
