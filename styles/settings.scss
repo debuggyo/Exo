@@ -83,7 +83,7 @@
         background-color: colors.$surface_container_high;
         border-radius: 20px;
         padding: 5px;
-        min-height: 50px;
+        min-height: 40px;
         .network-row {
             background-color: transparent;
             border-radius: 8px;
@@ -103,7 +103,8 @@
             }
             padding: 5px;
     
-            .connected-status-label {
+            .connected-status-label, .status-label {
+                background-color: transparent;
                 padding: 0px 16px;
             }
     

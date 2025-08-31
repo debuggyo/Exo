@@ -11,7 +11,6 @@ class BluetoothTab(widgets.Box):
     def __init__(self):
         self.bluetooth_service = BluetoothService.get_default()
         
-        # Check if the Bluetooth adapter is absent
         if self.bluetooth_service.state == "absent":
             super().__init__(
                 vertical=True, 
@@ -26,7 +25,6 @@ class BluetoothTab(widgets.Box):
             )
             return
 
-        # If Bluetooth is found, proceed with normal setup
         super().__init__(
             vertical=True, 
             spacing=20, 
@@ -41,6 +39,18 @@ class BluetoothTab(widgets.Box):
         
         self.append(self.adapter_category)
         self.append(self.device_category)
+
+        self.scan_status_label = widgets.Label(label="")
+        self.scan_button = Button.button(
+            icon="bluetooth_searching",
+            label="Scan for Devices",
+            on_click=lambda x: asyncio.create_task(self.start_scan()),
+        )
+        self.append(SettingsRow(
+            title="Scan for Devices",
+            description="Actively search for new Bluetooth devices in your vicinity.",
+            child=[self.scan_button]
+        ))
         
         self.append(SettingsRow(
             title="Open Bluetooth Settings",
@@ -49,16 +59,6 @@ class BluetoothTab(widgets.Box):
                 icon="settings_applications",
                 label="Open Settings",
                 on_click=lambda x: self._open_gnome_settings(),
-            )]
-        ))
-        
-        self.append(SettingsRow(
-            title="Refresh Devices",
-            description="Manually refresh the list of Bluetooth devices.",
-            child=[Button.button(
-                icon="refresh",
-                label="Refresh",
-                on_click=lambda x: asyncio.create_task(self.update_ui()),
             )]
         ))
         
@@ -72,6 +72,26 @@ class BluetoothTab(widgets.Box):
         
     def _on_device_changed(self, service, device):
         asyncio.create_task(self.update_ui())
+
+    async def start_scan(self):
+        self.scan_button.set_sensitive(False)
+        self.scan_button.label = "Scanning..."
+        self.scan_button.icon = "bluetooth_searching"
+        
+        for child in list(self.device_list_box.child):
+            self.device_list_box.remove(child)
+        self.device_list_box.append(widgets.Label(label="Scanning...", halign="center", vexpand=True))
+
+        self.bluetooth_service.setup_mode = True
+        await asyncio.sleep(15)
+        
+        self.bluetooth_service.setup_mode = False
+        
+        self.scan_button.set_sensitive(True)
+        self.scan_button.label = "Scan for Devices"
+        self.scan_button.icon = "bluetooth_searching"
+        await self.update_ui()
+
 
     async def update_ui(self):
         self.powered_switch_row.active = self.bluetooth_service.powered
@@ -100,10 +120,27 @@ class BluetoothTab(widgets.Box):
             send_notification("Error", "GNOME Control Center not found.")
 
     def create_device_row(self, device):
+        icon_map = {
+            "Headset": "headphones",
+            "Audio device": "speaker",
+            "Keyboard": "keyboard",
+            "Mouse": "mouse",
+            "Phone": "phone_android",
+            "Camera": "photo_camera",
+            "Computer": "computer",
+            "Unknown": "bluetooth_connected",
+        }
+
+        icon_name = device.icon_name
+        
+        mapped_icon = icon_map.get(device.device_type)
+        if mapped_icon:
+            icon_name = mapped_icon
+            
         row_content = widgets.Box(spacing=10, halign="fill", hexpand=True)
         
         icon = widgets.Label(
-            label=device.icon_name,
+            label=icon_name,
             css_classes=["material-symbols", "icon-label"],
             margin_start=10
         )
@@ -130,11 +167,12 @@ class BluetoothTab(widgets.Box):
         box = widgets.Box(css_classes=["settings-category"], vertical=True, spacing=2)
         box.append(CategoryLabel("Bluetooth Adapter"))
         
+        wifi_service = self.bluetooth_service
         self.powered_switch_row = SwitchRow(
             label="Bluetooth",
             description="Toggle the Bluetooth adapter on or off.",
-            active=self.bluetooth_service.powered,
-            on_change=lambda x, active: setattr(self.bluetooth_service, 'powered', active)
+            active=wifi_service.powered,
+            on_change=lambda x, active: setattr(wifi_service, 'powered', active)
         )
         box.append(self.powered_switch_row)
         
