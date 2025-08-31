@@ -4,42 +4,14 @@ from user_settings import user_settings
 from .tabs import (
     AppearanceTab,
     InterfaceTab,
+    NetworkTab,
+    BluetoothTab,
     NiriTab,
     HyprlandTab,
     AboutTab,
 )
+from modules.m3components import NavigationRail
 from ignis.app import IgnisApp
-
-
-class NavigationRail(widgets.Box):
-    def __init__(self, tabs, on_select, default="appearance"):
-        super().__init__(css_classes=["navigation-rail"], vertical=True, spacing=5)
-        self.on_select = on_select
-        self.buttons = {}
-
-        for key, (icon, label) in tabs.items():
-            btn = Button.button(
-                icon=icon,
-                label=label,
-                ialign="center",
-                valign="center",
-                css_classes=["rail-button"],
-                vertical=True,
-                on_click=lambda *_, key=key: self.select(key),
-            )
-            self.buttons[key] = btn
-            self.append(btn)
-
-        self.select(default)
-
-    def select(self, key):
-        for name, btn in self.buttons.items():
-            if name == key:
-                btn.add_css_class("selected")
-            else:
-                btn.remove_css_class("selected")
-        self.on_select(key)
-
 
 class Settings(widgets.RegularWindow):
     def __init__(self):
@@ -62,6 +34,8 @@ class Settings(widgets.RegularWindow):
         self.tabs = {
             "appearance": ("palette", "Appearance"),
             "interface": ("tune", "Interface"),
+            "network": ("network_wifi", "Network"),
+            "bluetooth": ("bluetooth", "Bluetooth"),
             "niri": ("settings", "Niri"),
             "hyprland": ("settings", "Hyprland"),
             "about": ("info", "System"),
@@ -119,6 +93,10 @@ class Settings(widgets.RegularWindow):
             self.content_scroll.set_child(AppearanceTab())
         elif key == "interface":
             self.content_scroll.set_child(InterfaceTab())
+        elif key == "network":
+            self.content_scroll.set_child(NetworkTab())
+        elif key == "bluetooth":
+            self.content_scroll.set_child(BluetoothTab())
         elif key == "niri":
             self.content_scroll.set_child(NiriTab())
         elif key == "hyprland":

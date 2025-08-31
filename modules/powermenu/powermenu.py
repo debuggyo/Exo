@@ -25,8 +25,8 @@ class PowerMenu(widgets.Window):
             halign="center",
             css_classes=["powermenu"],
             child=[
-                PowerMenuButton(icon="power_settings_new", command="shutdown"),
-                PowerMenuButton(icon="restart_alt", command="reboot now"),
+                PowerMenuButton(icon="power_settings_new", command="shutdown now"),
+                PowerMenuButton(icon="restart_alt", command="reboot"),
                 PowerMenuButton(icon="lock", command="hyprlock"),
                 PowerMenuButton(icon="logout", command="niri msg action quit || loginctl terminate-user ''"),
             ],

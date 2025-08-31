@@ -378,3 +378,42 @@ switch {
         }
     }
 }
+
+.navigation-rail {
+    padding: 10px;
+    .rail-button {
+        background-color: transparent;
+        padding: 2px 0px;
+        border-radius: 8px;
+        .m3-button-icon {
+            border-radius: 20rem;
+            padding: 2px 16px;
+            margin: 0px;
+            margin-bottom: -5px;
+            color: colors.$on_surface_variant;
+            font-size: 16pt;
+        }
+        .m3-button-label {
+            color: colors.$on_surface_variant;
+            font-size: 8pt;
+        }
+        &:hover, &:focus-visible {
+            background-color: transparent;
+            outline: none;
+
+            .m3-button-icon {
+                background-color: rgba(colors.$secondary_container, 0.25);
+            }
+        }
+        &.selected {
+            .m3-button-icon {
+                background-color: colors.$secondary_container;
+                color: colors.$on_secondary_container;
+                font-variation-settings: 'FILL' 1;
+            }
+        }
+    }
+    .reload-button {
+        min-height: 60px;
+    }
+}

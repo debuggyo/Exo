@@ -19,44 +19,6 @@
         }
     }
 
-    .navigation-rail {
-        padding: 10px;
-        .rail-button {
-            background-color: transparent;
-            padding: 0px 0px;
-            border-radius: 8px;
-            .m3-button-icon {
-                border-radius: 20rem;
-                padding: 4px 16px;
-                margin: 0px;
-                margin-bottom: -5px;
-                color: colors.$on_surface_variant;
-            }
-            .m3-button-label {
-                color: colors.$on_surface_variant;
-                font-size: 8pt;
-            }
-            &:hover, &:focus-visible {
-                background-color: transparent;
-                outline: none;
-
-                .m3-button-icon {
-                    background-color: rgba(colors.$secondary_container, 0.25);
-                }
-            }
-            &.selected {
-                .m3-button-icon {
-                    background-color: colors.$secondary_container;
-                    color: colors.$on_secondary_container;
-                    font-variation-settings: 'FILL' 1;
-                }
-            }
-        }
-        .reload-button {
-            min-height: 60px;
-        }
-    }
-
     scrolledwindow viewport {
         margin: 0px 5px 5px 0px;
         border-radius: 15px;
@@ -68,18 +30,6 @@
         .settings-category {
             margin: 0px;
             border-radius: 10px;
-            
-            // &:first-child {
-            //     margin-top: 5px;
-            //     border-top-left-radius: 15px;
-            //     border-top-right-radius: 15px;
-            // }
-            
-            // &:last-child {
-            //     margin-bottom: 5px;
-            //     border-bottom-left-radius: 15px;
-            //     border-bottom-right-radius: 15px;
-            // }
         }
         
         .wallpaper-preview {
@@ -108,24 +58,60 @@
             background-color: colors.$surface_container_high;
             border-radius: 20px;
         }
-
+        
         .wallpaper-gallery-container {
             padding: 5px;
             background-color: colors.$surface_container_high;
             border-radius: 20px;
-
+            
             scrolledwindow viewport {
                 background-color: colors.$surface_container_high;
             }
-
+            
             .wallpaper-thumbnail {
                 padding: 0px;
             }
         }
-
+        
         scrolledwindow viewport {
             margin: 0px;
             border-radius: 15px;
+        }
+    }
+    
+    .network-list-container, .status-label, .no-networks-label {
+        background-color: colors.$surface_container_high;
+        border-radius: 20px;
+        padding: 5px;
+        min-height: 50px;
+        .network-row {
+            background-color: transparent;
+            border-radius: 8px;
+            min-height: 30px;
+            font-weight: 400;
+            &:first-child {
+                border-top-left-radius: 15px;
+                border-top-right-radius: 15px;
+            }
+            &:last-child {
+                border-bottom-left-radius: 15px;
+                border-bottom-right-radius: 15px;
+            }
+    
+            &:hover {
+                background-color: colors.$surface_container_highest;
+            }
+            padding: 5px;
+    
+            .connected-status-label {
+                padding: 0px 16px;
+            }
+    
+            .icon-label {
+                font-family: "Material Symbols Outlined";
+                font-size: 14pt;
+                font-weight: 600;
+            }
         }
     }
 }

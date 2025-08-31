@@ -9,6 +9,7 @@ A Material 3 inspired desktop shell for Niri and Hyprland created with Ignis.
 * Material Symbols Font
 * Matugen
 * SWWW
+* gnome-bluetooth-3.0
 
 ## Install Instructions
 First install the dependencies.
