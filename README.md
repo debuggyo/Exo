@@ -74,4 +74,3 @@ https://github.com/user-attachments/assets/78e35d82-5fe9-4986-b545-80fc59bc4784
 * [Ignis](https://github.com/ignis-sh/ignis)
 * [linkfrg's dotfiles](https://github.com/linkfrg/dotfiles)
 * [Material 3 Guidelines](https://m3.material.io/)
-* 
