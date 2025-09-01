@@ -1,7 +1,7 @@
 import os
 from ignis import widgets, utils
 from user_settings import user_settings
-from .widgets import Clock, WindowInfo, Workspaces, Tray, Media
+from .widgets import Clock, WindowInfo, Workspaces, Tray, Media, Battery
 from modules.m3components import Button
 from modules.corners import Corners
 from ignis.css_manager import CssManager
@@ -22,6 +22,7 @@ class Bar:
         self.window_info = WindowInfo()
         self.workspaces = Workspaces()
         self.recording_indicator = RecordingIndicator()
+        self.battery = Battery()
         set_indicator(self.recording_indicator)
 
     def build(self):
@@ -42,7 +43,7 @@ class Bar:
             width = 25
 
         anchors = [side] if user_settings.interface.bar.centered else (["top", "bottom", side] if vertical else ["left", "right", side])
-        
+
         if vertical:
             size_request = {"width_request": width}
         else:
@@ -78,12 +79,13 @@ class Bar:
                         self.recording_indicator.widget(),
                         Tray(),
                         widgets.Button(child=widgets.Label(label="tune"), css_classes=["quickcenter-button"], on_click=lambda x: window_manager.toggle_window("QuickCenter")),
+                        self.battery.widget(),
                         self.time_date.widget()
                     ],
                 ),
             ),
         )
-        
+
         BarStyles.setFloating(user_settings.interface.bar.floating)
 
         return self.__win

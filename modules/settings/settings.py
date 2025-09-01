@@ -1,6 +1,5 @@
 from ignis import widgets
 from modules.m3components import Button
-from user_settings import user_settings
 from .tabs import (
     AppearanceTab,
     InterfaceTab,
@@ -51,7 +50,7 @@ class Settings(widgets.RegularWindow):
 
         rail.append(widgets.Box(vexpand=True))
         rail.append(self.reload_button)
-        
+
         super().__init__(
             css_classes=["settings-window"],
             default_width=1200,
@@ -88,7 +87,7 @@ class Settings(widgets.RegularWindow):
 
     def switch_tab(self, key):
         self.active_tab_label.label = self.tabs[key][1]
-        
+
         if key == "appearance":
             self.content_scroll.set_child(AppearanceTab())
         elif key == "interface":

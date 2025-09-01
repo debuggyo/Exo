@@ -4,6 +4,7 @@ from .workspaces import Workspaces
 from .tray import Tray
 from .media import Media
 from .recording_indicator import RecordingIndicator
+from .battery import Battery
 
 __all__ = [
     "Clock",
@@ -11,4 +12,6 @@ __all__ = [
     "Workspaces",
     "Tray",
     "Media",
+    "RecordingIndicator",
+    "Battery"
 ]
