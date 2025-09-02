@@ -1,6 +1,7 @@
 ![Exo](https://github.com/user-attachments/assets/ca159dea-aa7c-4d52-bc65-9129a8c1becf)
 
 A Material 3 inspired desktop shell for Niri and Hyprland created with Ignis.
+For support or showcasing your Exo setup, you can join the Exo [Discord](https://discord.gg/XjyxD3y5a5) server!
 
 ## Dependencies
 * Niri or Hyprland
