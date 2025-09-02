@@ -7,6 +7,7 @@ from ignis.window_manager import WindowManager
 from ignis import utils
 from gi.repository import Gtk
 from user_settings import user_settings
+from .battery import Battery
 
 window_manager = WindowManager.get_default()
 
@@ -16,11 +17,13 @@ class SystemInfoTray:
         self.bluetooth_service = BluetoothService.get_default()
         self.audio_service = AudioService.get_default()
 
+        self.battery_widget = Battery()
+
         self.container = widgets.Box(spacing=5, css_classes=["system-info-tray"])
         self.button = widgets.Button(child=self.container, css_classes=["system-info-tray-container"], on_click=lambda x: window_manager.toggle_window("QuickCenter"))
 
-        self.wifi = widgets.Label(label=None)
-        self.bluetooth = widgets.Label(label=None)
+        self.wifi = widgets.Label(label=None, css_classes=["icon"])
+        self.bluetooth = widgets.Label(label=None, css_classes=["icon"])
 
         self.audio_container = widgets.EventBox(
             on_right_click=self._toggle_audio_mute,
@@ -30,12 +33,14 @@ class SystemInfoTray:
             halign="center",
             valign="center"
         )
-        self.audio = widgets.Label(label=None, halign="center", valign="fill")
+        self.audio = widgets.Label(label=None, halign="center", valign="fill", css_classes=["icon"])
 
         self.container.append(self.wifi)
         self.container.append(self.bluetooth)
         self.container.append(self.audio_container)
         self.audio_container.append(self.audio)
+
+        self.container.append(self.battery_widget.widget())
 
         self.network_service.wifi.connect("notify::is-connected", self._update_ui)
         self.network_service.ethernet.connect("notify::is-connected", self._update_ui)
@@ -51,23 +56,18 @@ class SystemInfoTray:
         self.update_layout()
 
     def _toggle_audio_mute(self, widget=None):
-        # Corrected line: Directly set the 'is_muted' property
         self.audio_service.speaker.is_muted = not self.audio_service.speaker.is_muted
 
     def _on_audio_scroll_up(self, widget):
         current_volume = self.audio_service.speaker.volume
         new_volume = current_volume + 5
-        # Clamp the new volume to be between 0 and 100
         new_volume = max(0, min(100, new_volume))
-        # Corrected line: Directly set the 'volume' property
         self.audio_service.speaker.volume = new_volume
 
     def _on_audio_scroll_down(self, widget):
         current_volume = self.audio_service.speaker.volume
         new_volume = current_volume - 5
-        # Clamp the new volume to be between 0 and 100
         new_volume = max(0, min(100, new_volume))
-        # Corrected line: Directly set the 'volume' property
         self.audio_service.speaker.volume = new_volume
 
     def update_layout(self):
@@ -86,6 +86,7 @@ class SystemInfoTray:
             self.container.set_vexpand(True)
             self.container.set_vertical(False)
 
+        self.battery_widget.update_layout()
         self._update_ui()
 
     def _update_ui(self, *args):
@@ -95,7 +96,7 @@ class SystemInfoTray:
             if network.is_connected and network.devices and network.devices[0].ap:
                 strength = network.devices[0].ap.strength
                 if strength >= 75:
-                    self.wifi.set_label("network_wifi_4_bar")
+                    self.wifi.set_label("signal_wifi_4_bar")
                 elif strength >= 50:
                     self.wifi.set_label("network_wifi_3_bar")
                 elif strength >= 25:

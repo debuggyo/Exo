@@ -79,9 +79,7 @@ class Bar:
                     child=[
                         self.recording_indicator.widget(),
                         Tray(),
-                        widgets.Button(child=widgets.Label(label="tune"), css_classes=["quickcenter-button"]),
                         self.systeminfotray.widget(),
-                        self.battery.widget(),
                         self.time_date.widget()
                     ],
                 ),

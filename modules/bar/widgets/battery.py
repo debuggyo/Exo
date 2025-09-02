@@ -11,10 +11,8 @@ class Battery:
         self.battery = None
         self.connected_signals = False
 
-        self.outer_container = widgets.Box(spacing=5, css_classes=["battery-widget"])
         self.battery_percent = widgets.Label(css_classes=["battery-percent-label"])
         self.battery_status = widgets.Label(css_classes=["battery-status"])
-
         self.battery_fill = widgets.Box(css_classes=["battery-fill"])
 
         self.text_container = widgets.Box(spacing=2, halign="center", valign="center", homogeneous=False)
@@ -30,7 +28,9 @@ class Battery:
         )
         self.battery_box.set_overflow(Gtk.Overflow.HIDDEN)
 
-        self.outer_container.append(self.battery_box)
+        self.container = widgets.Box(spacing=5, css_classes=["battery-widget"])
+        self.container.append(self.battery_box)
+        self.container.set_visible(False)
 
         self.upowerservice.connect("notify::batteries", self._on_batteries_changed)
 
@@ -58,14 +58,14 @@ class Battery:
 
     def update_layout(self):
         is_vertical = user_settings.interface.bar.vertical
-        self.outer_container.set_vertical(is_vertical)
+        self.container.set_vertical(is_vertical)
         self.text_container.set_vertical(is_vertical)
 
         if is_vertical:
-            self.outer_container.set_halign("fill")
-            self.outer_container.set_valign("center")
-            self.outer_container.set_hexpand(False)
-            self.outer_container.set_vexpand(False)
+            self.container.set_halign("fill")
+            self.container.set_valign("center")
+            self.container.set_hexpand(False)
+            self.container.set_vexpand(False)
             self.battery_status.set_halign("center")
             self.battery_status.set_valign("end")
             self.battery_percent.set_valign("start")
@@ -73,10 +73,10 @@ class Battery:
 
             self.battery_box.set_size_request(25, 40)
         else:
-            self.outer_container.set_halign("center")
-            self.outer_container.set_valign("center")
-            self.outer_container.set_hexpand(False)
-            self.outer_container.set_vexpand(False)
+            self.container.set_halign("center")
+            self.container.set_valign("center")
+            self.container.set_hexpand(False)
+            self.container.set_vexpand(False)
             self.battery_status.set_halign("end")
             self.battery_status.set_valign("center")
             self.battery_percent.set_valign("center")
@@ -126,22 +126,19 @@ class Battery:
 
             self.battery_percent.set_label(f"{format_string}")
             self.battery_status.set_label(status)
-            self.outer_container.set_visible(True)
+            self.container.set_visible(True)
 
             if self.battery.charging:
-                self.outer_container.add_css_class("charging")
+                self.container.add_css_class("charging")
             else:
-                self.outer_container.remove_css_class("charging")
+                self.container.remove_css_class("charging")
 
             if percentage <= 20:
-                self.outer_container.add_css_class("low")
+                self.container.add_css_class("low")
             else:
-                self.outer_container.remove_css_class("low")
+                self.container.remove_css_class("low")
         else:
-            self.outer_container.set_visible(False)
+            self.container.set_visible(False)
 
     def widget(self):
-        if len(self.upowerservice.batteries) > 0:
-            return self.outer_container
-        else:
-            return None
+        return self.container
