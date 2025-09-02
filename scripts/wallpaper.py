@@ -54,8 +54,10 @@ class Wallpaper:
 
         if colorScheme in schemes:
             asyncio.create_task(utils.exec_sh_async(f"matugen image -t scheme-{colorScheme} '{path}' -m '{mode}'"))
+            asyncio.create_task(utils.exec_sh_async(f"gsettings set org.gnome.desktop.interface color-scheme 'prefer-{mode}'"))
         else:
             asyncio.create_task(utils.exec_sh_async(f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'"))
+            asyncio.create_task(utils.exec_sh_async(f"gsettings set org.gnome.desktop.interface color-scheme 'prefer-{mode}'"))
 
         user_settings.appearance.wallcolors.set_dark_mode(active)
         utils.Timeout(ms=2000, target=lambda: css_manager.reload_all_css())
