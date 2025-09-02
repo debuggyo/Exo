@@ -71,7 +71,7 @@ class Battery:
             self.battery_percent.set_valign("start")
             self.battery_percent.set_halign("center")
 
-            self.battery_box.set_size_request(25, 40)
+            self.battery_box.set_size_request(26, 40)
         else:
             self.container.set_halign("center")
             self.container.set_valign("center")
@@ -82,7 +82,7 @@ class Battery:
             self.battery_percent.set_valign("center")
             self.battery_percent.set_halign("center")
 
-            self.battery_box.set_size_request(50, 25)
+            self.battery_box.set_size_request(50, 26)
 
         self._update_ui()
 
@@ -116,12 +116,12 @@ class Battery:
                 self.battery_fill.set_vexpand(True)
                 self.battery_fill.set_valign("end")
                 self.battery_fill.set_height_request(int(40 * percentage / 100))
-                self.battery_fill.set_width_request(25)
+                self.battery_fill.set_width_request(26)
             else:
                 format_string = f"{percentage}%"
                 self.battery_fill.set_hexpand(True)
                 self.battery_fill.set_halign("start")
-                self.battery_fill.set_height_request(25)
+                self.battery_fill.set_height_request(26)
                 self.battery_fill.set_width_request(int(50 * percentage / 100))
 
             self.battery_percent.set_label(f"{format_string}")
