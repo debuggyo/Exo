@@ -23,6 +23,7 @@ class Bar:
         self.workspaces = Workspaces()
         self.recording_indicator = RecordingIndicator()
         self.battery = Battery()
+        self.tray = Tray()
         self.systeminfotray = SystemInfoTray()
         set_indicator(self.recording_indicator)
 
@@ -78,7 +79,7 @@ class Bar:
                     css_classes=["right-widgets"],
                     child=[
                         self.recording_indicator.widget(),
-                        Tray(),
+                        self.tray.widget(),
                         self.systeminfotray.widget(),
                         self.time_date.widget()
                     ],

@@ -171,6 +171,10 @@
             border-top-right-radius: 20px;
             border-bottom-right-radius: 20px;
         }
+
+        button {
+            background-color: transparent;
+        }
     }
 }
 
@@ -303,7 +307,7 @@
 // Tray
 .tray {
     background-color: colors.$surface_container;
-    padding: 0px 15px;
+    padding: 0px 10px;
     min-width: 12px;
 
     .tray-item {
@@ -466,6 +470,10 @@
             background-color: colors.$primary_container;
             color: colors.$on_primary_container;
         }
+    }
+
+    .tray {
+        padding: 5px 0px;
     }
 
     #recording-indicator {

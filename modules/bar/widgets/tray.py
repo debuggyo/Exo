@@ -1,6 +1,7 @@
 import asyncio
-from ignis import widgets
+from ignis import widgets, utils
 from ignis.services.system_tray import SystemTrayService, SystemTrayItem
+from user_settings import user_settings
 
 system_tray = SystemTrayService.get_default()
 
@@ -30,6 +31,8 @@ class TrayItem(widgets.Button):
             setup=lambda self: item.connect("removed", on_item_removed),
             on_right_click=menu.popup if menu else None,
             css_classes=["tray-item", "unset"],
+            halign="center",
+            valign="center",
         )
 
 
@@ -37,25 +40,44 @@ class Tray(widgets.Box):
     __gtype_name__ = "Tray"
 
     def __init__(self):
-        super().__init__(
+        self.container = widgets.Box(
             css_classes=["tray"],
-            spacing=10,
         )
+
         self.__setup()
 
     def __setup(self):
+        self.update_layout()
         self.update_visibility()
 
         system_tray.connect("added", self.handle_added)
-
+        
         for item in system_tray.items:
-            self.append(TrayItem(item, on_removed_callback=self.handle_item_removed))
+            self.container.append(TrayItem(item, on_removed_callback=self.handle_item_removed))
+
+    def update_layout(self):
+        is_vertical = user_settings.interface.bar.vertical
+        
+        self.container.set_vertical(is_vertical)
+        
+        if is_vertical:
+            self.container.set_hexpand(False)
+            self.container.set_vexpand(True)
+            self.container.set_spacing(0)
+        else:
+            self.container.set_hexpand(True)
+            self.container.set_vexpand(False)
+            self.container.set_spacing(10)
 
     def update_visibility(self):
-        self.set_visible(len(system_tray.items) > 0)
+        self.container.set_visible(len(system_tray.items) > 0)
         
     def handle_added(self, _, item):
-        self.append(TrayItem(item, on_removed_callback=self.handle_item_removed))
+        self.container.append(TrayItem(item, on_removed_callback=self.handle_item_removed))
+        self.update_visibility()
 
     def handle_item_removed(self):
         self.update_visibility()
+
+    def widget(self):
+        return self.container
