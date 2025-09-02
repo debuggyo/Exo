@@ -34,6 +34,7 @@ class BarStyles:
             BarStyles.bar_instance.media.update_visibility()
             BarStyles.bar_instance.recording_indicator.update_layout()
             BarStyles.bar_instance.battery.update_layout()
+            BarStyles.bar_instance.systeminfotray.update_layout()
 
 
     @staticmethod

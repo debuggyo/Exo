@@ -5,6 +5,7 @@ A Material 3 inspired desktop shell for Niri and Hyprland created with Ignis.
 ## Dependencies
 * Niri or Hyprland
 * Ignis (git/dev) _(`python-ignis-git` on the AUR)_
+* `ignis-gvc`
 * `gpu-screen-recorder` _(optional for screen recording)_
 * Material Symbols Font
 * Matugen

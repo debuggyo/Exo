@@ -396,6 +396,23 @@
     }
 }
 
+.system-info-tray-container {
+    padding: 0px;
+    .system-info-tray {
+        padding: 0px 10px;
+        label {
+            font-family: "Material Symbols Outlined";
+            font-size: 13.5pt;
+            font-weight: 500;
+        }
+    }
+
+    &:hover {
+        background-color: colors.$primary_container;
+        color: colors.$on_primary_container;
+    }
+}
+
 // Vertical Bar
 .vertical {
     .left-widgets,
@@ -453,6 +470,10 @@
 
     #recording-indicator {
         padding: 5px 0px;
+    }
+
+    .system-info-tray {
+        padding: 10px 0px;
     }
 
     &.separated {
@@ -547,20 +568,13 @@
         .workspaces {
             padding: 10px 6px;
             .workspace {
-                opacity: 0.5;
                 font-size: 0pt;
-                padding: 0px;
                 min-width: 6px;
                 min-height: 6px;
-                color: colors.$on_background;
-                background-color: colors.$on_background;
-                border-radius: 2rem;
 
                 &.active {
-                    opacity: 1;
                     min-height: 20px;
                     min-width: 10px;
-                    background-color: colors.$on_background;
                 }
             }
         }

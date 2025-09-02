@@ -10,30 +10,30 @@ from scripts import send_notification
 class NetworkTab(widgets.Box):
     def __init__(self):
         super().__init__(
-            vertical=True, 
-            spacing=20, 
-            css_classes=["settings-body"], 
-            hexpand=False, 
-            halign="center", 
+            vertical=True,
+            spacing=20,
+            css_classes=["settings-body"],
+            hexpand=False,
+            halign="center",
             width_request=800
         )
-        
+
         self.network_service = NetworkService.get_default()
-        
+
         self.network_category = self.create_network_category()
-        
+
         self.append(self.network_category)
-        
+
         self.append(SettingsRow(
             title="Open Network Settings",
             description="Open the network panel in the GNOME Settings application for advanced configuration.",
             child=[Button.button(
-                icon="settings_applications",
+                icon="barefoot",
                 label="Open Settings",
                 on_click=lambda x: self._open_gnome_settings(),
             )]
         ))
-        
+
         self.append(SettingsRow(
             title="Refresh Network Status",
             description="Manually refresh the status of all network connections.",
@@ -43,7 +43,7 @@ class NetworkTab(widgets.Box):
                 on_click=lambda x: asyncio.create_task(self.update_ui()),
             )]
         ))
-        
+
         self.network_service.wifi.connect("notify::enabled", self._on_property_changed)
         self.network_service.ethernet.connect("notify::is-connected", self._on_property_changed)
 
@@ -54,13 +54,13 @@ class NetworkTab(widgets.Box):
 
     async def update_ui(self):
         self.wifi_switch_row.active = self.network_service.wifi.enabled
-        
+
         eth_connected = self.network_service.ethernet.is_connected
         self.ethernet_status_label.label = "Connected" if eth_connected else "Disconnected"
         self.ethernet_status_label.set_css_classes(["status-label", "connected" if eth_connected else "disconnected"])
-        
+
         wifi_service = self.network_service.wifi
-        
+
         for child in list(self.wifi_list_box.child):
             self.wifi_list_box.remove(child)
 
@@ -89,7 +89,7 @@ class NetworkTab(widgets.Box):
     def _get_wifi_icon_name(self, ap):
         is_secured = ap.security != ''
         strength = ap.strength
-        
+
         if strength > 75:
             base_name = "network_wifi_3_bar"
         elif strength > 50:
@@ -98,7 +98,7 @@ class NetworkTab(widgets.Box):
             base_name = "network_wifi_1_bar"
         else:
             base_name = "network_wifi"
-        
+
         if is_secured:
             return f"{base_name}_locked"
         else:
@@ -111,10 +111,10 @@ class NetworkTab(widgets.Box):
     async def _disconnect_wifi_and_refresh(self, ap):
         await ap.disconnect_from()
         await self.update_ui()
-    
+
     def create_access_point_row(self, ap):
         row_content = widgets.Box(spacing=10, halign="fill", hexpand=True)
-        
+
         icon_name = self._get_wifi_icon_name(ap)
 
         icon = widgets.Label(
@@ -125,7 +125,7 @@ class NetworkTab(widgets.Box):
         ssid_label = widgets.Label(label=ap.ssid, hexpand=True, halign="start")
         row_content.append(icon)
         row_content.append(ssid_label)
-        
+
         if ap.is_connected:
             row_content.append(widgets.Label(label="Connected", css_classes=["connected-status-label"]))
             row_button = widgets.Button(
@@ -153,14 +153,14 @@ class NetworkTab(widgets.Box):
             on_change=lambda x, active: setattr(self.network_service.wifi, 'enabled', active)
         )
         box.append(self.wifi_switch_row)
-        
+
         self.wifi_list_box = widgets.Box(vertical=True, spacing=5, css_classes=["network-list-container"])
         box.append(SettingsRow(
             title="Available Networks",
             description="Select a network to connect.",
             child=[self.wifi_list_box]
         ))
-        
+
         self.ethernet_status_label = widgets.Label(label="", css_classes=["status-label"])
         box.append(SettingsRow(
             title="Ethernet Status",

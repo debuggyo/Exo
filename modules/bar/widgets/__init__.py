@@ -5,6 +5,7 @@ from .tray import Tray
 from .media import Media
 from .recording_indicator import RecordingIndicator
 from .battery import Battery
+from .systeminfotray import SystemInfoTray
 
 __all__ = [
     "Clock",
@@ -13,5 +14,6 @@ __all__ = [
     "Tray",
     "Media",
     "RecordingIndicator",
-    "Battery"
+    "Battery",
+    "SystemInfoTray"
 ]

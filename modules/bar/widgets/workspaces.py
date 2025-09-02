@@ -30,13 +30,13 @@ class WorkspaceButton(widgets.Button):
             label_text = str(workspace.id)
 
         self.workspace = workspace
-        
+
         super().__init__(
             css_classes=["workspace"],
             on_click=lambda x: self.workspace.switch_to(),
             child=widgets.Label(label=label_text, halign="center", valign="center"),
         )
-        
+
         def update_css_classes(*args):
             active_workspace = get_active_workspace()
             if active_workspace and self.workspace.id == active_workspace.id:
@@ -49,11 +49,11 @@ class WorkspaceButton(widgets.Button):
             if isinstance(SERVICE, HyprlandService):
                 SERVICE.connect("notify::active-workspace", update_css_classes)
             update_css_classes()
-            
+
         self.update_layout()
 
     def update_layout(self):
-        vertical = user_settings.interface.bar.vertical    
+        vertical = user_settings.interface.bar.vertical
         compact_mode = user_settings.interface.bar.density
         if vertical:
             self.set_halign("center")
@@ -73,16 +73,16 @@ class Workspaces(widgets.Box):
         self._workspace_box = widgets.Box(
             css_classes=["workspaces"]
         )
-        
+
         def update_workspaces(*args):
             if SERVICE:
                 workspaces = SERVICE.workspaces
-                
+
                 last_child = self._workspace_box.get_last_child()
                 while last_child:
                     self._workspace_box.remove(last_child)
                     last_child = self._workspace_box.get_last_child()
-                    
+
                 for workspace in workspaces:
                     self._workspace_box.append(WorkspaceButton(workspace))
             else:
@@ -91,25 +91,25 @@ class Workspaces(widgets.Box):
         if SERVICE:
             SERVICE.connect("notify::workspaces", update_workspaces)
             update_workspaces()
-            
+
         super().__init__(child=[self._workspace_box])
         self.update_layout()
 
     def update_layout(self):
-        vertical = user_settings.interface.bar.vertical    
+        vertical = user_settings.interface.bar.vertical
         compact_mode = user_settings.interface.bar.density
-        
+
         if compact_mode == 3:
             spacing = 5
         else:
             spacing = 2
-        
+
         self._workspace_box.set_vertical(vertical)
         self._workspace_box.set_spacing(spacing)
-        
+
         for child in self._workspace_box:
             if isinstance(child, WorkspaceButton):
                 child.update_layout()
-                
+
     def widget(self):
         return self
