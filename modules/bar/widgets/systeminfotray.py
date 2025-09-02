@@ -91,7 +91,11 @@ class SystemInfoTray:
 
     def _update_ui(self, *args):
         network = self.network_service.wifi
-        if network.enabled:
+        ethernet = self.network_service.ethernet
+        if ethernet.is_connected:
+            self.wifi.set_visible(True)
+            self.wifi.set_label("settings_ethernet")
+        elif network.enabled:
             self.wifi.set_visible(True)
             if network.is_connected and network.devices and network.devices[0].ap:
                 strength = network.devices[0].ap.strength

@@ -10,3 +10,7 @@
 *:focus {
     outline-color: colors.$secondary;
 }
+
+.popup-close, .popup-close button, .popup-close .background {
+    background-color: transparent;
+}
