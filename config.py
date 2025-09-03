@@ -7,12 +7,12 @@ from modules import (
     PowerMenu, 
     QuickCenter, 
     M3Test, 
-    NotificationPopup
+    NotificationPopup,
+    Dock
 )
 from ignis.css_manager import CssInfoPath, CssManager
 from ignis import utils
-from scripts import BarStyles
-from scripts.apply_bar_css import apply_bar_css
+from scripts import BarStyles, DockStyles
 from user_settings import user_settings
 
 css_manager = CssManager.get_default()
@@ -40,8 +40,11 @@ css_manager.apply_css(
 
 bar = Bar()
 BarStyles.set_bar_instance(bar)
+BarStyles._apply_css(bar.build())
 
-apply_bar_css(bar.build())
+dock = Dock()
+DockStyles.set_dock_instance(dock)
+DockStyles._apply_dock_css(dock.build())
 
 if user_settings.interface.misc.screen_corners or user_settings.interface.bar.corners:
     Corners.build()

@@ -5,7 +5,6 @@ from user_settings import user_settings
 from .send_notification import send_notification
 from modules.corners import Corners
 from .wallpaper import Wallpaper
-from .apply_bar_css import apply_bar_css
 
 def rebuild_corners():
     Corners.destroy_all()
@@ -25,6 +24,55 @@ class BarStyles:
         cls._rounded_corners_row = row_instance
 
     @staticmethod
+    def _apply_css(window):
+        if not window:
+            return
+
+        side = user_settings.interface.bar.side
+        vertical = user_settings.interface.bar.vertical
+        separation = user_settings.interface.bar.separation
+        floating = user_settings.interface.bar.floating
+        centered = user_settings.interface.bar.centered
+        compact_mode = user_settings.interface.bar.density
+
+        all_possible_classes = {
+            "hug", "extrapadding", "round", "floating", "full",
+            "separated", "compact", "compact-plus", "ultracompact",
+            "vertical", "top", "bottom", "left", "right", "horizontal"
+        }
+
+        for css_class in all_possible_classes:
+            window.remove_css_class(css_class)
+        
+        if floating:
+            window.add_css_class("floating")
+        else:
+            window.add_css_class("hug")
+            if not centered:
+                window.add_css_class("extrapadding")
+            elif centered:
+                window.add_css_class("round")
+        
+        if separation:
+            window.add_css_class("separated")
+        else:
+            window.add_css_class("full")
+
+        if compact_mode == 1:
+            window.add_css_class("compact")
+        elif compact_mode == 2:
+            window.add_css_class("compact-plus")
+        elif compact_mode == 3:
+            window.add_css_class("ultracompact")
+
+        if vertical:
+            window.add_css_class("vertical")
+        else:
+            window.add_css_class("horizontal")
+
+        window.add_css_class(side)
+
+    @staticmethod
     def _update_all_layouts():
         if BarStyles.bar_instance:
             BarStyles.bar_instance.window_info.update_layout()
@@ -36,7 +84,6 @@ class BarStyles:
             BarStyles.bar_instance.battery.update_layout()
             BarStyles.bar_instance.tray.update_layout()
             BarStyles.bar_instance.systeminfotray.update_layout()
-
 
     @staticmethod
     def _compute_margins(side: str, floating: bool):
@@ -66,30 +113,21 @@ class BarStyles:
 
         win = bar.get_window()
 
-        win.remove_css_class("horizontal")
-        win.remove_css_class("vertical")
-        if vertical:
-            win.add_css_class("vertical")
-        else:
-            win.add_css_class("horizontal")
-
-        win.remove_css_class("top")
-        win.remove_css_class("bottom")
-        win.remove_css_class("left")
-        win.remove_css_class("right")
-        win.add_css_class(side)
-
         floating = user_settings.interface.bar.floating
         win.margin_top, win.margin_left, win.margin_right, win.margin_bottom = BarStyles._compute_margins(side, floating)
 
-        width = 40; height = 40
+        width = 40
+        height = 40
         compact_mode = user_settings.interface.bar.density
         if compact_mode == 1:
-            width = 35; height = 35
+            width = 35
+            height = 35
         elif compact_mode == 2:
-            width = 30; height = 30
+            width = 30
+            height = 30
         elif compact_mode == 3:
-            width = 25; height = 25
+            width = 25
+            height = 25
 
         win.set_width_request(width if vertical else -1)
         win.set_height_request(height if not vertical else -1)
@@ -149,13 +187,14 @@ class BarStyles:
         BarStyles._update_all_layouts()
         rebuild_corners()
 
-        apply_bar_css(win)
+        BarStyles._apply_css(win)
 
     @staticmethod
     def setCompact(mode: int):
         user_settings.interface.bar.set_density(mode)
         if BarStyles.bar_instance:
-            apply_bar_css(BarStyles.bar_instance.get_window())
+            win = BarStyles.bar_instance.get_window()
+            BarStyles._apply_css(win)
 
             height = 40
             width = 40
@@ -169,7 +208,6 @@ class BarStyles:
                 height = 25
                 width = 25
 
-            win = BarStyles.bar_instance.get_window()
             if win:
                 if user_settings.interface.bar.vertical:
                     win.set_width_request(width)
@@ -194,13 +232,13 @@ class BarStyles:
     def setSeparation(enabled: bool):
         user_settings.interface.bar.set_separation(enabled)
         if BarStyles.bar_instance:
-            apply_bar_css(BarStyles.bar_instance.get_window())
+            BarStyles._apply_css(BarStyles.bar_instance.get_window())
 
     @staticmethod
     def setFloating(enabled: bool):
         user_settings.interface.bar.set_floating(enabled)
         if BarStyles.bar_instance:
-            apply_bar_css(BarStyles.bar_instance.get_window())
+            BarStyles._apply_css(BarStyles.bar_instance.get_window())
         BarStyles.setSide(user_settings.interface.bar.side)
         rebuild_corners()
         BarStyles._update_all_layouts()
@@ -222,7 +260,7 @@ class BarStyles:
         BarStyles.setSide(user_settings.interface.bar.side)
         rebuild_corners()
         if BarStyles.bar_instance:
-            apply_bar_css(BarStyles.bar_instance.get_window())
+            BarStyles._apply_css(BarStyles.bar_instance.get_window())
         BarStyles._update_rounded_corners_visibility()
 
     @staticmethod

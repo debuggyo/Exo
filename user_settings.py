@@ -37,6 +37,14 @@ class UserSettings(OptionsManager):
 
             modules = Modules()
 
+        class Dock(OptionsGroup):
+            enabled: bool = False
+            side: str = "bottom"
+            vertical: bool = False
+            floating: bool = True
+            centered: bool = True
+            size: int = 24
+
         class Notifications(OptionsGroup):
             anchor: list = []
 
@@ -44,6 +52,7 @@ class UserSettings(OptionsManager):
             screen_corners: bool = True
 
         bar = Bar()
+        dock = Dock()
         notifications = Notifications()
         misc = Misc()
     appearance = Appearance()

@@ -2,7 +2,7 @@ import os
 
 from ignis import widgets
 from modules.m3components import Button
-from scripts import Wallpaper, BarStyles, send_notification
+from scripts import Wallpaper, BarStyles, DockStyles, send_notification
 from user_settings import user_settings
 from ..widgets import CategoryLabel, make_toggle_buttons, SwitchRow, SettingsRow
 from ignis.app import IgnisApp
@@ -86,6 +86,71 @@ class BarCategory(widgets.Box):
         self.append(self._rounded_corners_row)
         BarStyles.set_rounded_corners_row(self._rounded_corners_row)
         BarStyles._update_rounded_corners_visibility()
+
+class DockCategory(widgets.Box):
+    def __init__(self):
+        super().__init__(
+            css_classes=["settings-category"],
+            vertical=True,
+            spacing=2,
+        )
+
+        self.append(CategoryLabel("Dock"))
+
+        self.append(SwitchRow(
+                label="Enable",
+                description="Enable a Dock with your pinned apps. (experimental, scuffed)",
+                active=user_settings.interface.dock.enabled,
+                on_change=lambda x, active: DockStyles.setEnabled(active)
+            ))
+
+        self.append(SettingsRow(
+            title="Position",
+            description="Pick a side for the dock to be located.",
+            child=[
+                make_toggle_buttons(
+                    [
+                        ("Top", "top", "align_vertical_top"),
+                        ("Bottom", "bottom", "align_vertical_bottom"),
+                        ("Left", "left", "align_horizontal_left"),
+                        ("Right", "right", "align_horizontal_right"),
+                    ],
+                    lambda: user_settings.interface.dock.side,
+                    DockStyles.setSide,
+                    on_any_click=None
+                )
+            ]
+        ))
+
+        self.append(SettingsRow(
+            title="Size",
+            description="Set a size for your dock icons.",
+            child=[
+                widgets.Scale(
+                    vertical=False,
+                    min=16,
+                    max=128,
+                    step=1,
+                    value=user_settings.interface.dock.size,
+                    on_change=lambda x: DockStyles.setSize(x.value),
+                    draw_value=True
+                )
+            ]
+        ))
+
+        self.append(SwitchRow(
+                label="Floating Dock",
+                description="Make the dock float away from the edges of the screen.",
+                active=user_settings.interface.dock.floating,
+                on_change=lambda x, active: DockStyles.setFloating(active)
+            ))
+
+        self.append(SwitchRow(
+                label="Extend to Edges",
+                description="Make the dock span the full width of the screen.",
+                active=(not user_settings.interface.dock.centered),
+                on_change=lambda x, active: DockStyles.setCentered(not active)
+            ))
 
 class NotificationsCategory(widgets.Box):
     def __init__(self):
@@ -179,6 +244,7 @@ class InterfaceTab(widgets.Box):
     def __init__(self):
         super().__init__(vertical=True, spacing=20, css_classes=["settings-body"], hexpand=False, halign="center", width_request=800)
         self.append(BarCategory())
+        self.append(DockCategory())
         self.append(NotificationsCategory())
         self.append(MiscCategory())
         self.hexpand = True
