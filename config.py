@@ -1,12 +1,12 @@
 import os
 from modules import (
-    Bar, 
-    Corners, 
-    Settings, 
-    Launcher, 
-    PowerMenu, 
-    QuickCenter, 
-    M3Test, 
+    Bar,
+    Corners,
+    Settings,
+    Launcher,
+    PowerMenu,
+    QuickCenter,
+    M3Test,
     NotificationPopup,
     Dock
 )
@@ -38,6 +38,7 @@ css_manager.apply_css(
     )
 )
 
+QuickCenter()
 bar = Bar()
 BarStyles.set_bar_instance(bar)
 BarStyles._apply_css(bar.build())
@@ -51,7 +52,6 @@ if user_settings.interface.misc.screen_corners or user_settings.interface.bar.co
 Settings()
 Launcher()
 PowerMenu()
-QuickCenter()
 M3Test()
 
 for monitor in range(utils.get_n_monitors()):

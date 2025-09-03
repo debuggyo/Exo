@@ -1,6 +1,6 @@
 import os
-
 from ignis import widgets, utils
+from ignis.window_manager import WindowManager
 from user_settings import user_settings
 from .send_notification import send_notification
 from modules.corners import Corners
@@ -43,7 +43,7 @@ class BarStyles:
 
         for css_class in all_possible_classes:
             window.remove_css_class(css_class)
-        
+
         if floating:
             window.add_css_class("floating")
         else:
@@ -52,7 +52,7 @@ class BarStyles:
                 window.add_css_class("extrapadding")
             elif centered:
                 window.add_css_class("round")
-        
+
         if separation:
             window.add_css_class("separated")
         else:
@@ -84,6 +84,13 @@ class BarStyles:
             BarStyles.bar_instance.battery.update_layout()
             BarStyles.bar_instance.tray.update_layout()
             BarStyles.bar_instance.systeminfotray.update_layout()
+
+    @staticmethod
+    def _update_quick_center():
+        wm = WindowManager.get_default()
+        quick_center_window = wm.get_window("QuickCenter")
+        if quick_center_window:
+            quick_center_window.update_side()
 
     @staticmethod
     def _compute_margins(side: str, floating: bool):
@@ -188,6 +195,8 @@ class BarStyles:
         rebuild_corners()
 
         BarStyles._apply_css(win)
+
+        BarStyles._update_quick_center()
 
     @staticmethod
     def setCompact(mode: int):

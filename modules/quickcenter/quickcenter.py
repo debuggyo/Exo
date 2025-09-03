@@ -38,13 +38,7 @@ class QuickCenter(widgets.Window):
             ]
         )
 
-        
-
         self.actual_content_box.anchor = ["top", "bottom", "right"]
-        self.actual_content_box.margin_top = 5
-        self.actual_content_box.margin_bottom = 5
-        self.actual_content_box.margin_left = 5
-        self.actual_content_box.margin_right = 5
         self.actual_content_box.width_request = 400
 
         close_button = widgets.Button(
@@ -59,7 +53,7 @@ class QuickCenter(widgets.Window):
             child=close_button,
             overlays=[self.actual_content_box]
         )
-        
+
         super().__init__(
             css_classes=["popup-close"],
             hide_on_close=True,
@@ -72,11 +66,15 @@ class QuickCenter(widgets.Window):
             child=main_overlay
         )
 
+        self.update_side()
+
     def toggle_view(self, key):
         self.content_stack.visible_child_name = key
 
     def update_side(self):
-        if user_settings.interface.bar.side == "right":
+        if user_settings.interface.bar.side == "left":
             self.actual_content_box.set_halign("start")
         else:
             self.actual_content_box.set_halign("end")
+
+        self.actual_content_box.queue_resize()

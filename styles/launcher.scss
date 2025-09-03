@@ -1,6 +1,7 @@
 // Launcher
 .launcher-window {
     color: colors.$on_background;
+    border: 1px solid rgba(colors.$outline_variant, 0.5);
     padding: 5px;
     background-color: colors.$background;
     border-radius: 20px;
@@ -25,7 +26,7 @@
             margin: 5px 0px;
         }
     }
-    
+
     .pinned-apps-container {
         background-color: colors.$surface_container;
         border-radius: 15px;
@@ -65,11 +66,11 @@
         border-radius: 5px;
         background-color: colors.$surface_container;
         padding: 8px 1rem;
-    
+
         &:hover {
             background-color: colors.$surface_container_high;
         }
-    
+
         &:focus {
             outline: none;
             background-color: colors.$surface_container_high;
@@ -78,7 +79,7 @@
                 color: colors.$on_surface;
             }
         }
-    
+
         .app-label {
             font-weight: 400;
         }
