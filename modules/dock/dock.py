@@ -80,12 +80,7 @@ class Dock:
         # Connect signals to automatically update the dock
         self.applications_service.connect("notify::pinned", lambda *args: self._update_dock())
         if SERVICE:
-            if isinstance(SERVICE, NiriService):
-                # Niri doesn't have a window_added/removed signal, so we connect to the property change
-                SERVICE.connect("notify::windows", lambda *args: self._update_dock())
-            else: # HyprlandService
-                SERVICE.connect("window_added", lambda *args: self._update_dock())
-                SERVICE.connect("window_removed", lambda *args: self._update_dock())
+            SERVICE.connect("notify::windows", lambda *args: self._update_dock())
 
         return self.__win
 
