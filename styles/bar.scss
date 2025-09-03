@@ -574,14 +574,14 @@
             padding: 5px 0px;
         }
         .workspaces {
-            padding: 10px 6px;
+            padding: 10px 8px;
             .workspace {
                 font-size: 0pt;
                 min-width: 6px;
                 min-height: 6px;
 
                 &.active {
-                    min-height: 20px;
+                    min-height: 8px;
                     min-width: 10px;
                 }
             }
