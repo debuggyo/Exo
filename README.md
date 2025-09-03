@@ -9,10 +9,12 @@ For support or showcasing your Exo setup, you can join the Exo [Discord](https:/
 * Ignis (git/dev) _(`python-ignis-git` on the AUR)_
 * `ignis-gvc`
 * `gpu-screen-recorder` _(optional for screen recording)_
-* Material Symbols Font
-* Matugen
-* SWWW
-* gnome-bluetooth-3.0
+* Material Symbols Font _(`ttf-material-symbols-variable-git` on the AUR)_
+* `matugen`
+* `swww`
+* `gnome-bluetooth-3.0`
+* `adw-gtk3` Theme
+* `dart-sass`
 
 ## Install Instructions
 First install the dependencies.
@@ -56,6 +58,8 @@ set = true
 input_path = './templates/colors.scss'
 output_path = '~/.config/ignis/colors.scss'
 ```
+
+Then if you want you can install more [Matugen Themes](https://github.com/InioX/matugen-themes/tree/main?tab=readme-ov-file#gtk)
 
 
 ## Screenshots/Videos
