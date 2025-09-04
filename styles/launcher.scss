@@ -4,7 +4,7 @@
     border: 1px solid rgba(colors.$outline_variant, 0.5);
     padding: 5px;
     background-color: colors.$background;
-    border-radius: 20px;
+    border-radius: 25px 25px 20px 20px;
 
     .search-bar-container {
         background-color: colors.$surface_container;
@@ -47,13 +47,15 @@
     }
 
     .outer-box {
+        background-color: colors.$surface-container;
         border-radius: 15px;
 
         .inner-box {
             .featured-app-row {
+                border-bottom: 2px solid colors.$surface;
                 .app-item {
+                    border-radius: 0px;
                     outline: none;
-                    background-color: colors.$surface_container;
                     border: none;
                     .app-label {
                         color: colors.$on_surface;
@@ -63,8 +65,8 @@
         }
     }
     .app-item {
-        border-radius: 5px;
-        background-color: colors.$surface_container;
+        border-radius: 10px;
+        background-color: transparent;
         padding: 8px 1rem;
 
         &:hover {

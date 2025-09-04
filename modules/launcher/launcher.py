@@ -33,33 +33,33 @@ class AppItem(widgets.Button):
             )
         )
         self.set_height_request(100)
-        
+
         self._gesture = Gtk.GestureClick.new()
         self._gesture.set_button(3)
         self._gesture.connect("released", self.__on_right_click_released)
         self.add_controller(self._gesture)
-        
+
         self._application.connect("pinned", self.__on_app_state_change)
         self._application.connect("unpinned", self.__on_app_state_change)
-        
+
     def __on_right_click_released(self, gesture, n_press, x, y):
         popover = Gtk.Popover.new()
         popover.set_parent(self)
-        
+
         box = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
-        
+
         if self._application.is_pinned:
             action_button = Gtk.Button.new_with_label("Unpin")
             action_button.connect("clicked", lambda b: self.__unpin_app(popover))
         else:
             action_button = Gtk.Button.new_with_label("Pin")
             action_button.connect("clicked", lambda b: self.__pin_app(popover))
-            
+
         box.append(action_button)
-        
+
         popover.set_child(box)
         popover.popup()
-        
+
     def __pin_app(self, popover):
         self._application.pin()
         popover.popdown()
@@ -85,7 +85,7 @@ class PinnedAppItem(widgets.Button):
             child=widgets.Icon(image=application.icon, pixel_size=32, halign="center")
         )
         self.set_size_request(48, 48)
-        
+
         self._gesture = Gtk.GestureClick.new()
         self._gesture.set_button(3)
         self._gesture.connect("released", self.__on_right_click_released)
@@ -98,18 +98,18 @@ class PinnedAppItem(widgets.Button):
         popover = Gtk.Popover.new()
         popover.set_parent(self)
         box = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
-        
+
         if self._application.is_pinned:
             action_button = Gtk.Button.new_with_label("Unpin")
             action_button.connect("clicked", lambda b: self.__unpin_app(popover))
         else:
             action_button = Gtk.Button.new_with_label("Pin")
             action_button.connect("clicked", lambda b: self.__pin_app(popover))
-            
+
         box.append(action_button)
         popover.set_child(box)
         popover.popup()
-        
+
     def __pin_app(self, popover):
         self._application.pin()
         popover.popdown()
@@ -135,12 +135,12 @@ class Launcher(widgets.Window):
             halign="fill",
             hexpand=True
         )
-        
+
         self._pinned_apps_container = widgets.Box(
             spacing=10,
             css_classes=["pinned-apps-container"]
         )
-        
+
         self._pin_icon = widgets.Label(
             label="push_pin",
             css_classes=["icon", "pin-icon"]
@@ -156,10 +156,10 @@ class Launcher(widgets.Window):
         self._first_row = None
 
         search_icon = widgets.Label(
-            label="search", 
+            label="search",
             css_classes=["icon", "search-icon"]
         )
-        
+
         self._entry = widgets.Entry(
             placeholder_text="Search",
             css_classes=["launcher-search"],
@@ -189,7 +189,7 @@ class Launcher(widgets.Window):
 
         self._main_content_container.append(search_bar_container)
         self._main_content_container.append(self._pinned_apps_container)
-        
+
         scroll_container = widgets.Scroll(
             vexpand=True,
             css_classes=["outer-box"],
@@ -200,7 +200,7 @@ class Launcher(widgets.Window):
 
         super().__init__(
             css_classes=["launcher-window"],
-            default_width=800,
+            default_width=600,
             default_height=600,
             resizable=False,
             hide_on_close=True,
@@ -214,31 +214,31 @@ class Launcher(widgets.Window):
 
     def refresh_pinned_apps_list(self):
         self.__populate_pinned_apps_list()
-        
+
     def __populate_pinned_apps_list(self):
         while self._pinned_apps_container.get_last_child():
             self._pinned_apps_container.remove(self._pinned_apps_container.get_last_child())
 
         pinned_apps = applications.pinned
-        
+
         if not pinned_apps:
             self._pinned_apps_container.visible = False
             return
         else:
             self._pinned_apps_container.visible = True
-            
+
             self._pinned_apps_container.append(self._pin_icon)
 
         for app in pinned_apps:
             item = PinnedAppItem(app, self)
             self._pinned_apps_container.append(item)
-    
+
     def __populate_grid(self, apps: list[Application], featured_app: Application | None = None) -> None:
         last_child = self._app_grid_container.get_last_child()
         while last_child:
             self._app_grid_container.remove(last_child)
             last_child = self._app_grid_container.get_last_child()
-        
+
         self._first_row = None
 
         if not apps and not featured_app:
@@ -248,30 +248,30 @@ class Launcher(widgets.Window):
             first_item = AppItem(featured_app, self)
             first_item.set_size_request(-1, 80)
             first_item.hexpand = True
-            
+
             self._first_row = widgets.Box(spacing=5, css_classes=["app-row"], child=[first_item])
             self._first_row.add_css_class("featured-app-row")
             self._app_grid_container.append(self._first_row)
-        
+
         app_grid = widgets.Grid(
-            column_spacing=5,
-            row_spacing=5,
+            column_spacing=0,
+            row_spacing=0,
             halign="fill",
             hexpand=True,
         )
         self._app_grid_container.append(app_grid)
 
         remaining_apps = apps
-        
+
         for i, app in enumerate(remaining_apps):
             row = i // GRID_COLUMNS
             col = i % GRID_COLUMNS
-            
+
             app_grid.attach(AppItem(app, self), col, row, 1, 1)
 
     def __search(self, *args) -> None:
         query = self._entry.text
-        
+
         self._clear_button.visible = bool(query)
 
         if query:
