@@ -1,34 +1,39 @@
 // Power Options
 .powermenu {
-    background: rgba(colors.$background, 0.99);
-    padding: 5px;
+    background: colors.$surface_container;
+    border: 1px solid rgba(colors.$outline_variant, 0.5);
+    padding: 4px;
     border-radius: 25px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
 
     button {
         background-color: colors.$surface_container;
         color: colors.$on_background;
         margin: 2.5px;
-        font-size: 64pt;
-        padding: 70px 100px;
-        border-radius: 10px;
-        font-family: "Material Symbols Outlined";
-    }
+        border-radius: 20px;
+        
+        .power-menu-icon {
+            font-family: "Material Symbols Outlined";
+            font-size: 48pt;
+        }
 
-    button:first-child {
-        border-radius: 20px 10px 10px 20px;
-    }
+        .power-menu-label {
+            font-size: 12pt;
+            font-weight: 500;
+            color: colors.$on_surface_variant;
+        }
+        
+        &:hover {
+            background-color: colors.$surface_container_high;
+        }
 
-    button:last-child {
-        border-radius: 10px 20px 20px 10px;
-    }
+        &:focus {
+            background-color: colors.$primary_container;
+            color: colors.$on_primary_container;
+            font-variation-settings: 'FILL' 1;
+            outline: none;
 
-    button:hover {
-        background-color: colors.$surface_container_high;
-    }
-
-    button:focus {
-        background-color: colors.$primary;
-        color: colors.$on_primary;
-        font-variation-settings: 'FILL' 1;
+            .power-menu-label {color: colors.$on_primary_container}
+        }
     }
 }
