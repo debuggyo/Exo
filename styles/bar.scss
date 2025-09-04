@@ -116,9 +116,6 @@
             }
             padding: 2px 5px;
         }
-        .workspace.active {
-            padding: 0px 0px;
-        }
     }
     &.ultracompact {
         .left-widgets,
@@ -129,26 +126,6 @@
                 background-color: transparent;
             }
             padding: 0px 5px;
-        }
-        .workspaces {
-            padding-left: 10px;
-            .workspace {
-                opacity: 0.5;
-                font-size: 0pt;
-                padding: 0px;
-                min-width: 6px;
-                min-height: 6px;
-                color: colors.$on_background;
-                background-color: colors.$on_background;
-                border-radius: 2rem;
-
-                &.active {
-                    opacity: 1;
-                    min-height: 10px;
-                    min-width: 20px;
-                    background-color: colors.$on_background;
-                }
-            }
         }
     }
 }
@@ -198,7 +175,7 @@
     }
 }
 
-// Workspace
+// Workspaces
 .workspaces {
     padding: 2px;
     border-radius: 20px 5px 5px 20px;
@@ -225,6 +202,58 @@
             font-weight: 700;
             border-radius: 20px;
         }
+    }
+
+    &.windows {
+        .workspace {
+            background-color: colors.$surface_container_high;
+            color: colors.$on_background;
+            padding: 0px 10px;
+            border-radius: 5px;
+
+            &:hover {
+                background-color: colors.$surface_container_highest;
+            }
+
+            &.active {
+                background-color: colors.$primary;
+                color: colors.$on_primary;
+                border-radius: 20px;
+            }
+        }
+    }
+
+    &.dots {
+        padding: 0px 15px;
+        .workspace {
+            opacity: 0.5;
+            font-size: 0pt;
+            padding: 0px;
+            min-width: 6px;
+            min-height: 6px;
+            color: colors.$on_background;
+            background-color: colors.$on_background;
+            border-radius: 2rem;
+
+            &.active {
+                opacity: 1;
+                min-height: 10px;
+                min-width: 20px;
+                background-color: colors.$on_background;
+            }
+        }
+    }
+}
+
+.bar.horizontal .workspaces .workspace {
+    &:first-child {
+        border-top-left-radius: 20px;
+        border-bottom-left-radius: 20px;
+    }
+    
+    &:last-child {
+        border-top-right-radius: 20px;
+        border-bottom-right-radius: 20px;
     }
 }
 
@@ -442,6 +471,32 @@
         .workspace.active {
             padding: 10px 0px;
         }
+        &.windows .workspace {
+            padding: 5px 0px;
+
+            &:first-child {
+                border-top-left-radius: 20px;
+                border-top-right-radius: 20px;
+            }
+
+            &:last-child {
+                border-bottom-left-radius: 20px;
+                border-bottom-right-radius: 20px;
+            }
+        }
+        &.dots {
+            padding: 15px 0px;
+            .workspace {
+                font-size: 0pt;
+                min-width: 6px;
+                min-height: 6px;
+
+                &.active {
+                    min-height: 8px;
+                    min-width: 10px;
+                }
+            }
+        }
     }
 
     .center-widgets {
@@ -553,8 +608,11 @@
         .right-widgets {
             padding: 5px 2px;
         }
-        .workspace.active {
-            padding: 3px 0px;
+        &:not(.windows) .workspaces:not(.dots) { 
+            padding: 0px;
+            .workspace.active {
+                padding: 3px 0px;
+            }
         }
     }
     &.compact-plus {
@@ -563,8 +621,11 @@
         .right-widgets {
             padding: 5px 2px;
         }
-        .workspace.active {
-            padding: 0px 0px;
+        .workspaces:not(.dots) { 
+            padding: 0px;
+            &:not(.windows) .workspace.active {
+                padding: 0px 0px;
+            }
         }
     }
     &.ultracompact {
@@ -573,17 +634,10 @@
         .right-widgets {
             padding: 5px 0px;
         }
-        .workspaces {
-            padding: 10px 8px;
-            .workspace {
-                font-size: 0pt;
-                min-width: 6px;
-                min-height: 6px;
-
-                &.active {
-                    min-height: 8px;
-                    min-width: 10px;
-                }
+        .workspaces:not(.dots) { 
+            padding: 0px;
+            &:not(.windows) .workspace.active {
+                padding: 0px 0px;
             }
         }
     }

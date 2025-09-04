@@ -47,7 +47,7 @@ class UserSettings(OptionsManager):
             size: int = 24
 
         class Notifications(OptionsGroup):
-            anchor: list = []
+            anchor: list = ["top", "right"]
 
         class Misc(OptionsGroup):
             screen_corners: bool = True

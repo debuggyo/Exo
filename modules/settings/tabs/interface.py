@@ -55,6 +55,23 @@ class BarCategory(widgets.Box):
             ]
         ))
 
+        self.append(SettingsRow(
+            title="Workspace Indicator Style",
+            description="Pick between 3 different Workspace Indicator styles.",
+            child=[
+                make_toggle_buttons(
+                    [
+                        ("Icons", "windows", "photo"),
+                        ("Numbers", "numbers", "counter_1"),
+                        ("Dots", "dots", "more_horiz"),
+                    ],
+                    lambda: user_settings.interface.bar.modules.workspaces_style,
+                    BarStyles.setWorkspacesStyle,
+                    on_any_click=None
+                )
+            ]
+        ))
+
         self.append(SwitchRow(
                 label="Floating Bar",
                 description="Make the bar float away from the edges of the screen.",
@@ -97,14 +114,21 @@ class DockCategory(widgets.Box):
 
         self.append(CategoryLabel("Dock"))
 
-        self.append(SwitchRow(
-                label="Enable",
-                description="Enable a Dock with your pinned apps. (experimental, scuffed)",
-                active=user_settings.interface.dock.enabled,
-                on_change=lambda x, active: DockStyles.setEnabled(active)
-            ))
+        self._enable_switch = SwitchRow(
+            label="Enable",
+            description="Enable a Dock with your pinned apps. (experimental, scuffed)",
+            active=user_settings.interface.dock.enabled,
+            on_change=lambda x, active: self._on_enable_change(active)
+        )
+        self.append(self._enable_switch)
 
-        self.append(SettingsRow(
+        self._settings_box = widgets.Box(
+            css_classes=["dock-settings-container"],
+            vertical=True,
+            spacing=2,
+        )
+        
+        self._settings_box.append(SettingsRow(
             title="Position",
             description="Pick a side for the dock to be located.",
             child=[
@@ -122,7 +146,7 @@ class DockCategory(widgets.Box):
             ]
         ))
 
-        self.append(SettingsRow(
+        self._settings_box.append(SettingsRow(
             title="Size",
             description="Set a size for your dock icons.",
             child=[
@@ -138,19 +162,26 @@ class DockCategory(widgets.Box):
             ]
         ))
 
-        self.append(SwitchRow(
+        self._settings_box.append(SwitchRow(
                 label="Floating Dock",
                 description="Make the dock float away from the edges of the screen.",
                 active=user_settings.interface.dock.floating,
                 on_change=lambda x, active: DockStyles.setFloating(active)
             ))
 
-        self.append(SwitchRow(
+        self._settings_box.append(SwitchRow(
                 label="Extend to Edges",
                 description="Make the dock span the full width of the screen.",
                 active=(not user_settings.interface.dock.centered),
                 on_change=lambda x, active: DockStyles.setCentered(not active)
             ))
+
+        self.append(self._settings_box)
+        self._settings_box.set_visible(user_settings.interface.dock.enabled)
+
+    def _on_enable_change(self, active):
+        DockStyles.setEnabled(active)
+        self._settings_box.set_visible(active)
 
 class NotificationsCategory(widgets.Box):
     def __init__(self):

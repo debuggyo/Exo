@@ -3,13 +3,13 @@ import threading
 import time
 from ignis import widgets, utils
 from user_settings import user_settings
-from scripts.recorder import stop_recording, pause_recording, unpause_recording, recorder, record_portal, record_screen
+from scripts.recorder import stop_recording, pause_recording, unpause_recording, recorder, record_portal, record_screen, record_region
 
 class RecordingIndicator:
     def __init__(self):
         self.container = widgets.Button(
             on_click=lambda _: self.handle_click(),
-            on_right_click=lambda _: self.toggle_pause_recording(),
+            on_right_click=lambda _: self.handle_right_click(),
             css_classes=["recording-indicator"],
             tooltip_text="Click to start/stop recording. \nRight click to pause/unpause."
         )
@@ -64,6 +64,18 @@ class RecordingIndicator:
                 stop_recording()
             else:
                 record_screen()
+        elif mode == "recording":
+            if recorder.active:
+                stop_recording()
+
+    def handle_right_click(self):
+        mode = user_settings.interface.bar.modules.recording_indicator
+
+        if mode == "always":
+            if recorder.active:
+                stop_recording()
+            else:
+                record_region()
         elif mode == "recording":
             if recorder.active:
                 stop_recording()

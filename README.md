@@ -9,6 +9,7 @@ For support or showcasing your Exo setup, you can join the Exo [Discord](https:/
 * Ignis (git/dev) _(`python-ignis-git` on the AUR)_
 * `ignis-gvc`
 * `gpu-screen-recorder` _(optional for screen recording)_
+* `slurp` _(optional for region recording)_
 * Material Symbols Font _(`ttf-material-symbols-variable-git` on the AUR)_
 * `matugen`
 * `swww`
@@ -31,7 +32,8 @@ In your Niri or Hyprland config add the following keybinds, bind them to anythin
 | Opens Settings Window              | `ignis open-window Settings`               |
 | Opens Power Menu                   | `ignis open-window PowerMenu`              |
 | Record the screen                  | `ignis run-command recorder-record-screen` |
-| Record with options _(Niri only)_  | `ignis run-command recorder-record-portal` |
+| Record a selected region           | `ignis run-command recorder-record-region` |
+| Record a window _(Niri only)_      | `ignis run-command recorder-record-portal` |
 
 Set up matugen (see below) and run `matugen image /path/to/wallpaper` to set a wallpaper and color scheme before starting ignis.
 

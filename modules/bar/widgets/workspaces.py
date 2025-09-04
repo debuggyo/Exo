@@ -40,12 +40,12 @@ class WorkspaceButton(widgets.Button):
         self._icons_box = None
 
         if style == "windows":
-            self._icons_box = widgets.Box(spacing=2, css_classes=["workspace-icons"])
+            self._icons_box = widgets.Box(spacing=5, css_classes=["workspace-icons"])
             children.append(self._icons_box)
         
         self._main_content_box = widgets.Box(
-            halign="fill",
-            valign="fill",
+            halign="center",
+            valign="center",
             spacing=4,
             child=children  
         )
@@ -72,9 +72,8 @@ class WorkspaceButton(widgets.Button):
         self.update_layout()
         if style == "windows":
             self._update_icons()
-
-        if SERVICE:
-            SERVICE.connect("notify::windows", lambda *args: self._update_icons())
+            if SERVICE:
+                SERVICE.connect("notify::windows", lambda *args: self._update_icons())
 
     def _get_windows_for_workspace(self):
         if isinstance(SERVICE, NiriService):
@@ -94,6 +93,8 @@ class WorkspaceButton(widgets.Button):
 
         windows = self._get_windows_for_workspace()
         
+        self._icons_box.set_visible(bool(windows))
+
         for window in windows:
             app_id = None
             if isinstance(window, NiriWindow):
@@ -101,21 +102,26 @@ class WorkspaceButton(widgets.Button):
             elif isinstance(window, HyprlandWindow):
                 app_id = window.class_name
             
+            icon_name = None
             if app_id:
                 apps = APPLICATIONS.search(APPLICATIONS.apps, app_id)
                 if apps and apps[0].icon:
-                    icon_widget = widgets.Icon(
-                        icon_name=apps[0].icon,
-                        pixel_size=16
-                    )
-                    self._icons_box.append(icon_widget)
+                    icon_name = apps[0].icon
+            
+            if not icon_name:
+                icon_name = "application-x-executable-symbolic"
+
+            icon_widget = widgets.Icon(
+                icon_name=icon_name,
+                pixel_size=16
+            )
+            self._icons_box.append(icon_widget)
         
         self._main_content_box.queue_resize()
 
 
     def update_layout(self):
         vertical = user_settings.interface.bar.vertical
-        compact_mode = user_settings.interface.bar.density
         style = user_settings.interface.bar.modules.workspaces_style
 
         if self._icons_box:
@@ -124,14 +130,14 @@ class WorkspaceButton(widgets.Button):
         if vertical:
             self._main_content_box.set_vertical(True)
             self.set_halign("center")
-            if compact_mode == 3:
+            if style == "dots":
                 self.set_valign("center")
             else:
                 self.set_valign("fill")
         else:
             self._main_content_box.set_vertical(False)
             self.set_valign("center")
-            if compact_mode == 3:
+            if style == "dots":
                 self.set_halign("center")
             else:
                 self.set_halign("fill")
@@ -142,59 +148,58 @@ class WorkspaceButton(widgets.Button):
 class Workspaces(widgets.Box):
     def __init__(self):
         self._workspace_box = widgets.Box(
-            css_classes=["workspaces"]
+            css_classes=["workspaces"],
+            halign="center",
+            hexpand=True,
+            valign="center",
+            vexpand=True,
         )
         
         super().__init__(child=[self._workspace_box])
 
-        def update_workspaces(*args):
-            # Get the current style from user settings
-            style = user_settings.interface.bar.modules.workspaces_style
-            
-            # Explicitly manage CSS classes to avoid conflicts and invalid properties
-            self.remove_css_class("dots")
-            self.remove_css_class("windows")
-            self.remove_css_class("numbers")
-
-            if style == "dots":
-                self.add_css_class("dots")
-            elif style == "windows":
-                self.add_css_class("windows")
-            elif style == "numbers":
-                self.add_css_class("numbers")
-
-            if SERVICE:
-                workspaces = SERVICE.workspaces
-
-                last_child = self._workspace_box.get_last_child()
-                while last_child:
-                    self._workspace_box.remove(last_child)
-                    last_child = self._workspace_box.get_last_child()
-
-                for workspace in workspaces:
-                    self._workspace_box.append(WorkspaceButton(workspace))
-            else:
-                pass
-
         if SERVICE:
-            SERVICE.connect("notify::workspaces", update_workspaces)
-            update_workspaces()
+            SERVICE.connect("notify::workspaces", self.update_workspaces)
+            self.update_workspaces()
 
         self.update_layout()
+    
+    def update_workspaces(self, *args):
+        style = user_settings.interface.bar.modules.workspaces_style
+        
+        self._workspace_box.remove_css_class("dots")
+        self._workspace_box.remove_css_class("windows")
+        self._workspace_box.remove_css_class("numbers")
+
+        if style == "dots":
+            self._workspace_box.add_css_class("dots")
+        elif style == "windows":
+            self._workspace_box.add_css_class("windows")
+        elif style == "numbers":
+            self._workspace_box.add_css_class("numbers")
+
+        if SERVICE:
+            workspaces = SERVICE.workspaces
+
+            last_child = self._workspace_box.get_last_child()
+            while last_child:
+                self._workspace_box.remove(last_child)
+                last_child = self._workspace_box.get_last_child()
+
+            for workspace in workspaces:
+                self._workspace_box.append(WorkspaceButton(workspace))
+        else:
+            pass
 
     def update_layout(self):
         vertical = user_settings.interface.bar.vertical
-        compact_mode = user_settings.interface.bar.density
         
         style = user_settings.interface.bar.modules.workspaces_style
 
-        if compact_mode == 3:
-            spacing = 5
-        else:
-            spacing = 2
         
-        if style == "dots":
-            spacing = 0
+        if style == "windows":
+            spacing = 2
+        else:
+            spacing = 5
 
         self._workspace_box.set_vertical(vertical)
         self._workspace_box.set_spacing(spacing)

@@ -94,6 +94,49 @@ def record_screen(*args: str):
 def record_portal(*args: str):
     _record_source("portal", *args)
 
+async def _record_region_task():
+    """Selects a region using 'slurp' and starts recording it."""
+    try:
+        if recorder.active:
+            recorder.stop_recording()
+            return
+
+        send_notification("Region Selection", "Please select a region to record.")
+        
+        proc = await asyncio.create_subprocess_exec(
+            "slurp",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        stdout, stderr = await proc.communicate()
+        
+        if proc.returncode != 0:
+            if proc.returncode == 127:
+                send_notification("Dependency Missing", "The 'slurp' tool is required for region recording but was not found.")
+            else:
+                send_notification("Region Selection Canceled", "No region was selected or an error occurred.")
+            return
+
+        region_str = stdout.decode().strip()
+        if not region_str:
+            send_notification("Region Selection Canceled", "No region was selected.")
+            return
+        
+        # Reformat the region string from 'X,Y WxH' to 'WxH+X+Y'
+        xy, wh = region_str.split(" ")
+        x, y = xy.split(",")
+        reformatted_region = f"{wh}+{x}+{y}"
+
+        _record_source(source="region", region=reformatted_region)
+        
+    except FileNotFoundError:
+        send_notification("Dependency Missing", "The 'slurp' tool is required for region recording but was not found.")
+    except Exception as e:
+        send_notification("Region Selection Error", f"An unexpected error occurred: {str(e)}")
+
+def record_region(*args: str):
+    asyncio.create_task(_record_region_task())
+
 def setup_recorder_commands():
     command_manager.add_command(
         command_name="recorder-record-screen",
@@ -103,6 +146,11 @@ def setup_recorder_commands():
     command_manager.add_command(
         command_name="recorder-record-portal",
         callback=record_portal,
+    )
+
+    command_manager.add_command(
+        command_name="recorder-record-region",
+        callback=record_region,
     )
 
 def setup_recorder_signals():
