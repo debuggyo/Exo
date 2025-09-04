@@ -34,6 +34,7 @@ class UserSettings(OptionsManager):
                 media_widget: bool = True
                 military_time: bool = False
                 recording_indicator: str = "recording"
+                workspaces_style: str = "numbers"
 
             modules = Modules()
 

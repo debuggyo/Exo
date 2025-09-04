@@ -238,6 +238,13 @@ class BarStyles:
             BarStyles.bar_instance.recording_indicator.update_visibility()
 
     @staticmethod
+    def setWorkspacesStyle(style: str):
+        user_settings.interface.bar.modules.set_workspaces_style(style)
+        if BarStyles.bar_instance and BarStyles.bar_instance.workspaces:
+            BarStyles.bar_instance.workspaces.update_workspaces()
+            BarStyles.bar_instance.workspaces.update_layout()
+
+    @staticmethod
     def setSeparation(enabled: bool):
         user_settings.interface.bar.set_separation(enabled)
         if BarStyles.bar_instance:
