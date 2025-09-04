@@ -37,6 +37,8 @@ In your Niri or Hyprland config add the following keybinds, bind them to anythin
 
 Set up matugen (see below) and run `matugen image /path/to/wallpaper` to set a wallpaper and color scheme before starting ignis.
 
+Set the gtk theme to adw-gtk3 by running `gsettings set org.gnome.desktop.interface gtk-theme "adw-gtk3"` or by setting the theme in your preferred gtk settings program.
+
 Add `ignis init` and `swww-daemon` to auto start in your Niri/Hyprland config and you're ready to go!
 
 ### Matugen
@@ -63,6 +65,19 @@ output_path = '~/.config/ignis/colors.scss'
 
 Then if you want you can install more [Matugen Themes](https://github.com/InioX/matugen-themes/tree/main?tab=readme-ov-file#gtk)
 
+## Recommended Hyprland/Niri Settings
+| Option                             | Value                                      |
+|------------------------------------|--------------------------------------------|
+| Outer Margin                       | 5                                          |
+| Border Radius                      | 20                                         |
+
+This is to make sure that the window corners match the screen/bar corners.
+
+These can be set to any value, though looks better when the radius is set to `25 - Margin`
+
+If you don't use bar or screen corners, these don't matter and you can pick your own values.
+
+I intend to make this automatic when I implement Niri/Hyprland configuration in the settings window.
 
 ## Screenshots/Videos
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/8179e2f8-0eea-4a55-96f3-c4746fdca45c" />

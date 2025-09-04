@@ -8,6 +8,7 @@ class NiriTab(widgets.Box):
             vertical=True,
             spacing=2,
             child=[
-                CategoryLabel("Niri Settings")
+                CategoryLabel("Niri Settings"),
+                widgets.Label(label="Coming Soon.")
             ]
         )

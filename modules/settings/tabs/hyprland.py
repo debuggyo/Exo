@@ -8,6 +8,7 @@ class HyprlandTab(widgets.Box):
             vertical=True,
             spacing=2,
             child=[
-                CategoryLabel("Hyprland Settings")
+                CategoryLabel("Hyprland Settings"),
+                widgets.Label(label="Coming Soon.")
             ]
         )
