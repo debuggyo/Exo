@@ -1,4 +1,3 @@
-# launcher.py
 import gi
 gi.require_version('Gtk', '4.0')
 from gi.repository import Gtk
@@ -192,24 +191,51 @@ class Launcher(widgets.Window):
 
         scroll_container = widgets.Scroll(
             vexpand=True,
+            valign="fill",
             css_classes=["outer-box"],
-            child=self._app_grid_container
+            child=self._app_grid_container,
+            height_request=500,
         )
         scroll_container.set_overflow(Gtk.Overflow.HIDDEN)
         self._main_content_container.append(scroll_container)
 
-        super().__init__(
+        actual_launcher_content_box = widgets.Box(
+            vertical=True,
+            spacing=0,
+            hexpand=False,
+            halign="center",
+            valign="center",
             css_classes=["launcher-window"],
-            default_width=600,
-            default_height=600,
-            resizable=False,
+            child=[
+                self._main_content_container
+            ]
+        )
+        actual_launcher_content_box.width_request = 600
+        actual_launcher_content_box.height_request = 600
+
+        close_button = widgets.Button(
+            vexpand=True,
+            hexpand=True,
+            can_focus=False,
+            on_click=lambda x: window_manager.close_window("Launcher")
+        )
+
+        main_overlay = widgets.Overlay(
+            css_classes=["popup-close"],
+            child=close_button,
+            overlays=[actual_launcher_content_box]
+        )
+
+        super().__init__(
+            css_classes=["popup-close"],
             hide_on_close=True,
             visible=False,
-            setup=lambda self: self.connect("notify::visible", self.__on_open),
             namespace="Launcher",
-            kb_mode="exclusive",
             popup=True,
-            child=self._main_content_container
+            layer="overlay",
+            kb_mode="exclusive",
+            anchor=["left", "right", "top", "bottom"],
+            child=main_overlay
         )
 
     def refresh_pinned_apps_list(self):
