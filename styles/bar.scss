@@ -245,12 +245,12 @@
     }
 }
 
-.bar.horizontal .workspaces .workspace {
+.bar.horizontal .workspaces.windows .workspace {
     &:first-child {
         border-top-left-radius: 20px;
         border-bottom-left-radius: 20px;
     }
-    
+
     &:last-child {
         border-top-right-radius: 20px;
         border-bottom-right-radius: 20px;
@@ -608,7 +608,7 @@
         .right-widgets {
             padding: 5px 2px;
         }
-        &:not(.windows) .workspaces:not(.dots) { 
+        &:not(.windows) .workspaces:not(.dots) {
             padding: 0px;
             .workspace.active {
                 padding: 3px 0px;
@@ -621,7 +621,7 @@
         .right-widgets {
             padding: 5px 2px;
         }
-        .workspaces:not(.dots) { 
+        .workspaces:not(.dots) {
             padding: 0px;
             &:not(.windows) .workspace.active {
                 padding: 0px 0px;
@@ -634,7 +634,7 @@
         .right-widgets {
             padding: 5px 0px;
         }
-        .workspaces:not(.dots) { 
+        .workspaces:not(.dots) {
             padding: 0px;
             &:not(.windows) .workspace.active {
                 padding: 0px 0px;
