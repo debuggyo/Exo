@@ -1,0 +1,6 @@
+{
+<* for name, value in colors *>
+    "{{name}}": "{{value.default.hex}}"
+    <* if not loop.last *>,<* endif *>
+<* endfor *>
+}

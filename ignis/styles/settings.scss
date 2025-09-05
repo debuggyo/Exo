@@ -1,0 +1,160 @@
+// Settings Window
+.settings-window {
+    padding: 0px;
+    background-color: colors.$surface;
+    color: colors.$on_background;
+    min-width: 950px;
+
+    .header-bar {
+        padding: 5px 1rem;
+        color: colors.$on_surface;
+        .header-title-icon {
+            font-family: "Material Symbols Outlined";
+            font-variation-settings: 'FILL' 1;
+            font-size: 2rem;
+        }
+        .header-title {
+            font-size: 12pt;
+            font-weight: 600;
+        }
+    }
+
+    scrolledwindow viewport {
+        margin: 0px 5px 5px 0px;
+        border-radius: 15px;
+        background-color: colors.$surface_container;
+    }
+    
+    .settings-body {
+        padding: 20px 10px;
+        .settings-category {
+            margin: 0px;
+            border-radius: 10px;
+        }
+        
+        .wallpaper-preview {
+            border-radius: 20px;
+        }
+        
+        .wallpaper-button-overlay {
+            color: transparent;
+            transition: 100ms;
+            border-radius: 20px;
+            outline-offset: 2px;
+            
+            &:hover {
+                background-color: rgba(colors.$surface_container, 0.2);
+            }
+        }
+        
+        .wallpaper-filename-label {
+            background-color: colors.$surface_container;
+            color: colors.$on_surface;
+            padding: 5px 1rem;
+            border-radius: 50rem;
+        }
+        
+        .folder-chooser-button {
+            background-color: colors.$surface_container_high;
+            border-radius: 20px;
+        }
+        
+        .wallpaper-gallery-container {
+            padding: 5px;
+            background-color: colors.$surface_container_high;
+            border-radius: 20px;
+            
+            scrolledwindow viewport {
+                background-color: colors.$surface_container_high;
+            }
+            
+            .wallpaper-thumbnail {
+                padding: 0px;
+            }
+        }
+        
+        scrolledwindow viewport {
+            margin: 0px;
+            border-radius: 15px;
+        }
+    }
+    
+    .network-list-container, .status-label, .no-networks-label {
+        background-color: colors.$surface_container_high;
+        border-radius: 20px;
+        padding: 5px;
+        min-height: 40px;
+        .network-row {
+            background-color: transparent;
+            border-radius: 8px;
+            min-height: 30px;
+            font-weight: 400;
+            &:first-child {
+                border-top-left-radius: 15px;
+                border-top-right-radius: 15px;
+            }
+            &:last-child {
+                border-bottom-left-radius: 15px;
+                border-bottom-right-radius: 15px;
+            }
+    
+            &:hover {
+                background-color: colors.$surface_container_highest;
+            }
+            padding: 5px;
+    
+            .connected-status-label, .status-label {
+                background-color: transparent;
+                padding: 0px 16px;
+            }
+    
+            .icon-label {
+                font-family: "Material Symbols Outlined";
+                font-size: 14pt;
+                font-weight: 600;
+            }
+        }
+    }
+}
+
+.settings-category-label {
+    margin-left: 0.5rem;
+    font-size: 1.6rem;
+    font-weight: 500;
+}
+
+.settings-row {
+    min-width: 800px;
+    padding: 0.5rem 1rem;
+
+    .settings-row-header {
+        .settings-row-title {
+            font-weight: 400;
+            font-size: 1rem;
+            color: colors.$on_surface;
+        }
+        .settings-row-description {
+            font-weight: 400;
+            font-size: 1rem;
+            color: colors.$on_surface_variant;
+            opacity: 0.7;
+        }
+    }
+    .switch-row {
+        transition: 100ms;
+        padding: 5px 10px;
+        margin: 0px -10px;
+    }
+}
+.row-button {
+    border-radius: 15px;
+    padding: 0px;
+    background: transparent;
+    outline: none;
+    &:hover {
+        background-color: colors.$surface_container_highest;
+    }
+    .switch-row {
+        padding-right: 10px;
+    }
+}
