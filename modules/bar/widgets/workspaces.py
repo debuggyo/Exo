@@ -145,7 +145,7 @@ class WorkspaceButton(widgets.Button):
         if style == "dots":
             self._main_content_box.set_spacing(0)
 
-class Workspaces(widgets.Box):
+class Workspaces(widgets.EventBox):
     def __init__(self):
         self._workspace_box = widgets.Box(
             css_classes=["workspaces"],
@@ -155,7 +155,11 @@ class Workspaces(widgets.Box):
             vexpand=True,
         )
         
-        super().__init__(child=[self._workspace_box])
+        super().__init__(
+            child=[self._workspace_box],
+            on_scroll_up=lambda self: self.workspaces_scroll(+1),
+            on_scroll_down=lambda self: self.workspaces_scroll(-1),
+        )
 
         if SERVICE:
             SERVICE.connect("notify::workspaces", self.update_workspaces)
@@ -207,6 +211,36 @@ class Workspaces(widgets.Box):
         for child in self._workspace_box:
             if isinstance(child, WorkspaceButton):
                 child.update_layout()
+
+    def workspaces_scroll(self, difference: int):
+        if not SERVICE:
+            return
+
+        active_workspace_id = None
+
+        if isinstance(SERVICE, NiriService):
+            active_workspace_niri = next(
+                (ws for ws in SERVICE.workspaces if ws.is_active),
+                None
+            )
+            if active_workspace_niri:
+                active_workspace_id = active_workspace_niri.idx
+            else:
+                print("No active Niri workspace found.")
+                return
+
+        elif isinstance(SERVICE, HyprlandService):
+            active_workspace_hyprland = SERVICE.active_workspace
+            if active_workspace_hyprland:
+                active_workspace_id = active_workspace_hyprland.id
+            else:
+                print("No active Hyprland workspace found.")
+                return
+
+        if active_workspace_id is not None:
+            new_workspace_id = active_workspace_id + difference
+            SERVICE.switch_to_workspace(new_workspace_id)
+
 
     def widget(self):
         return self
