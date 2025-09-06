@@ -211,7 +211,7 @@ def install_exo():
             print(f"An unexpected error occurred: {e}")
 
     # Copy default files
-    default_wallpaper_path = os.path.join(current_directory, "exodefaults", "wallpaper.png")
+    default_wallpaper_path = os.path.join(current_directory, "exodefaults", "default_wallpaper.png")
     wallpaper_dir = os.path.expanduser("~/Pictures/Wallpapers")
     os.makedirs(wallpaper_dir, exist_ok=True)
     
