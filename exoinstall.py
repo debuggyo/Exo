@@ -291,7 +291,7 @@ def install_exo():
         print(f"Error creating file: {e}")
 
     # Set default wallpaper and generate default color scheme
-    subprocess.run(["matugen", "image", default_wallpaper_path], check=True)
+    subprocess.run(["matugen", "image", default_wallpaper_dest], check=True)
 
 # Main execution logic
 def main():
