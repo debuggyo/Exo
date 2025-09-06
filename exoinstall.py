@@ -2,7 +2,6 @@ import os
 import sys
 import subprocess
 import shutil
-import distro
 
 # Global variable for the standard config path
 CONFIG_DIR = os.path.expanduser("~/.config/")
@@ -16,46 +15,42 @@ def get_user_choice(prompt, options):
         print("Invalid input.")
 
 def install_yay():
-    if distro.id() == "manjaro":
-        subprocess.run(["sudo", "pacman", "-S", "--needed", "git", "base-devel", "yay"], check=True)
-        return True
-    else:
-        yay_bin_dir = "yay-bin"
-        if os.path.exists(yay_bin_dir):
-            print(f"Directory '{yay_bin_dir}' already exists. Attempting to remove it...")
-            try:
-                shutil.rmtree(yay_bin_dir)
-            except OSError as e:
-                print(f"Error removing existing directory: {e}")
-                return False
-
+    yay_bin_dir = "yay-bin"
+    if os.path.exists(yay_bin_dir):
+        print(f"Directory '{yay_bin_dir}' already exists. Attempting to remove it...")
         try:
-            print("Installing base-devel and git from official repos...")
-            subprocess.run(["sudo", "pacman", "-S", "--needed", "--noconfirm", "git", "base-devel"], check=True)
-            print("Cloning yay from the AUR...")
-            subprocess.run(["git", "clone", "https://aur.archlinux.org/yay-bin.git"], check=True)
-            
-            os.chdir(yay_bin_dir)
-            print("Running makepkg. Please follow the prompts for sudo password.")
-            subprocess.run(["makepkg", "-si", "--noconfirm"], check=True)
-            os.chdir("..")
-
             shutil.rmtree(yay_bin_dir)
-
-            return True
-
-        except subprocess.CalledProcessError as e:
-            print(f"An error occurred during yay installation.")
-            print(f"Command '{' '.join(e.cmd)}' returned non-zero exit status {e.returncode}.")
-            if e.stdout: print(e.stdout.decode())
-            if e.stderr: print(e.stderr.decode())
-            # Ensure we are in the correct directory before returning
-            if os.getcwd().endswith(yay_bin_dir):
-                os.chdir("..")
+        except OSError as e:
+            print(f"Error removing existing directory: {e}")
             return False
-        except FileNotFoundError:
-            print("A required command was not found. Ensure git and base-devel are installed.")
-            return False
+
+    try:
+        print("Installing base-devel and git from official repos...")
+        subprocess.run(["sudo", "pacman", "-S", "--needed", "--noconfirm", "git", "base-devel"], check=True)
+        print("Cloning yay from the AUR...")
+        subprocess.run(["git", "clone", "https://aur.archlinux.org/yay-bin.git"], check=True)
+        
+        os.chdir(yay_bin_dir)
+        print("Running makepkg. Please follow the prompts for sudo password.")
+        subprocess.run(["makepkg", "-si", "--noconfirm"], check=True)
+        os.chdir("..")
+
+        shutil.rmtree(yay_bin_dir)
+
+        return True
+
+    except subprocess.CalledProcessError as e:
+        print(f"An error occurred during yay installation.")
+        print(f"Command '{' '.join(e.cmd)}' returned non-zero exit status {e.returncode}.")
+        if e.stdout: print(e.stdout.decode())
+        if e.stderr: print(e.stderr.decode())
+        # Ensure we are in the correct directory before returning
+        if os.getcwd().endswith(yay_bin_dir):
+            os.chdir("..")
+        return False
+    except FileNotFoundError:
+        print("A required command was not found. Ensure git and base-devel are installed.")
+        return False
 
 def check_aur_helper():
     if shutil.which("paru"):
