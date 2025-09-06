@@ -4,7 +4,18 @@ A Material 3 inspired desktop shell for Niri and Hyprland created with Ignis.
 
 For support or showcasing your Exo setup, you can join the Exo [Discord](https://discord.gg/XjyxD3y5a5) server!
 
-## Dependencies
+## Automatic Install Script (recommended method, Arch-based distros only)
+```
+sudo pacman -S git python
+git clone https://github.com/debuggyo/Exo
+cd Exo
+python exoinstall.py
+``` 
+
+## Manual Install Instructions
+First install the dependencies.
+
+# Dependencies
 * Niri or Hyprland
 * Ignis (git/dev) _(`python-ignis-git` on the AUR)_
 * `ignis-gvc`
@@ -16,9 +27,6 @@ For support or showcasing your Exo setup, you can join the Exo [Discord](https:/
 * `gnome-bluetooth-3.0`
 * `adw-gtk3` Theme
 * `dart-sass`
-
-## Install Instructions
-First install the dependencies.
 
 Create an `ignis` folder in your `.config` if it's not already there.
 
