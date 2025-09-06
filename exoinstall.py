@@ -144,7 +144,7 @@ def install_dependencies():
 def install_optional_dependencies():
     print("Optional dependencies.")
     options = {
-        "ttf-rubik": "Rubik Font",
+        "ttf-rubik-vf": "Rubik Font",
         "bibata-cursor-theme-bin": "Bibata Cursors",
         "gpu-screen-recorder": "GPU Screen Recorder (required for screen recording)",
         "slurp": "Slurp (required for screen recording a region)"
