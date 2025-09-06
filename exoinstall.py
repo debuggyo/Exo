@@ -285,7 +285,7 @@ def install_exo():
     user_settings_file = os.path.join(CONFIG_DIR, "ignis", "user_settings.json")
     try:
         with open(user_settings_file, 'w') as file:
-            file.write("")
+            file.write("{}")
         print(f"File '{user_settings_file}' created successfully.")
     except IOError as e:
         print(f"Error creating file: {e}")
