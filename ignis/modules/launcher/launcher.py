@@ -235,6 +235,7 @@ class Launcher(widgets.Window):
             layer="overlay",
             kb_mode="exclusive",
             anchor=["left", "right", "top", "bottom"],
+            setup=lambda self: self.connect("notify::visible", self.__on_open),
             child=main_overlay
         )
 
