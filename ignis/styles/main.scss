@@ -1,13 +1,13 @@
 @use "../colors";
-@import "bar.scss";
-@import "dock.scss";
-@import "corners.scss";
-@import "settings.scss";
-@import "launcher.scss";
-@import "powermenu.scss";
-@import "quickcenter.scss";
-@import "notifications.scss";
-@import "m3.scss";
+@use "bar.scss";
+@use "dock.scss";
+@use "corners.scss";
+@use "settings.scss";
+@use "launcher.scss";
+@use "powermenu.scss";
+@use "quickcenter.scss";
+@use "notifications.scss";
+@use "m3.scss";
 
 *:focus {
     outline-color: colors.$secondary;

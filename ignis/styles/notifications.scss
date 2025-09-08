@@ -1,3 +1,5 @@
+@use "../colors";
+
 .notification, .notification-popup {
     background-color: colors.$surface_container;
     padding: 10px;
