@@ -89,7 +89,7 @@ def unpause_recording():
         _update_pause_state()
 
 def record_screen(*args: str):
-    _record_source("screen", *args)
+    _record_source("screen", audio_devices=["default_output"],  *args)
 
 def record_portal(*args: str):
     _record_source("portal", *args)
