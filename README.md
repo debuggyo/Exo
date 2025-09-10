@@ -6,9 +6,11 @@ For support or showcasing your Exo setup, you can join the Exo [Discord](https:/
 
 ## Automatic Install Script (recommended method, Arch-based distros only)
 The installer script will automatically clone the repository to a temporary folder, install the necessary dependencies, and copy the configuration files to the correct locations.
+
+This script can also be used to update Exo.
 ```
 sudo pacman -S git python
-curl -o https://raw.githubusercontent.com/debuggyo/Exo/main/exoinstall.py
+curl -o exoinstall.py https://raw.githubusercontent.com/debuggyo/Exo/main/exoinstall.py
 python exoinstall.py
 ```
 
