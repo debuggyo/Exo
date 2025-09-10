@@ -30,7 +30,7 @@ class PowerMenuButton(widgets.Button):
             width_request=150,
         )
 
-class PowerMenu(widgets.Window):
+class PowerMenu(widgets.RevealerWindow):
     def __init__(self):
         main_box = widgets.Grid(
             valign="center",
@@ -46,7 +46,15 @@ class PowerMenu(widgets.Window):
                 PowerMenuButton(icon="frame_reload", label="Restart Exo", command="ignis reload"),
             ],
         )
-        
+
+        revealer = widgets.Revealer(
+            child=main_box,
+            transition_duration=250,
+            transition_type="crossfade",
+            halign="center",
+            valign="center",
+        )
+
         close_button = widgets.Button(
             vexpand=True,
             hexpand=True,
@@ -58,16 +66,25 @@ class PowerMenu(widgets.Window):
         main_overlay = widgets.Overlay(
             css_classes=["popup-close"],
             child=close_button,
-            overlays=[main_box]
+            overlays=[revealer]
         )
 
         super().__init__(
+            revealer=revealer,
+            child=main_overlay,
             popup=True,
             kb_mode="exclusive",
             namespace="PowerMenu",
             exclusivity="ignore",
             visible=False,
-            child=main_overlay,
             css_classes=["popup-close"],
             anchor=["left", "right", "top", "bottom"],
         )
+
+        self.main_box = main_box
+        self.revealer = revealer
+
+        self.connect("notify::visible", self._toggle_revealer)
+
+    def _toggle_revealer(self, *_):
+        self.revealer.reveal_child = self.visible
