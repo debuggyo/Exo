@@ -270,7 +270,7 @@
 
 // Time & Date
 .timedate {
-    padding: 0px 10px;
+    padding: 0px 5px;
     min-height: 0px;
 
     .time {
@@ -346,8 +346,7 @@
 
 // Tray
 .tray {
-    background-color: colors.$surface_container;
-    padding: 0px 10px;
+    padding: 0px;
     min-width: 12px;
 
     .tray-item {
@@ -523,7 +522,7 @@
     }
 
     .timedate {
-        padding: 10px 0px;
+        padding: 5px 0px;
         .date {
             opacity: 1;
             font-size: 10pt;
@@ -539,7 +538,7 @@
     }
 
     .tray {
-        padding: 5px 0px;
+        padding: 0px;
     }
 
     #recording-indicator {

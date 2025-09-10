@@ -76,13 +76,10 @@ class BarStyles:
     def _update_all_layouts():
         if BarStyles.bar_instance:
             BarStyles.bar_instance.window_info.update_layout()
-            BarStyles.bar_instance.time_date.update_layout()
             BarStyles.bar_instance.media.update_layout()
             BarStyles.bar_instance.workspaces.update_layout()
             BarStyles.bar_instance.media.update_visibility()
             BarStyles.bar_instance.recording_indicator.update_layout()
-            BarStyles.bar_instance.battery.update_layout()
-            BarStyles.bar_instance.tray.update_layout()
             BarStyles.bar_instance.systeminfotray.update_layout()
 
     @staticmethod

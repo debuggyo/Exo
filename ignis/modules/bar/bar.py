@@ -1,7 +1,7 @@
 import os
 from ignis import widgets, utils
 from user_settings import user_settings
-from .widgets import Clock, WindowInfo, Workspaces, Tray, Media, Battery, SystemInfoTray
+from .widgets import WindowInfo, Workspaces, Media, Battery, SystemInfoTray
 from modules.m3components import Button
 from modules.corners import Corners
 from ignis.css_manager import CssManager
@@ -17,13 +17,11 @@ class Bar:
     def __init__(self, monitor: int = 0):
         self.monitor = monitor
         self.__win = None
-        self.time_date = Clock()
         self.media = Media()
         self.window_info = WindowInfo()
         self.workspaces = Workspaces()
         self.recording_indicator = RecordingIndicator()
         self.battery = Battery()
-        self.tray = Tray()
         self.systeminfotray = SystemInfoTray()
         set_indicator(self.recording_indicator)
 
@@ -79,9 +77,7 @@ class Bar:
                     css_classes=["right-widgets"],
                     child=[
                         self.recording_indicator.widget(),
-                        self.tray.widget(),
                         self.systeminfotray.widget(),
-                        self.time_date.widget()
                     ],
                 ),
             ),
