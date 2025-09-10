@@ -19,7 +19,7 @@ css_manager = CssManager.get_default()
 css_manager.apply_css(
     CssInfoPath(
         name="main",
-        path=os.path.expanduser("~/.config/ignis/style.scss"),
+        path=os.path.expanduser("~/.config/ignis/styles/main.scss"),
         compiler_function=lambda path: utils.sass_compile(path=path)
     )
 )

@@ -9,7 +9,6 @@
     }
 }
 
-// -- Bar
 .bar {
     background-color: colors.$surface;
     color: colors.$on_background;
@@ -113,8 +112,10 @@
     }
 
     &.compact {
-        .workspace.active {
-            padding: 0px 5px;
+        .left-widgets,
+        .center-widgets,
+        .right-widgets {
+            padding: 2px;
         }
     }
     &.compact-plus {
@@ -217,10 +218,8 @@
 
     &.windows {
         .workspace {
-            background-color: colors.$surface_container_high;
             color: colors.$on_background;
             padding: 0px 10px;
-            border-radius: 5px;
 
             &:hover {
                 background-color: colors.$surface_container_highest;
@@ -253,18 +252,6 @@
                 background-color: colors.$on_background;
             }
         }
-    }
-}
-
-.bar.horizontal .workspaces.windows .workspace {
-    &:first-child {
-        border-top-left-radius: 20px;
-        border-bottom-left-radius: 20px;
-    }
-
-    &:last-child {
-        border-top-right-radius: 20px;
-        border-bottom-right-radius: 20px;
     }
 }
 
@@ -483,16 +470,6 @@
         }
         &.windows .workspace {
             padding: 5px 0px;
-
-            &:first-child {
-                border-top-left-radius: 20px;
-                border-top-right-radius: 20px;
-            }
-
-            &:last-child {
-                border-bottom-left-radius: 20px;
-                border-bottom-right-radius: 20px;
-            }
         }
         &.dots {
             padding: 15px 0px;
