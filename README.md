@@ -8,7 +8,7 @@ For support or showcasing your Exo setup, you can join the Exo [Discord](https:/
 The installer script will automatically clone the repository to a temporary folder, install the necessary dependencies, and copy the configuration files to the correct locations.
 
 This script can also be used to update Exo.
-```
+```sh
 sudo pacman -S git python
 curl -o exoinstall.py https://raw.githubusercontent.com/debuggyo/Exo/main/exoinstall.py
 python exoinstall.py
@@ -32,7 +32,13 @@ First install the dependencies.
 
 Create an `ignis` folder in your `.config` if it's not already there.
 
-`git clone https://github.com/debuggyo/Exo ~/.config/ignis`
+```sh
+git clone https://github.com/debuggyo/Exo
+cd Exo
+cp -r ignis ~/.config/
+cp -r matugen ~/.config/
+touch ~/.config/ignis/user_settings.json
+```
 
 In your Niri or Hyprland config add the following keybinds, bind them to anything you would like.
 
