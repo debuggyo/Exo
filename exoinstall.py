@@ -281,14 +281,40 @@ class ExoInstaller:
             niri_config_dir = os.path.join(self.config_dir, "niri")
             os.makedirs(niri_config_dir, exist_ok=True)
             niri_source = os.path.join(self.source_dir, "exodefaults", "config.kdl")
-            shutil.copy2(niri_source, os.path.join(niri_config_dir, "config.kdl"))
+            niri_dest = os.path.join(niri_config_dir, "config.kdl")
+
+            if os.path.exists(niri_dest):
+                print(f"{self.Colors.YELLOW}Niri config already exists.{self.Colors.ENDC}")
+                choice = self.get_user_choice("Backup (b), Overwrite (o), Skip (s)? ", ['b', 'o', 's'])
+                if choice == 'b':
+                    print(f"Backing up {niri_dest}...")
+                    shutil.copy2(niri_dest, niri_dest + ".bak")
+                elif choice == 'o':
+                    print(f"Overwriting {niri_dest}...")
+                elif choice == 's':
+                    print(f"Skipping {niri_dest}...")
+                    return
+            shutil.copy2(niri_source, niri_dest)
 
         if desktop_env in ["hyprland", "both"]:
             print("Copying Hyprland config...")
             hypr_config_dir = os.path.join(self.config_dir, "hyprland")
             os.makedirs(hypr_config_dir, exist_ok=True)
             hypr_source = os.path.join(self.source_dir, "exodefaults", "hyprland.conf")
-            shutil.copy2(hypr_source, os.path.join(hypr_config_dir, "hyprland.conf"))
+            hypr_dest = os.path.join(hypr_config_dir, "hyprland.conf")
+
+            if os.path.exists(hypr_dest):
+                print(f"{self.Colors.YELLOW}Hyprland config already exists.{self.Colors.ENDC}")
+                choice = self.get_user_choice("Backup (b), Overwrite (o), Skip (s)? ", ['b', 'o', 's'])
+                if choice == 'b':
+                    print(f"Backing up {hypr_dest}...")
+                    shutil.copy2(hypr_dest, hypr_dest + ".bak")
+                elif choice == 'o':
+                    print(f"Overwriting {hypr_dest}...")
+                elif choice == 's':
+                    print(f"Skipping {hypr_dest}...")
+                    return
+            shutil.copy2(hypr_source, hypr_dest)
 
     def final_setup(self):
         self.print_header("Final Setup")

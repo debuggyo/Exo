@@ -229,3 +229,6 @@ hotkey-overlay {
     skip-at-startup
     hide-not-bound
 }
+
+spawn-at-startup "ignis" "init"
+spawn-at-startup "swww-daemon"
