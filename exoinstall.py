@@ -3,6 +3,7 @@ import sys
 import subprocess
 import shutil
 import hashlib
+import tempfile
 
 class ExoInstaller:
     class Colors:
@@ -14,9 +15,11 @@ class ExoInstaller:
         ENDC = '\033[0m'
         BOLD = '\033[1m'
 
+    REPO_URL = "https://github.com/debuggyo/Exo.git"
+
     def __init__(self):
         self.default_config_dir = os.path.expanduser("~/.config/")
-        self.source_dir = os.getcwd()
+        self.source_dir = None
         self.config_dir = self.default_config_dir
         self.aur_helper = None
         self.dry_run = False
@@ -26,21 +29,49 @@ class ExoInstaller:
 
     def run(self):
         self.print_header("Welcome to the Exo Installer")
-        print("1: Full Installation")
-        print("2: Update Existing Installation")
-        print("3: Run in Test Mode (Dry Run)")
-        print("q: Quit")
-        choice = self.get_user_choice("Select an option: ", ["1", "2", "3", "q"])
 
-        if choice == '1':
-            self.full_install()
-        elif choice == '2':
-            self.update_install()
-        elif choice == '3':
-            self.enter_test_mode()
-        elif choice == 'q':
-            print("Quitting.")
-            sys.exit(0)
+        if not self.check_arch_distro():
+            sys.exit(1)
+
+        try:
+            with tempfile.TemporaryDirectory() as temp_dir:
+                self.clone_repo(self.REPO_URL, temp_dir)
+                self.source_dir = temp_dir
+
+                print("1: Full Installation")
+                print("2: Update Existing Installation")
+                print("3: Run in Test Mode (Dry Run)")
+                print("q: Quit")
+                choice = self.get_user_choice("Select an option: ", ["1", "2", "3", "q"])
+
+                if choice == '1':
+                    self.full_install()
+                elif choice == '2':
+                    self.update_install()
+                elif choice == '3':
+                    self.enter_test_mode()
+                elif choice == 'q':
+                    print("Quitting.")
+        except Exception as e:
+            print(f"{self.Colors.RED}An unexpected error occurred: {e}{self.Colors.ENDC}")
+            sys.exit(1)
+        finally:
+            print("\nTemporary files have been cleaned up.")
+
+    def clone_repo(self, repo_url, dest_dir):
+        if not shutil.which("git"):
+            print(f"{self.Colors.RED}Git command not found. Please install Git to continue.{self.Colors.ENDC}")
+            sys.exit(1)
+
+        print(f"Cloning '{repo_url}' into a temporary directory...")
+        result = subprocess.run(
+            ['git', 'clone', '--depth', '1', repo_url, dest_dir],
+            capture_output=True, text=True, check=False
+        )
+
+        if result.returncode != 0:
+            print(f"{self.Colors.RED}Error cloning repository: {result.stderr}{self.Colors.ENDC}")
+            sys.exit(1)
 
     def enter_test_mode(self):
         self.dry_run = True
@@ -84,11 +115,44 @@ class ExoInstaller:
         print(f"{self.Colors.HEADER}{self.Colors.BOLD}{'='*50}{self.Colors.ENDC}")
 
     def get_user_choice(self, prompt, options):
-        while True:
-            option = input(f"{self.Colors.YELLOW}{prompt}{self.Colors.ENDC}").lower()
-            if option in options:
-                return option
-            print(f"{self.Colors.RED}Invalid input.{self.Colors.ENDC}")
+        # Check if we can use a raw terminal for immediate input
+        try:
+            # Unix-like systems (Linux, macOS)
+            import termios, tty
+
+            print(f"{self.Colors.YELLOW}{prompt}{self.Colors.ENDC}", end='', flush=True)
+
+            fd = sys.stdin.fileno()
+            old_settings = termios.tcgetattr(fd)
+            try:
+                tty.setraw(fd)
+                while True:
+                    char = sys.stdin.read(1)
+                    if char.lower() in options:
+                        print(char) # Echo the key press
+                        return char.lower()
+
+            finally:
+                termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+
+        except ImportError:
+            # Fallback for Windows
+            try:
+                import msvcrt
+                print(f"{self.Colors.YELLOW}{prompt}{self.Colors.ENDC}", end='', flush=True)
+                while True:
+                    char = msvcrt.getch().decode('utf-8')
+                    if char.lower() in options:
+                        print(char) # Echo the key press
+                        return char.lower()
+            except ImportError:
+                # Fallback to standard line-buffered input if neither works
+                print(f"\n{self.Colors.YELLOW}Warning: Immediate input is not supported. Please press 'Enter' after your choice.{self.Colors.ENDC}")
+                while True:
+                    option = input(f"{self.Colors.YELLOW}{prompt}{self.Colors.ENDC}").lower()
+                    if option in options:
+                        return option
+                    print(f"{self.Colors.RED}Invalid input.{self.Colors.ENDC}")
 
     def get_file_hash(self, file_path):
         hasher = hashlib.sha256()
@@ -99,6 +163,16 @@ class ExoInstaller:
             return hasher.hexdigest()
         except IOError:
             return None
+
+    def check_arch_distro(self):
+        self.print_header("Distro Check")
+        if os.path.exists('/etc/arch-release'):
+            print(f"{self.Colors.GREEN}Detected Arch-based distribution. Proceeding with installation...{self.Colors.ENDC}")
+            return True
+        else:
+            print(f"{self.Colors.RED}This installer is designed for Arch-based distributions only.{self.Colors.ENDC}")
+            print(f"{self.Colors.RED}Warning: '/etc/arch-release' not found. Exiting.{self.Colors.ENDC}")
+            return False
 
     def check_aur_helper(self):
         self.print_header("Checking for AUR Helper")
@@ -164,7 +238,6 @@ class ExoInstaller:
                     installed_desktops.append(desktop)
 
         if len(installed_desktops) == 0:
-            print("Neither Niri nor Hyprland found.")
             return self.install_desktop()
         elif len(installed_desktops) == 1:
             print(f"Found existing desktop: {installed_desktops[0]}")
@@ -172,6 +245,35 @@ class ExoInstaller:
         else:
             print("Found both Niri and Hyprland.")
             return "both"
+
+    def install_desktop(self):
+        self.print_header("Desktop Environment Installation")
+        print("Neither Niri nor Hyprland found. Would you like to install one?")
+        print("1: Niri")
+        print("2: Hyprland")
+        print("3: Both")
+        print("q: Quit")
+
+        choice = self.get_user_choice("Select an option: ", ["1", "2", "3", "q"])
+
+        if choice == "1":
+            print("Installing Niri...")
+            if self.run_command(["sudo", "pacman", "-S", "--noconfirm", "niri"]):
+                return "niri"
+        elif choice == "2":
+            print("Installing Hyprland...")
+            if self.run_command(["sudo", "pacman", "-S", "--noconfirm", "hyprland"]):
+                return "hyprland"
+        elif choice == "3":
+            print("Installing Niri and Hyprland...")
+            if self.run_command(["sudo", "pacman", "-S", "--noconfirm", "niri", "hyprland"]):
+                return "both"
+        elif choice == "q":
+            print("Quitting.")
+            sys.exit(0)
+
+        print(f"{self.Colors.RED}Installation failed or cancelled. Cannot proceed.{self.Colors.ENDC}")
+        return None
 
     def install_desktop_configs(self, desktop_env):
         if desktop_env in ["niri", "both"]:
@@ -215,6 +317,8 @@ class ExoInstaller:
             print(f"{self.Colors.YELLOW}[DRY RUN] Skipping AUR helper check and dependency installation.{self.Colors.ENDC}")
 
         desktop_env = self.check_desktop()
+        if not desktop_env:
+            return
 
         core_folders = ["ignis", "matugen"]
         for folder in core_folders:
@@ -244,7 +348,6 @@ class ExoInstaller:
     def update_install(self):
         self.print_header("Updating Existing Exo Installation")
 
-        # New options for automatic confirmation
         overwrite_choice = self.get_user_choice("\nHow to handle file overwrites? (y: Yes to all, n: Prompt for each): ", ['y', 'n'])
         if overwrite_choice == 'y':
             self.auto_confirm_overwrite = True
@@ -264,14 +367,11 @@ class ExoInstaller:
 
             print(f"\n--- Comparing folder: {self.Colors.BLUE}{folder}{self.Colors.ENDC} ---")
 
-            # Compare source to destination and copy new/updated files
             for root, dirs, files in os.walk(source_path):
-                # Exclude __pycache__ from traversal
                 dirs[:] = [d for d in dirs if d != '__pycache__']
 
                 for file in files:
-                    # Also check for __pycache__ files
-                    if file == '__pycache__' or os.path.basename(file) in self.protected_files:
+                    if os.path.basename(file) in self.protected_files:
                         continue
 
                     source_file = os.path.join(root, file)
@@ -279,9 +379,7 @@ class ExoInstaller:
                     dest_file = os.path.join(dest_path, rel_path)
                     self.compare_and_copy(source_file, dest_file)
 
-            # Compare destination to source and delete orphaned files
             for root, dirs, files in os.walk(dest_path):
-                # Exclude __pycache__ from traversal
                 dirs[:] = [d for d in dirs if d != '__pycache__']
 
                 for file in files:

@@ -5,12 +5,12 @@ A Material 3 inspired desktop shell for Niri and Hyprland created with Ignis.
 For support or showcasing your Exo setup, you can join the Exo [Discord](https://discord.gg/XjyxD3y5a5) server!
 
 ## Automatic Install Script (recommended method, Arch-based distros only)
+The installer script will automatically clone the repository to a temporary folder, install the necessary dependencies, and copy the configuration files to the correct locations.
 ```
 sudo pacman -S git python
-git clone https://github.com/debuggyo/Exo
-cd Exo
+curl -o https://raw.githubusercontent.com/debuggyo/Exo/main/exoinstall.py
 python exoinstall.py
-``` 
+```
 
 ## Manual Install Instructions
 First install the dependencies.
