@@ -30,8 +30,8 @@ class ExoInstaller:
     def run(self):
         self.print_header("Welcome to the Exo Installer")
 
-        if not self.check_arch_distro():
-            sys.exit(1)
+        # The distro check is now done only for a full installation.
+        # This allows the update function to be used on other distros.
 
         try:
             with tempfile.TemporaryDirectory() as temp_dir:
@@ -167,11 +167,11 @@ class ExoInstaller:
     def check_arch_distro(self):
         self.print_header("Distro Check")
         if os.path.exists('/etc/arch-release'):
-            print(f"{self.Colors.GREEN}Detected Arch-based distribution. Proceeding with installation...{self.Colors.ENDC}")
+            print(f"{self.Colors.GREEN}Detected Arch-based distribution. Proceeding...{self.Colors.ENDC}")
             return True
         else:
-            print(f"{self.Colors.RED}This installer is designed for Arch-based distributions only.{self.Colors.ENDC}")
-            print(f"{self.Colors.RED}Warning: '/etc/arch-release' not found. Exiting.{self.Colors.ENDC}")
+            print(f"{self.Colors.RED}This full installation is designed for Arch-based distributions only.{self.Colors.ENDC}")
+            print(f"{self.Colors.RED}Warning: '/etc/arch-release' not found. Cannot proceed with full installation.{self.Colors.ENDC}")
             return False
 
     def check_aur_helper(self):
@@ -308,6 +308,10 @@ class ExoInstaller:
 
     def full_install(self):
         self.print_header("Starting Full Exo Installation")
+
+        # Perform the distro check here
+        if not self.check_arch_distro():
+            return
 
         if not self.dry_run:
             if not self.check_aur_helper():
