@@ -21,6 +21,8 @@ class ExoInstaller:
         self.aur_helper = None
         self.dry_run = False
         self.protected_files = ["user_settings.json", "colors.scss"]
+        self.auto_confirm_overwrite = False
+        self.auto_confirm_delete = False
 
     def run(self):
         self.print_header("Welcome to the Exo Installer")
@@ -171,24 +173,6 @@ class ExoInstaller:
             print("Found both Niri and Hyprland.")
             return "both"
 
-    def install_desktop(self):
-        print("Which desktop environment do you want to install?")
-        print("1: Niri")
-        print("2: Hyprland")
-        print("3: Both")
-        print("4: Ignore")
-        options = {'1': 'niri', '2': 'hyprland', '3': 'both', '4': 'ignore'}
-        choice = self.get_user_choice("Select an option: ", list(options.keys()))
-        desktop = options[choice]
-
-        if desktop == "niri":
-            self.run_command(["sudo", "pacman", "-S", "--noconfirm", "niri"])
-        elif desktop == "hyprland":
-            self.run_command(["sudo", "pacman", "-S", "--noconfirm", "hyprland"])
-        elif desktop == "both":
-            self.run_command(["sudo", "pacman", "-S", "--noconfirm", "niri", "hyprland"])
-        return desktop
-
     def install_desktop_configs(self, desktop_env):
         if desktop_env in ["niri", "both"]:
             print("Copying Niri config...")
@@ -259,8 +243,17 @@ class ExoInstaller:
 
     def update_install(self):
         self.print_header("Updating Existing Exo Installation")
-        core_folders = ["ignis", "matugen"]
 
+        # New options for automatic confirmation
+        overwrite_choice = self.get_user_choice("\nHow to handle file overwrites? (y: Yes to all, n: Prompt for each): ", ['y', 'n'])
+        if overwrite_choice == 'y':
+            self.auto_confirm_overwrite = True
+
+        delete_choice = self.get_user_choice("How to handle orphaned files? (y: Yes to all, n: Prompt for each): ", ['y', 'n'])
+        if delete_choice == 'y':
+            self.auto_confirm_delete = True
+
+        core_folders = ["ignis", "matugen"]
         for folder in core_folders:
             source_path = os.path.join(self.source_dir, folder)
             dest_path = os.path.join(self.config_dir, folder)
@@ -270,9 +263,15 @@ class ExoInstaller:
                 continue
 
             print(f"\n--- Comparing folder: {self.Colors.BLUE}{folder}{self.Colors.ENDC} ---")
-            for root, _, files in os.walk(source_path):
+
+            # Compare source to destination and copy new/updated files
+            for root, dirs, files in os.walk(source_path):
+                # Exclude __pycache__ from traversal
+                dirs[:] = [d for d in dirs if d != '__pycache__']
+
                 for file in files:
-                    if os.path.basename(file) in self.protected_files:
+                    # Also check for __pycache__ files
+                    if file == '__pycache__' or os.path.basename(file) in self.protected_files:
                         continue
 
                     source_file = os.path.join(root, file)
@@ -280,7 +279,11 @@ class ExoInstaller:
                     dest_file = os.path.join(dest_path, rel_path)
                     self.compare_and_copy(source_file, dest_file)
 
-            for root, _, files in os.walk(dest_path):
+            # Compare destination to source and delete orphaned files
+            for root, dirs, files in os.walk(dest_path):
+                # Exclude __pycache__ from traversal
+                dirs[:] = [d for d in dirs if d != '__pycache__']
+
                 for file in files:
                     if os.path.basename(file) in self.protected_files:
                         continue
@@ -291,7 +294,7 @@ class ExoInstaller:
 
                     if not os.path.exists(source_file):
                         self.prompt_and_delete(dest_file)
-        # self.final_setup() # Don't run full final setup on update, maybe a specific update version?
+
         print(f"\n{self.Colors.GREEN}Update check complete.{self.Colors.ENDC}")
 
     def compare_and_copy(self, source, dest):
@@ -304,17 +307,27 @@ class ExoInstaller:
             shutil.copy2(source, dest)
         elif source_hash != dest_hash:
             print(f"{self.Colors.YELLOW}File mismatch: '{os.path.basename(source)}'{self.Colors.ENDC}")
-            choice = self.get_user_choice("  Overwrite with latest version? (y/n): ", ['y', 'n'])
-            if choice == 'y':
-                print(f"  Updating '{os.path.basename(source)}'...")
+
+            if self.auto_confirm_overwrite:
+                print(f"  Updating '{os.path.basename(source)}' (automatic).")
                 shutil.copy2(source, dest)
+            else:
+                choice = self.get_user_choice("  Overwrite with latest version? (y/n): ", ['y', 'n'])
+                if choice == 'y':
+                    print(f"  Updating '{os.path.basename(source)}'...")
+                    shutil.copy2(source, dest)
 
     def prompt_and_delete(self, file_path):
         print(f"{self.Colors.YELLOW}Orphaned file found: '{os.path.basename(file_path)}' exists in your config but not in the source.{self.Colors.ENDC}")
-        choice = self.get_user_choice("  Delete this file? (y/n): ", ['y', 'n'])
-        if choice == 'y':
-            print(f"  Deleting '{os.path.basename(file_path)}'...")
+
+        if self.auto_confirm_delete:
+            print(f"  Deleting '{os.path.basename(file_path)}' (automatic).")
             os.remove(file_path)
+        else:
+            choice = self.get_user_choice("  Delete this file? (y/n): ", ['y', 'n'])
+            if choice == 'y':
+                print(f"  Deleting '{os.path.basename(file_path)}'...")
+                os.remove(file_path)
 
 if __name__ == "__main__":
     if os.geteuid() == 0:
