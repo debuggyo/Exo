@@ -45,13 +45,12 @@ class ExoInstaller:
                 print("1: Full Installation")
                 print("2: Update Existing Installation")
                 print("3: Run in Test Mode (Dry Run)")
-                if not command_exists:
-                    print("4: Install as Command")
                 print("q: Quit")
                 options = ["1", "2", "3", "q"]
-                if not command_exists:
-                    options.append("4")
                 choice = self.get_user_choice("Select an option: ", options)
+                # Automatically install exoupdate if not present
+                if not command_exists:
+                    self.install_as_command()
 
                 if choice == '1':
                     self.full_install()
@@ -59,8 +58,6 @@ class ExoInstaller:
                     self.update_install()
                 elif choice == '3':
                     self.enter_test_mode()
-                elif choice == '4' and not command_exists:
-                    self.install_as_command()
                 elif choice == 'q':
                     print("Quitting.")
         except Exception as e:
@@ -588,76 +585,76 @@ class ExoInstaller:
                 print(f"  Deleting '{os.path.basename(file_path)}'...")
                 os.remove(file_path)
 
-   def install_as_command(self):
-       self.print_header("Installing as Command")
-       prefix = "/usr/local"
-       dest_dir = os.path.join(prefix, "bin")
-       if not os.path.exists(dest_dir):
-           print(f"{self.Colors.YELLOW}Creating directory: {dest_dir}{self.Colors.ENDC}")
-           try:
-               os.makedirs(dest_dir)
-           except OSError as e:
-               print(f"{self.Colors.RED}Error creating directory: {e}{self.Colors.ENDC}")
-               return
+    def install_as_command(self):
+        self.print_header("Installing as Command")
+        prefix = "/usr/local"
+        dest_dir = os.path.join(prefix, "bin")
+        if not os.path.exists(dest_dir):
+            print(f"{self.Colors.YELLOW}Creating directory: {dest_dir}{self.Colors.ENDC}")
+            try:
+                os.makedirs(dest_dir)
+            except OSError as e:
+                print(f"{self.Colors.RED}Error creating directory: {e}{self.Colors.ENDC}")
+                return
 
-       dest_file = os.path.join(dest_dir, "exoupdate")
-       try:
-           cmd = ["sudo", "cp", sys.argv[0], dest_file]
-           result = self.run_command(cmd)
-           if result and result.returncode == 0:
-               print(f"{self.Colors.GREEN}Copied script to: {dest_file}{self.Colors.ENDC}")
-           else:
-               print(f"{self.Colors.RED}Error copying script.{self.Colors.ENDC}")
-               return
-       except Exception as e:
-           print(f"{self.Colors.RED}Error copying script: {e}{self.Colors.ENDC}")
-           return
+        dest_file = os.path.join(dest_dir, "exoupdate")
+        try:
+            cmd = ["sudo", "cp", sys.argv[0], dest_file]
+            result = self.run_command(cmd)
+            if result and result.returncode == 0:
+                print(f"{self.Colors.GREEN}Copied script to: {dest_file}{self.Colors.ENDC}")
+            else:
+                print(f"{self.Colors.RED}Error copying script.{self.Colors.ENDC}")
+                return
+        except Exception as e:
+            print(f"{self.Colors.RED}Error copying script: {e}{self.Colors.ENDC}")
+            return
 
-       try:
-           cmd = ["sudo", "chmod", "755", dest_file]
-           result = self.run_command(cmd)
-           if result and result.returncode == 0:
-               print(f"{self.Colors.GREEN}Made script executable.{self.Colors.ENDC}")
-           else:
-               print(f"{self.Colors.RED}Error making script executable.{self.Colors.ENDC}")
-               return
-       except Exception as e:
-           print(f"{self.Colors.RED}Error making script executable: {e}{self.Colors.ENDC}")
-           return
+        try:
+            cmd = ["sudo", "chmod", "755", dest_file]
+            result = self.run_command(cmd)
+            if result and result.returncode == 0:
+                print(f"{self.Colors.GREEN}Made script executable.{self.Colors.ENDC}")
+            else:
+                print(f"{self.Colors.RED}Error making script executable.{self.Colors.ENDC}")
+                return
+        except Exception as e:
+            print(f"{self.Colors.RED}Error making script executable: {e}{self.Colors.ENDC}")
+            return
 
-       print(f"{self.Colors.GREEN}Installation as command complete. You can now run 'exoupdate' from anywhere.{self.Colors.ENDC}")
+        print(f"{self.Colors.GREEN}Installation as command complete. You can now run 'exoupdate' from anywhere.{self.Colors.ENDC}")
 
-   def update_installed_command_if_needed(self):
-       installed_path = "/usr/local/bin/exoupdate"
-       cloned_script = sys.argv[0]
-       # If running from /usr/local/bin/exoupdate, use the cloned repo's script
-       if os.path.basename(cloned_script) == "exoupdate":
-           cloned_script = os.path.join(self.source_dir, "exoinstall.py")
-       if not os.path.exists(installed_path):
-           return  # Nothing to update
+    def update_installed_command_if_needed(self):
+        installed_path = "/usr/local/bin/exoupdate"
+        cloned_script = sys.argv[0]
+        # If running from /usr/local/bin/exoupdate, use the cloned repo's script
+        if os.path.basename(cloned_script) == "exoupdate":
+            cloned_script = os.path.join(self.source_dir, "exoinstall.py")
+        if not os.path.exists(installed_path):
+            return  # Nothing to update
 
-       def file_hash(path):
-           hasher = hashlib.sha256()
-           try:
-               with open(path, "rb") as f:
-                   hasher.update(f.read())
-               return hasher.hexdigest()
-           except Exception:
-               return None
+        def file_hash(path):
+            hasher = hashlib.sha256()
+            try:
+                with open(path, "rb") as f:
+                    hasher.update(f.read())
+                return hasher.hexdigest()
+            except Exception:
+                return None
 
-       installed_hash = file_hash(installed_path)
-       cloned_hash = file_hash(cloned_script)
+        installed_hash = file_hash(installed_path)
+        cloned_hash = file_hash(cloned_script)
 
-       if installed_hash and cloned_hash and installed_hash != cloned_hash:
-           print(f"{self.Colors.YELLOW}Updating installed exoupdate command...{self.Colors.ENDC}")
-           cmd = ["sudo", "cp", cloned_script, installed_path]
-           result = self.run_command(cmd)
-           if result and result.returncode == 0:
-               print(f"{self.Colors.GREEN}exoupdate command updated successfully.{self.Colors.ENDC}")
-           else:
-               print(f"{self.Colors.RED}Failed to update exoupdate command.{self.Colors.ENDC}")
-       else:
-           print(f"{self.Colors.GREEN}Installed exoupdate command is up to date.{self.Colors.ENDC}")
+        if installed_hash and cloned_hash and installed_hash != cloned_hash:
+            print(f"{self.Colors.YELLOW}Updating installed exoupdate command...{self.Colors.ENDC}")
+            cmd = ["sudo", "cp", cloned_script, installed_path]
+            result = self.run_command(cmd)
+            if result and result.returncode == 0:
+                print(f"{self.Colors.GREEN}exoupdate command updated successfully.{self.Colors.ENDC}")
+            else:
+                print(f"{self.Colors.RED}Failed to update exoupdate command.{self.Colors.ENDC}")
+        else:
+            print(f"{self.Colors.GREEN}Installed exoupdate command is up to date.{self.Colors.ENDC}")
 
 
 
