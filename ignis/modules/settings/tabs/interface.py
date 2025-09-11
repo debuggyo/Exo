@@ -127,7 +127,7 @@ class DockCategory(widgets.Box):
             vertical=True,
             spacing=2,
         )
-        
+
         self._settings_box.append(SettingsRow(
             title="Position",
             description="Pick a side for the dock to be located.",
@@ -190,7 +190,7 @@ class NotificationsCategory(widgets.Box):
             vertical=True,
             spacing=2,
         )
-        
+
         self.append(CategoryLabel("Notifications"))
 
         self.append(SettingsRow(
@@ -262,7 +262,7 @@ class MiscCategory(widgets.Box):
                     ]
                 ),
                 SwitchRow(
-                    label="Military Time",
+                    label="Use 24 hour time.",
                     description="Toggle between 12-hour (AM/PM) and 24-hour time formats.",
                     active=self.military_time,
                     on_change=lambda x, active: BarStyles.setMilitaryTime(active)
