@@ -254,7 +254,7 @@ class ExoInstaller:
 
         dependencies = {
             "arch": ["python-ignis-git", "ignis-gvc", "ttf-material-symbols-variable-git", "matugen-bin", "swww", "gnome-bluetooth-3.0", "adw-gtk-theme", "dart-sass"],
-            "fedora": ["python3-pip", "cargo", "gnome-bluetooth-libs", "adw-gtk3-theme", "dart-sass", "google-noto-sans-symbols-fonts", "meson", "ninja-build", "pkg-config", "scdoc", "libxkbcommon-devel", "wayland-devel", "libdisplay-info-devel", "libliftoff-devel"],
+            "fedora": ["python3-pip", "cargo", "gnome-bluetooth-libs", "adw-gtk3-theme", "google-noto-sans-symbols-fonts", "meson", "ninja-build", "pkg-config", "scdoc", "libxkbcommon-devel", "wayland-devel", "libdisplay-info-devel", "libliftoff-devel"],
             "ubuntu": ["python3-pip", "cargo", "libgnome-bluetooth-3.0-13", "adw-gtk-theme", "dart-sass", "fonts-material-design-icons-iconfont", "meson", "ninja-build", "pkg-config", "scdoc", "libxkbcommon-dev", "wayland-dev", "libdisplay-info-dev", "libliftoff-dev"]
         }
 
@@ -296,9 +296,15 @@ class ExoInstaller:
             if not shutil.which("sass"):
                 print("dart-sass is not available as a native package. Attempting to install via npm...")
                 if shutil.which("npm"):
+                    # Try global install, fallback to user-local if permission denied
                     result = self.run_command(["npm", "install", "-g", "sass"])
                     if result is None or (hasattr(result, "returncode") and result.returncode != 0):
-                        print(f"{self.Colors.RED}Failed to install dart-sass via npm.{self.Colors.ENDC}")
+                        print(f"{self.Colors.YELLOW}Global npm install failed, trying user-local install...{self.Colors.ENDC}")
+                        result_local = self.run_command(["npm", "install", "--prefix", os.path.expanduser("~/.local"), "sass"])
+                        if result_local is None or (hasattr(result_local, "returncode") and result_local.returncode != 0):
+                            print(f"{self.Colors.RED}Failed to install dart-sass via npm. You may need to run 'sudo npm install -g sass' or add ~/.local/bin to your PATH if using user-local install.{self.Colors.ENDC}")
+                        else:
+                            print(f"{self.Colors.GREEN}Installed dart-sass locally via npm. Add ~/.local/bin to your PATH if not already present.{self.Colors.ENDC}")
                     else:
                         print(f"{self.Colors.GREEN}Installed dart-sass via npm.{self.Colors.ENDC}")
                 else:
@@ -311,7 +317,6 @@ class ExoInstaller:
         gvc_repo_url = "https://github.com/ignis-sh/ignis-gvc.git"
         gvc_repo_dir = os.path.join(gvc_temp_dir, "ignis-gvc")
         self.run_command(["git", "clone", gvc_repo_url, gvc_repo_dir])
-        # Attempt to build/install ignis-gvc from source. If setup.py or pyproject.toml is missing, print an error.
         setup_py = os.path.join(gvc_repo_dir, "setup.py")
         pyproject_toml = os.path.join(gvc_repo_dir, "pyproject.toml")
         if os.path.exists(setup_py) or os.path.exists(pyproject_toml):
@@ -322,6 +327,7 @@ class ExoInstaller:
                 print(f"{self.Colors.GREEN}Installed ignis-gvc from source.{self.Colors.ENDC}")
         else:
             print(f"{self.Colors.RED}ignis-gvc does not have a setup.py or pyproject.toml. Unable to install from source.{self.Colors.ENDC}")
+            print(f"{self.Colors.YELLOW}Please install ignis-gvc manually. See https://github.com/ignis-sh/ignis-gvc for instructions.{self.Colors.ENDC}")
         shutil.rmtree(gvc_temp_dir)
 
         if not shutil.which("swww"):
@@ -333,6 +339,12 @@ class ExoInstaller:
             print(f"Cloning {swww_repo_url} to {swww_repo_dir}...")
             result = self.run_command(["git", "clone", swww_repo_url, swww_repo_dir], cwd=temp_dir)
             if result and result.returncode == 0:
+                print("Debug: Listing contents of swww repo directory before building:")
+                try:
+                    for entry in os.listdir(swww_repo_dir):
+                        print("  ", entry)
+                except Exception as e:
+                    print(f"{self.Colors.RED}Error listing swww repo directory: {e}{self.Colors.ENDC}")
                 print("Building swww...")
                 result = self.run_command(["meson", "setup", "build"], cwd=swww_repo_dir)
                 if result and result.returncode == 0:
@@ -347,7 +359,7 @@ class ExoInstaller:
                     else:
                         print(f"{self.Colors.RED}Error building swww with ninja.{self.Colors.ENDC}")
                 else:
-                    print(f"{self.Colors.RED}Error running meson setup.{self.Colors.ENDC}")
+                    print(f"{self.Colors.RED}Error running meson setup. Check above for directory contents and ensure meson.build exists in the repo root.{self.Colors.ENDC}")
             else:
                 print(f"{self.Colors.RED}Error cloning swww repository.{self.Colors.ENDC}")
 
@@ -469,9 +481,15 @@ class ExoInstaller:
         user_settings_path = os.path.join(ignis_config_dir, "user_settings.json")
 
         print("\nGenerating initial color scheme with Matugen...")
-        matugen_command = ["matugen", "image", default_wallpaper_dest]
-        self.run_command(matugen_command)
-        print(f"{self.Colors.GREEN}Initial color scheme generated.{self.Colors.ENDC}")
+        if shutil.which("matugen"):
+            matugen_command = ["matugen", "image", default_wallpaper_dest]
+            result = self.run_command(matugen_command)
+            if result is None or (hasattr(result, "returncode") and result.returncode != 0):
+                print(f"{self.Colors.RED}Failed to generate color scheme with Matugen.{self.Colors.ENDC}")
+            else:
+                print(f"{self.Colors.GREEN}Initial color scheme generated.{self.Colors.ENDC}")
+        else:
+            print(f"{self.Colors.RED}Matugen is not installed or not in PATH. Skipping color scheme generation. Please install matugen and run manually if desired.{self.Colors.ENDC}")
 
         if not os.path.exists(user_settings_path):
             print("Creating default user_settings.json...")
