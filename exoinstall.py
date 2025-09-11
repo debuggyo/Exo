@@ -298,7 +298,7 @@ class ExoInstaller:
 
         if desktop_env in ["hyprland", "both"]:
             print("Copying Hyprland config...")
-            hypr_config_dir = os.path.join(self.config_dir, "hyprland")
+            hypr_config_dir = os.path.join(self.config_dir, "hypr", "hyprland")
             os.makedirs(hypr_config_dir, exist_ok=True)
             hypr_source = os.path.join(self.source_dir, "exodefaults", "hyprland.conf")
             hypr_dest = os.path.join(hypr_config_dir, "hyprland.conf")
@@ -331,6 +331,21 @@ class ExoInstaller:
 
         print(f"{self.Colors.GREEN}Default wallpaper placed in {wallpaper_dir}{self.Colors.ENDC}")
         print("Wallpaper will be set on first desktop launch.")
+
+        ignis_config_dir = os.path.join(self.config_dir, "ignis")
+        user_settings_path = os.path.join(ignis_config_dir, "user_settings.json")
+
+        print("\nGenerating initial color scheme with Matugen...")
+        matugen_command = ["matugen", "image", default_wallpaper_dest]
+        self.run_command(matugen_command)
+        print(f"{self.Colors.GREEN}Initial color scheme generated.{self.Colors.ENDC}")
+
+        if not os.path.exists(user_settings_path):
+            print("Creating default user_settings.json...")
+            os.makedirs(ignis_config_dir, exist_ok=True)
+            with open(user_settings_path, 'w') as f:
+                f.write('{}')
+
 
     def full_install(self):
         self.print_header("Starting Full Exo Installation")
