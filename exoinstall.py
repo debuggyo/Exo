@@ -26,6 +26,8 @@ class ExoInstaller:
         self.protected_files = ["user_settings.json", "colors.scss"]
         self.auto_confirm_overwrite = False
         self.auto_confirm_delete = False
+        self.distro = None
+        self.package_manager = None
 
     def run(self):
         self.print_header("Welcome to the Exo Installer")
@@ -164,15 +166,40 @@ class ExoInstaller:
         except IOError:
             return None
 
-    def check_arch_distro(self):
+    def detect_distro(self):
         self.print_header("Distro Check")
         if os.path.exists('/etc/arch-release'):
-            print(f"{self.Colors.GREEN}Detected Arch-based distribution. Proceeding...{self.Colors.ENDC}")
+            self.distro = "arch"
+            print(f"{self.Colors.GREEN}Detected Arch-based distribution.{self.Colors.ENDC}")
+        elif os.path.exists('/etc/fedora-release'):
+            self.distro = "fedora"
+            print(f"{self.Colors.GREEN}Detected Fedora-based distribution.{self.Colors.ENDC}")
+        elif os.path.exists('/etc/lsb-release'):
+            try:
+                with open('/etc/lsb-release') as f:
+                    for line in f:
+                        if "Ubuntu" in line or "Debian" in line.capitalize():
+                            self.distro = "ubuntu"
+                            print(f"{self.Colors.GREEN}Detected Debian/Ubuntu-based distribution.{self.Colors.ENDC}")
+                            break
+            except IOError:
+                pass
+
+        if self.distro:
             return True
         else:
-            print(f"{self.Colors.RED}This full installation is designed for Arch-based distributions only.{self.Colors.ENDC}")
-            print(f"{self.Colors.RED}Warning: '/etc/arch-release' not found. Cannot proceed with full installation.{self.Colors.ENDC}")
+            print(f"{self.Colors.YELLOW}Unsupported distribution detected.{self.Colors.ENDC}")
+            print("You will need to install the required dependencies manually.")
+            print("Dependencies: python-ignis, ignis-gvc, matugen, swww, gnome-bluetooth, adw-gtk-theme, dart-sass, material-symbols-font")
             return False
+
+    def get_package_manager(self):
+        if self.distro == "arch":
+            self.package_manager = "pacman"
+        elif self.distro == "fedora":
+            self.package_manager = "dnf"
+        elif self.distro == "ubuntu":
+            self.package_manager = "apt"
 
     def check_aur_helper(self):
         self.print_header("Checking for AUR Helper")
@@ -223,11 +250,89 @@ class ExoInstaller:
 
     def install_dependencies(self):
         self.print_header("Installing Dependencies")
-        dependencies = [
-            "python-ignis-git", "ignis-gvc", "ttf-material-symbols-variable-git",
-            "matugen-bin", "swww", "gnome-bluetooth-3.0", "adw-gtk-theme", "dart-sass"
-        ]
-        self.run_command([self.aur_helper, "-S", "--noconfirm"] + dependencies)
+
+        choice = self.get_user_choice("Do you want to automatically install dependencies? (y/n): ", ['y', 'n'])
+        if choice == 'n':
+            print("Skipping dependency installation. Please ensure all required packages are installed manually.")
+            return
+
+        dependencies = {
+            "arch": ["python-ignis-git", "ignis-gvc", "ttf-material-symbols-variable-git", "matugen-bin", "swww", "gnome-bluetooth-3.0", "adw-gtk-theme", "dart-sass"],
+            "fedora": ["python3-pip", "cargo", "gnome-bluetooth-libs", "adw-gtk3-theme", "dart-sass", "google-noto-sans-symbols-fonts", "meson", "ninja-build", "pkg-config", "scdoc", "libxkbcommon-devel", "wayland-devel", "libdisplay-info-devel", "libliftoff-devel"],
+            "ubuntu": ["python3-pip", "cargo", "libgnome-bluetooth-3.0-13", "adw-gtk-theme", "dart-sass", "fonts-material-design-icons-iconfont", "meson", "ninja-build", "pkg-config", "scdoc", "libxkbcommon-dev", "wayland-dev", "libdisplay-info-dev", "libliftoff-dev"]
+        }
+
+        if self.distro == "fedora" or self.distro == "ubuntu":
+            self.run_command(["sudo", "apt", "install", "-y", "cargo"])
+            print ("Installed cargo")
+
+        manual_install_notes = {
+            "fedora": "You will need to manually install \'ignis-gvc\'.",
+            "ubuntu": "You will need to manually install \'ignis-gvc\'."
+        }
+
+        if self.distro in dependencies:
+            packages = dependencies[self.distro]
+            print(f"Attempting to install the following packages: {', '.join(packages)}")
+            if self.distro == "arch":
+                self.run_command([self.aur_helper, "-S", "--noconfirm"] + packages)
+            elif self.distro == "fedora":
+                self.run_command(["sudo", "dnf", "install", "-y"] + packages)
+            elif self.distro == "ubuntu":
+                self.run_command(["sudo", "apt", "update"])
+                self.run_command(["sudo", "apt", "install", "-y"] + packages)
+
+                print("\nInstalling ignis via pip...")
+                self.run_command(["pip", "install", "--user", "git+https://github.com/ignis-sh/ignis.git"])
+
+                print("\nInstalling matugen via cargo...")
+                self.run_command(["cargo", "install", "matugen"])
+
+            if self.distro in manual_install_notes:
+                print(f"\n{self.Colors.YELLOW}NOTE: {manual_install_notes[self.distro]}{self.Colors.ENDC}")
+        else:
+            print(f"{self.Colors.YELLOW}No automatic dependency installation for your distribution.{self.Colors.ENDC}")
+
+        print("\nInstalling ignis-gvc from source...")
+        gvc_temp_dir = tempfile.mkdtemp()
+        gvc_repo_url = "https://github.com/ignis-sh/ignis-gvc.git"
+        gvc_repo_dir = os.path.join(gvc_temp_dir, "ignis-gvc")
+        self.run_command(["git", "clone", gvc_repo_url, gvc_repo_dir])
+        self.run_command(["pip", "install", "--user", gvc_repo_dir])
+        shutil.rmtree(gvc_temp_dir)
+
+        if not shutil.which("swww"):
+            print("\nswww not found, attempting to build from source...")
+            temp_dir = tempfile.mkdtemp()
+            swww_repo_url = "https://github.com/LGFae/swww.git"
+            swww_repo_dir = os.path.join(temp_dir, "swww")
+
+            print(f"Cloning {swww_repo_url} to {swww_repo_dir}...")
+            result = self.run_command(["git", "clone", swww_repo_url, swww_repo_dir], cwd=temp_dir)
+            if result and result.returncode == 0:
+                build_dir = os.path.join(swww_repo_dir, "build")
+                print("Building swww...")
+                result = self.run_command(["meson", "setup", build_dir], cwd=swww_repo_dir)
+                if result and result.returncode == 0:
+                    result = self.run_command(["ninja", "-C", build_dir], cwd=swww_repo_dir)
+                    if result and result.returncode == 0:
+                        print("Installing swww...")
+                        result = self.run_command(["sudo", "ninja", "-C", build_dir, "install"], cwd=swww_repo_dir)
+                        if result and result.returncode == 0:
+                            print(f"{self.Colors.GREEN}swww built and installed successfully!{self.Colors.ENDC}")
+                        else:
+                            print(f"{self.Colors.RED}Error installing swww.{self.Colors.ENDC}")
+                    else:
+                        print(f"{self.Colors.RED}Error building swww with ninja.{self.Colors.ENDC}")
+                else:
+                    print(f"{self.Colors.RED}Error running meson setup.{self.Colors.ENDC}")
+            else:
+                print(f"{self.Colors.RED}Error cloning swww repository.{self.Colors.ENDC}")
+
+            # Clean up temporary directory
+            shutil.rmtree(temp_dir)
+        else:
+            print("swww found in PATH.")
 
     def check_desktop(self):
         self.print_header("Checking Desktop Environment")
@@ -256,17 +361,23 @@ class ExoInstaller:
 
         choice = self.get_user_choice("Select an option: ", ["1", "2", "3", "q"])
 
+        install_cmd = ["sudo", self.package_manager]
+        if self.distro == "fedora":
+            install_cmd.extend(["install", "-y"])
+        else: # arch and ubuntu
+            install_cmd.extend(["-S", "--noconfirm"] if self.distro == "arch" else ["install", "-y"])
+
         if choice == "1":
             print("Installing Niri...")
-            if self.run_command(["sudo", "pacman", "-S", "--noconfirm", "niri"]):
+            if self.run_command(install_cmd + ["niri"]):
                 return "niri"
         elif choice == "2":
             print("Installing Hyprland...")
-            if self.run_command(["sudo", "pacman", "-S", "--noconfirm", "hyprland"]):
+            if self.run_command(install_cmd + ["hyprland"]):
                 return "hyprland"
         elif choice == "3":
             print("Installing Niri and Hyprland...")
-            if self.run_command(["sudo", "pacman", "-S", "--noconfirm", "niri", "hyprland"]):
+            if self.run_command(install_cmd + ["niri", "hyprland"]):
                 return "both"
         elif choice == "q":
             print("Quitting.")
@@ -350,12 +461,15 @@ class ExoInstaller:
     def full_install(self):
         self.print_header("Starting Full Exo Installation")
 
-        # Perform the distro check here
-        if not self.check_arch_distro():
-            return
+        if not self.detect_distro():
+            choice = self.get_user_choice("Continue with installation without automatic dependency management? (y/n): ", ['y', 'n'])
+            if choice == 'n':
+                return
+
+        self.get_package_manager()
 
         if not self.dry_run:
-            if not self.check_aur_helper():
+            if self.distro == "arch" and not self.check_aur_helper():
                 return
             self.install_dependencies()
         else:
