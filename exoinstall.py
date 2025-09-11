@@ -258,43 +258,70 @@ class ExoInstaller:
             "ubuntu": ["python3-pip", "cargo", "libgnome-bluetooth-3.0-13", "adw-gtk-theme", "dart-sass", "fonts-material-design-icons-iconfont", "meson", "ninja-build", "pkg-config", "scdoc", "libxkbcommon-dev", "wayland-dev", "libdisplay-info-dev", "libliftoff-dev"]
         }
 
-        if self.distro == "fedora" or self.distro == "ubuntu":
-            self.run_command(["sudo", "apt", "install", "-y", "cargo"])
-            print ("Installed cargo")
-
-        manual_install_notes = {
-            "fedora": "You will need to manually install \'ignis-gvc\'.",
-            "ubuntu": "You will need to manually install \'ignis-gvc\'."
-        }
-
         if self.distro in dependencies:
             packages = dependencies[self.distro]
             print(f"Attempting to install the following packages: {', '.join(packages)}")
             if self.distro == "arch":
-                self.run_command([self.aur_helper, "-S", "--noconfirm"] + packages)
+                result = self.run_command([self.aur_helper, "-S", "--noconfirm"] + packages)
+                if result is None or (hasattr(result, "returncode") and result.returncode != 0):
+                    print(f"{self.Colors.RED}Failed to install some packages with AUR helper.{self.Colors.ENDC}")
             elif self.distro == "fedora":
-                self.run_command(["sudo", "dnf", "install", "-y"] + packages)
+                result = self.run_command(["sudo", "dnf", "install", "-y"] + packages)
+                if result is None or (hasattr(result, "returncode") and result.returncode != 0):
+                    print(f"{self.Colors.RED}Failed to install some packages with dnf.{self.Colors.ENDC}")
             elif self.distro == "ubuntu":
-                self.run_command(["sudo", "apt", "update"])
-                self.run_command(["sudo", "apt", "install", "-y"] + packages)
+                result = self.run_command(["sudo", "apt", "update"])
+                if result is None or (hasattr(result, "returncode") and result.returncode != 0):
+                    print(f"{self.Colors.RED}Failed to update apt repositories.{self.Colors.ENDC}")
+                result = self.run_command(["sudo", "apt", "install", "-y"] + packages)
+                if result is None or (hasattr(result, "returncode") and result.returncode != 0):
+                    print(f"{self.Colors.RED}Failed to install some packages with apt.{self.Colors.ENDC}")
 
                 print("\nInstalling ignis via pip...")
-                self.run_command(["pip", "install", "--user", "git+https://github.com/ignis-sh/ignis.git"])
+                result = self.run_command(["pip", "install", "--user", "git+https://github.com/ignis-sh/ignis.git"])
+                if result is None or (hasattr(result, "returncode") and result.returncode != 0):
+                    print(f"{self.Colors.RED}Failed to install ignis via pip.{self.Colors.ENDC}")
 
                 print("\nInstalling matugen via cargo...")
-                self.run_command(["cargo", "install", "matugen"])
+                result = self.run_command(["cargo", "install", "matugen"])
+                if result is None or (hasattr(result, "returncode") and result.returncode != 0):
+                    print(f"{self.Colors.RED}Failed to install matugen via cargo.{self.Colors.ENDC}")
 
-            if self.distro in manual_install_notes:
-                print(f"\n{self.Colors.YELLOW}NOTE: {manual_install_notes[self.distro]}{self.Colors.ENDC}")
         else:
             print(f"{self.Colors.YELLOW}No automatic dependency installation for your distribution.{self.Colors.ENDC}")
+
+        # Dart-sass handling for Fedora/Ubuntu
+        if self.distro in ["fedora", "ubuntu"]:
+            print("\nChecking for dart-sass...")
+            if not shutil.which("sass"):
+                print("dart-sass is not available as a native package. Attempting to install via npm...")
+                if shutil.which("npm"):
+                    result = self.run_command(["npm", "install", "-g", "sass"])
+                    if result is None or (hasattr(result, "returncode") and result.returncode != 0):
+                        print(f"{self.Colors.RED}Failed to install dart-sass via npm.{self.Colors.ENDC}")
+                    else:
+                        print(f"{self.Colors.GREEN}Installed dart-sass via npm.{self.Colors.ENDC}")
+                else:
+                    print(f"{self.Colors.RED}npm is not installed. Please install npm and then run 'npm install -g sass'.{self.Colors.ENDC}")
+            else:
+                print("dart-sass (sass) is already installed.")
 
         print("\nInstalling ignis-gvc from source...")
         gvc_temp_dir = tempfile.mkdtemp()
         gvc_repo_url = "https://github.com/ignis-sh/ignis-gvc.git"
         gvc_repo_dir = os.path.join(gvc_temp_dir, "ignis-gvc")
         self.run_command(["git", "clone", gvc_repo_url, gvc_repo_dir])
-        self.run_command(["pip", "install", "--user", gvc_repo_dir])
+        # Attempt to build/install ignis-gvc from source. If setup.py or pyproject.toml is missing, print an error.
+        setup_py = os.path.join(gvc_repo_dir, "setup.py")
+        pyproject_toml = os.path.join(gvc_repo_dir, "pyproject.toml")
+        if os.path.exists(setup_py) or os.path.exists(pyproject_toml):
+            result = self.run_command(["pip", "install", "--user", gvc_repo_dir])
+            if result is None or (hasattr(result, "returncode") and result.returncode != 0):
+                print(f"{self.Colors.RED}Failed to install ignis-gvc from source.{self.Colors.ENDC}")
+            else:
+                print(f"{self.Colors.GREEN}Installed ignis-gvc from source.{self.Colors.ENDC}")
+        else:
+            print(f"{self.Colors.RED}ignis-gvc does not have a setup.py or pyproject.toml. Unable to install from source.{self.Colors.ENDC}")
         shutil.rmtree(gvc_temp_dir)
 
         if not shutil.which("swww"):
@@ -306,14 +333,13 @@ class ExoInstaller:
             print(f"Cloning {swww_repo_url} to {swww_repo_dir}...")
             result = self.run_command(["git", "clone", swww_repo_url, swww_repo_dir], cwd=temp_dir)
             if result and result.returncode == 0:
-                build_dir = os.path.join(swww_repo_dir, "build")
                 print("Building swww...")
-                result = self.run_command(["meson", "setup", build_dir], cwd=swww_repo_dir)
+                result = self.run_command(["meson", "setup", "build"], cwd=swww_repo_dir)
                 if result and result.returncode == 0:
-                    result = self.run_command(["ninja", "-C", build_dir], cwd=swww_repo_dir)
+                    result = self.run_command(["ninja", "-C", "build"], cwd=swww_repo_dir)
                     if result and result.returncode == 0:
                         print("Installing swww...")
-                        result = self.run_command(["sudo", "ninja", "-C", build_dir, "install"], cwd=swww_repo_dir)
+                        result = self.run_command(["sudo", "ninja", "-C", "build", "install"], cwd=swww_repo_dir)
                         if result and result.returncode == 0:
                             print(f"{self.Colors.GREEN}swww built and installed successfully!{self.Colors.ENDC}")
                         else:
