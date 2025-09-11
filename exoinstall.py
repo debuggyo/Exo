@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import sys
 import subprocess
@@ -32,19 +33,25 @@ class ExoInstaller:
     def run(self):
         self.print_header("Welcome to the Exo Installer")
 
-        # The distro check is now done only for a full installation.
-        # This allows the update function to be used on other distros.
+        # Only show "Install as Command" if not already installed
+        command_exists = shutil.which("exoupdate") is not None
 
         try:
             with tempfile.TemporaryDirectory() as temp_dir:
                 self.clone_repo(self.REPO_URL, temp_dir)
                 self.source_dir = temp_dir
+                self.update_installed_command_if_needed()
 
                 print("1: Full Installation")
                 print("2: Update Existing Installation")
                 print("3: Run in Test Mode (Dry Run)")
+                if not command_exists:
+                    print("4: Install as Command")
                 print("q: Quit")
-                choice = self.get_user_choice("Select an option: ", ["1", "2", "3", "q"])
+                options = ["1", "2", "3", "q"]
+                if not command_exists:
+                    options.append("4")
+                choice = self.get_user_choice("Select an option: ", options)
 
                 if choice == '1':
                     self.full_install()
@@ -52,6 +59,8 @@ class ExoInstaller:
                     self.update_install()
                 elif choice == '3':
                     self.enter_test_mode()
+                elif choice == '4' and not command_exists:
+                    self.install_as_command()
                 elif choice == 'q':
                     print("Quitting.")
         except Exception as e:
@@ -138,23 +147,13 @@ class ExoInstaller:
                 termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
         except ImportError:
-            # Fallback for Windows
-            try:
-                import msvcrt
-                print(f"{self.Colors.YELLOW}{prompt}{self.Colors.ENDC}", end='', flush=True)
-                while True:
-                    char = msvcrt.getch().decode('utf-8')
-                    if char.lower() in options:
-                        print(char) # Echo the key press
-                        return char.lower()
-            except ImportError:
-                # Fallback to standard line-buffered input if neither works
-                print(f"\n{self.Colors.YELLOW}Warning: Immediate input is not supported. Please press 'Enter' after your choice.{self.Colors.ENDC}")
-                while True:
-                    option = input(f"{self.Colors.YELLOW}{prompt}{self.Colors.ENDC}").lower()
-                    if option in options:
-                        return option
-                    print(f"{self.Colors.RED}Invalid input.{self.Colors.ENDC}")
+            # Fallback to standard line-buffered input if neither works
+            print(f"\n{self.Colors.YELLOW}Warning: Immediate input is not supported. Please press 'Enter' after your choice.{self.Colors.ENDC}")
+            while True:
+                option = input(f"{self.Colors.YELLOW}{prompt}{self.Colors.ENDC}").lower()
+                if option in options:
+                    return option
+                print(f"{self.Colors.RED}Invalid input.{self.Colors.ENDC}")
 
     def get_file_hash(self, file_path):
         hasher = hashlib.sha256()
@@ -457,6 +456,9 @@ class ExoInstaller:
             with open(user_settings_path, 'w') as f:
                 f.write('{}')
 
+        # Automatically install exoupdate command if not present
+        if shutil.which("exoupdate") is None:
+            self.install_as_command()
 
     def full_install(self):
         self.print_header("Starting Full Exo Installation")
@@ -585,6 +587,79 @@ class ExoInstaller:
             if choice == 'y':
                 print(f"  Deleting '{os.path.basename(file_path)}'...")
                 os.remove(file_path)
+
+   def install_as_command(self):
+       self.print_header("Installing as Command")
+       prefix = "/usr/local"
+       dest_dir = os.path.join(prefix, "bin")
+       if not os.path.exists(dest_dir):
+           print(f"{self.Colors.YELLOW}Creating directory: {dest_dir}{self.Colors.ENDC}")
+           try:
+               os.makedirs(dest_dir)
+           except OSError as e:
+               print(f"{self.Colors.RED}Error creating directory: {e}{self.Colors.ENDC}")
+               return
+
+       dest_file = os.path.join(dest_dir, "exoupdate")
+       try:
+           cmd = ["sudo", "cp", sys.argv[0], dest_file]
+           result = self.run_command(cmd)
+           if result and result.returncode == 0:
+               print(f"{self.Colors.GREEN}Copied script to: {dest_file}{self.Colors.ENDC}")
+           else:
+               print(f"{self.Colors.RED}Error copying script.{self.Colors.ENDC}")
+               return
+       except Exception as e:
+           print(f"{self.Colors.RED}Error copying script: {e}{self.Colors.ENDC}")
+           return
+
+       try:
+           cmd = ["sudo", "chmod", "755", dest_file]
+           result = self.run_command(cmd)
+           if result and result.returncode == 0:
+               print(f"{self.Colors.GREEN}Made script executable.{self.Colors.ENDC}")
+           else:
+               print(f"{self.Colors.RED}Error making script executable.{self.Colors.ENDC}")
+               return
+       except Exception as e:
+           print(f"{self.Colors.RED}Error making script executable: {e}{self.Colors.ENDC}")
+           return
+
+       print(f"{self.Colors.GREEN}Installation as command complete. You can now run 'exoupdate' from anywhere.{self.Colors.ENDC}")
+
+   def update_installed_command_if_needed(self):
+       installed_path = "/usr/local/bin/exoupdate"
+       cloned_script = sys.argv[0]
+       # If running from /usr/local/bin/exoupdate, use the cloned repo's script
+       if os.path.basename(cloned_script) == "exoupdate":
+           cloned_script = os.path.join(self.source_dir, "exoinstall.py")
+       if not os.path.exists(installed_path):
+           return  # Nothing to update
+
+       def file_hash(path):
+           hasher = hashlib.sha256()
+           try:
+               with open(path, "rb") as f:
+                   hasher.update(f.read())
+               return hasher.hexdigest()
+           except Exception:
+               return None
+
+       installed_hash = file_hash(installed_path)
+       cloned_hash = file_hash(cloned_script)
+
+       if installed_hash and cloned_hash and installed_hash != cloned_hash:
+           print(f"{self.Colors.YELLOW}Updating installed exoupdate command...{self.Colors.ENDC}")
+           cmd = ["sudo", "cp", cloned_script, installed_path]
+           result = self.run_command(cmd)
+           if result and result.returncode == 0:
+               print(f"{self.Colors.GREEN}exoupdate command updated successfully.{self.Colors.ENDC}")
+           else:
+               print(f"{self.Colors.RED}Failed to update exoupdate command.{self.Colors.ENDC}")
+       else:
+           print(f"{self.Colors.GREEN}Installed exoupdate command is up to date.{self.Colors.ENDC}")
+
+
 
 if __name__ == "__main__":
     if os.geteuid() == 0:
