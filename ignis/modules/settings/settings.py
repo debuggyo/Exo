@@ -5,8 +5,6 @@ from .tabs import (
     InterfaceTab,
     NetworkTab,
     BluetoothTab,
-    NiriTab,
-    HyprlandTab,
     AboutTab,
 )
 from modules.m3components import NavigationRail
@@ -35,8 +33,6 @@ class Settings(widgets.RegularWindow):
             "interface": ("tune", "Interface"),
             "network": ("network_wifi", "Network"),
             "bluetooth": ("bluetooth", "Bluetooth"),
-            "niri": ("settings", "Niri"),
-            "hyprland": ("settings", "Hyprland"),
             "about": ("info", "System"),
         }
 
@@ -96,9 +92,5 @@ class Settings(widgets.RegularWindow):
             self.content_scroll.set_child(NetworkTab())
         elif key == "bluetooth":
             self.content_scroll.set_child(BluetoothTab())
-        elif key == "niri":
-            self.content_scroll.set_child(NiriTab())
-        elif key == "hyprland":
-            self.content_scroll.set_child(HyprlandTab())
         elif key == "about":
             self.content_scroll.set_child(AboutTab())

@@ -2,8 +2,6 @@ from .appearance import AppearanceTab
 from .interface import InterfaceTab
 from .network import NetworkTab
 from .bluetooth import BluetoothTab
-from .niri import NiriTab
-from .hyprland import HyprlandTab
 from .about import AboutTab
 
 __all__ = [
