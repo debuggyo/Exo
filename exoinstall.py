@@ -276,6 +276,16 @@ class ExoInstaller:
                 result = self.run_command(["sudo", "dnf", "install", "-y"] + packages)
                 if result is None or (hasattr(result, "returncode") and result.returncode != 0):
                     print(f"{self.Colors.RED}Failed to install some packages with dnf.{self.Colors.ENDC}")
+
+                print("\nInstalling ignis via pip...")
+                result = self.run_command(["pip", "install", "--user", "git+https://github.com/ignis-sh/ignis.git"])
+                if result is None or (hasattr(result, "returncode") and result.returncode != 0):
+                    print(f"{self.Colors.RED}Failed to install ignis via pip.{self.Colors.ENDC}")
+
+                print("\nInstalling matugen via cargo...")
+                result = self.run_command(["cargo", "install", "matugen"])
+                if result is None or (hasattr(result, "returncode") and result.returncode != 0):
+                    print(f"{self.Colors.RED}Failed to install matugen via cargo.{self.Colors.ENDC}")
             elif self.distro == "ubuntu":
                 result = self.run_command(["sudo", "apt", "update"])
                 if result is None or (hasattr(result, "returncode") and result.returncode != 0):

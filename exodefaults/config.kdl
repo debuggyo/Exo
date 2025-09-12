@@ -227,7 +227,6 @@ overview {
 
 hotkey-overlay {
     skip-at-startup
-    hide-not-bound
 }
 
 spawn-at-startup "ignis" "init"
