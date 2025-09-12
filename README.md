@@ -16,9 +16,26 @@ The script can also be used to update Exo on any distribution.
 sudo apt install curl git python3  # For Debian/Ubuntu
 sudo dnf install curl git python3  # For Fedora
 sudo pacman -S curl git python3   # For Arch
-curl -o exoinstall.py https://raw.githubusercontent.com/debuggyo/Exo/main/exoinstall.py
-python3 exoinstall.py
 ```
+
+```sh
+curl -sSL https://raw.githubusercontent.com/debuggyo/Exo/main/exoinstall.py | python3 -
+```
+
+## Updating and Uninstalling
+
+You can run the installer script again at any time to update or remove Exo. If you installed it as a system command, simply run `exoupdate` in your terminal. Otherwise, re-run the script with `python3 exoinstall.py`.
+
+### Uninstalling
+Select the "Uninstall Exo" option from the script's main menu. The uninstaller will:
+*   **Remove** the `~/.config/ignis` and `~/.config/matugen` configuration folders.
+* **Remove** the `exoupdate` command from `/usr/local/bin/`.
+* **Remove** specific Niri (`config.kdl`) and Hyprland (`hyprland.conf`) config files copied by the installer.
+* **Remove** the default wallpaper from your `~/Pictures/Wallpapers` directory.
+
+The uninstaller will NOT:
+*   **Remove** any installed dependencies (like Ignis, Niri, Hyprland, etc.). You must remove these yourself using your system's package manager if desired.
+* **Remove** any `.bak` backup files created during previous updates.
 
 ## Manual Install Instructions
 
