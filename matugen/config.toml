@@ -3,25 +3,9 @@ command = "swww"
 arguments = ["img", "--transition-type", "simple"]
 set = true
 
-[templates.waybar]
-input_path = './templates/colors.css'
-output_path = '~/.config/waybar/colors.css'
-
-[templates.zen]
-input_path = './templates/zen.css'
-output_path = '~/.zen/sygko1he.Default (release)/chrome/colors.css'
-
-[templates.eww]
-input_path = './templates/colors.scss'
-output_path = '~/.config/eww/colors.scss'
-
 [templates.ignis]
 input_path = './templates/colors.scss'
 output_path = '~/.config/ignis/colors.scss'
-
-[templates.wofi]
-input_path = './templates/colors.css'
-output_path = '~/.config/wofi/colors.css'
 
 [templates.hypr]
 input_path = './templates/colors.conf'
@@ -52,13 +36,3 @@ output_path = '~/.config/qt5ct/colors/matugen.conf'
 [templates.qt6ct]
 input_path = './templates/qt-colors.conf'
 output_path = '~/.config/qt6ct/colors/matugen.conf'
-
-[templates.dunst]
-input_path = './templates/dunstrc'
-output_path = '~/.config/dunst/dunstrc'
-post_hook = 'pkill dunst'
-
-[templates.pywalfox]
-input_path = './templates/pywalfox-colors.json'
-output_path = '~/.cache/wal/colors.json'
-post_hook = 'pywalfox update'
