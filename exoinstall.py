@@ -322,16 +322,36 @@ class ExoInstaller:
         gvc_repo_url = "https://github.com/ignis-sh/ignis-gvc.git"
         gvc_repo_dir = os.path.join(gvc_temp_dir, "ignis-gvc")
         self.run_command(["git", "clone", gvc_repo_url, gvc_repo_dir])
+
+        # Check for gobject-introspection-1.0.pc and set PKG_CONFIG_PATH if needed
+        def check_pkgconfig_file(pc_name):
+            paths = [
+                "/usr/lib64/pkgconfig",
+                "/usr/lib/pkgconfig",
+                "/usr/share/pkgconfig"
+            ]
+            for path in paths:
+                if os.path.exists(os.path.join(path, pc_name)):
+                    return path
+            return None
+
+        env = os.environ.copy()
+        pc_path = check_pkgconfig_file("gobject-introspection-1.0.pc")
+        if pc_path:
+            env["PKG_CONFIG_PATH"] = f"{pc_path}:{env.get('PKG_CONFIG_PATH', '')}"
+        else:
+            print(f"{self.Colors.RED}gobject-introspection-1.0.pc not found. Please install gobject-introspection-devel.{self.Colors.ENDC}")
+
         # Build with meson
-        result = self.run_command(["meson", "setup", "build", "--prefix=/usr"], cwd=gvc_repo_dir)
+        result = self.run_command(["meson", "setup", "build", "--prefix=/usr"], cwd=gvc_repo_dir, env=env)
         if result is None or (hasattr(result, "returncode") and result.returncode != 0):
             print(f"{self.Colors.RED}Failed to run meson setup for ignis-gvc.{self.Colors.ENDC}")
         else:
-            result = self.run_command(["meson", "compile", "-C", "build"], cwd=gvc_repo_dir)
+            result = self.run_command(["meson", "compile", "-C", "build"], cwd=gvc_repo_dir, env=env)
             if result is None or (hasattr(result, "returncode") and result.returncode != 0):
                 print(f"{self.Colors.RED}Failed to compile ignis-gvc with meson.{self.Colors.ENDC}")
             else:
-                result = self.run_command(["sudo", "meson", "install", "-C", "build"], cwd=gvc_repo_dir)
+                result = self.run_command(["sudo", "meson", "install", "-C", "build"], cwd=gvc_repo_dir, env=env)
                 if result is None or (hasattr(result, "returncode") and result.returncode != 0):
                     print(f"{self.Colors.RED}Failed to install ignis-gvc with meson.{self.Colors.ENDC}")
                 else:
@@ -347,8 +367,27 @@ class ExoInstaller:
             print(f"Cloning {swww_repo_url} to {swww_repo_dir}...")
             result = self.run_command(["git", "clone", swww_repo_url, swww_repo_dir], cwd=temp_dir)
             if result and result.returncode == 0:
+                # Check for wayland-protocols.pc and set PKG_CONFIG_PATH if needed
+                def check_pkgconfig_file(pc_name):
+                    paths = [
+                        "/usr/lib64/pkgconfig",
+                        "/usr/lib/pkgconfig",
+                        "/usr/share/pkgconfig"
+                    ]
+                    for path in paths:
+                        if os.path.exists(os.path.join(path, pc_name)):
+                            return path
+                    return None
+
+                env = os.environ.copy()
+                pc_path = check_pkgconfig_file("wayland-protocols.pc")
+                if pc_path:
+                    env["PKG_CONFIG_PATH"] = f"{pc_path}:{env.get('PKG_CONFIG_PATH', '')}"
+                else:
+                    print(f"{self.Colors.RED}wayland-protocols.pc not found. Please install wayland-protocols-devel.{self.Colors.ENDC}")
+
                 print("Building swww with cargo...")
-                result = self.run_command(["cargo", "build", "--release"], cwd=swww_repo_dir)
+                result = self.run_command(["cargo", "build", "--release"], cwd=swww_repo_dir, env=env)
                 if result and result.returncode == 0:
                     # Copy binaries to /usr/local/bin
                     for binary in ["swww", "swww-daemon"]:
