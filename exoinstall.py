@@ -294,21 +294,19 @@ class ExoInstaller:
         if self.distro in ["fedora", "ubuntu"]:
             print("\nChecking for dart-sass...")
             if not shutil.which("sass"):
-                print("dart-sass is not available as a native package. Attempting to install via npm...")
+                print("dart-sass is not available as a native package. Attempting to install via npm (user-local)...")
                 if shutil.which("npm"):
-                    # Try global install, fallback to user-local if permission denied
-                    result = self.run_command(["npm", "install", "-g", "sass"])
-                    if result is None or (hasattr(result, "returncode") and result.returncode != 0):
-                        print(f"{self.Colors.YELLOW}Global npm install failed, trying user-local install...{self.Colors.ENDC}")
-                        result_local = self.run_command(["npm", "install", "--prefix", os.path.expanduser("~/.local"), "sass"])
-                        if result_local is None or (hasattr(result_local, "returncode") and result_local.returncode != 0):
-                            print(f"{self.Colors.RED}Failed to install dart-sass via npm. You may need to run 'sudo npm install -g sass' or add ~/.local/bin to your PATH if using user-local install.{self.Colors.ENDC}")
-                        else:
-                            print(f"{self.Colors.GREEN}Installed dart-sass locally via npm. Add ~/.local/bin to your PATH if not already present.{self.Colors.ENDC}")
+                    result_local = self.run_command(["npm", "install", "--prefix", os.path.expanduser("~/.local"), "sass"])
+                    if result_local is None or (hasattr(result_local, "returncode") and result_local.returncode != 0):
+                        print(f"{self.Colors.RED}Failed to install dart-sass via npm. You may need to add ~/.local/bin to your PATH if using user-local install.{self.Colors.ENDC}")
                     else:
-                        print(f"{self.Colors.GREEN}Installed dart-sass via npm.{self.Colors.ENDC}")
+                        print(f"{self.Colors.GREEN}Installed dart-sass locally via npm. Add ~/.local/bin to your PATH if not already present.{self.Colors.ENDC}")
+                        # Check if ~/.local/bin is in PATH
+                        user_local_bin = os.path.expanduser("~/.local/bin")
+                        if user_local_bin not in os.environ.get("PATH", ""):
+                            print(f"{self.Colors.YELLOW}Reminder: ~/.local/bin is not in your PATH. Add it to use 'sass' globally.{self.Colors.ENDC}")
                 else:
-                    print(f"{self.Colors.RED}npm is not installed. Please install npm and then run 'npm install -g sass'.{self.Colors.ENDC}")
+                    print(f"{self.Colors.RED}npm is not installed. Please install npm and then run 'npm install --prefix ~/.local sass'.{self.Colors.ENDC}")
             else:
                 print("dart-sass (sass) is already installed.")
 
@@ -317,17 +315,20 @@ class ExoInstaller:
         gvc_repo_url = "https://github.com/ignis-sh/ignis-gvc.git"
         gvc_repo_dir = os.path.join(gvc_temp_dir, "ignis-gvc")
         self.run_command(["git", "clone", gvc_repo_url, gvc_repo_dir])
-        setup_py = os.path.join(gvc_repo_dir, "setup.py")
-        pyproject_toml = os.path.join(gvc_repo_dir, "pyproject.toml")
-        if os.path.exists(setup_py) or os.path.exists(pyproject_toml):
-            result = self.run_command(["pip", "install", "--user", gvc_repo_dir])
-            if result is None or (hasattr(result, "returncode") and result.returncode != 0):
-                print(f"{self.Colors.RED}Failed to install ignis-gvc from source.{self.Colors.ENDC}")
-            else:
-                print(f"{self.Colors.GREEN}Installed ignis-gvc from source.{self.Colors.ENDC}")
+        # Build with meson
+        result = self.run_command(["meson", "setup", "build", "--prefix=/usr"], cwd=gvc_repo_dir)
+        if result is None or (hasattr(result, "returncode") and result.returncode != 0):
+            print(f"{self.Colors.RED}Failed to run meson setup for ignis-gvc.{self.Colors.ENDC}")
         else:
-            print(f"{self.Colors.RED}ignis-gvc does not have a setup.py or pyproject.toml. Unable to install from source.{self.Colors.ENDC}")
-            print(f"{self.Colors.YELLOW}Please install ignis-gvc manually. See https://github.com/ignis-sh/ignis-gvc for instructions.{self.Colors.ENDC}")
+            result = self.run_command(["meson", "compile", "-C", "build"], cwd=gvc_repo_dir)
+            if result is None or (hasattr(result, "returncode") and result.returncode != 0):
+                print(f"{self.Colors.RED}Failed to compile ignis-gvc with meson.{self.Colors.ENDC}")
+            else:
+                result = self.run_command(["sudo", "meson", "install", "-C", "build"], cwd=gvc_repo_dir)
+                if result is None or (hasattr(result, "returncode") and result.returncode != 0):
+                    print(f"{self.Colors.RED}Failed to install ignis-gvc with meson.{self.Colors.ENDC}")
+                else:
+                    print(f"{self.Colors.GREEN}Installed ignis-gvc from source using meson.{self.Colors.ENDC}")
         shutil.rmtree(gvc_temp_dir)
 
         if not shutil.which("swww"):
@@ -339,27 +340,24 @@ class ExoInstaller:
             print(f"Cloning {swww_repo_url} to {swww_repo_dir}...")
             result = self.run_command(["git", "clone", swww_repo_url, swww_repo_dir], cwd=temp_dir)
             if result and result.returncode == 0:
-                print("Debug: Listing contents of swww repo directory before building:")
-                try:
-                    for entry in os.listdir(swww_repo_dir):
-                        print("  ", entry)
-                except Exception as e:
-                    print(f"{self.Colors.RED}Error listing swww repo directory: {e}{self.Colors.ENDC}")
-                print("Building swww...")
-                result = self.run_command(["meson", "setup", "build"], cwd=swww_repo_dir)
+                print("Building swww with cargo...")
+                result = self.run_command(["cargo", "build", "--release"], cwd=swww_repo_dir)
                 if result and result.returncode == 0:
-                    result = self.run_command(["ninja", "-C", "build"], cwd=swww_repo_dir)
-                    if result and result.returncode == 0:
-                        print("Installing swww...")
-                        result = self.run_command(["sudo", "ninja", "-C", "build", "install"], cwd=swww_repo_dir)
-                        if result and result.returncode == 0:
-                            print(f"{self.Colors.GREEN}swww built and installed successfully!{self.Colors.ENDC}")
+                    # Copy binaries to /usr/local/bin
+                    for binary in ["swww", "swww-daemon"]:
+                        src = os.path.join(swww_repo_dir, "target", "release", binary)
+                        dest = os.path.join("/usr/local/bin", binary)
+                        if os.path.exists(src):
+                            copy_result = self.run_command(["sudo", "cp", src, dest])
+                            if copy_result and copy_result.returncode == 0:
+                                print(f"{self.Colors.GREEN}Installed {binary} to /usr/local/bin.{self.Colors.ENDC}")
+                            else:
+                                print(f"{self.Colors.RED}Failed to copy {binary} to /usr/local/bin.{self.Colors.ENDC}")
                         else:
-                            print(f"{self.Colors.RED}Error installing swww.{self.Colors.ENDC}")
-                    else:
-                        print(f"{self.Colors.RED}Error building swww with ninja.{self.Colors.ENDC}")
+                            print(f"{self.Colors.RED}Binary {binary} not found after build.{self.Colors.ENDC}")
+                    print(f"{self.Colors.YELLOW}Optional: Autocompletion scripts are available in the completions directory of the swww repo.{self.Colors.ENDC}")
                 else:
-                    print(f"{self.Colors.RED}Error running meson setup. Check above for directory contents and ensure meson.build exists in the repo root.{self.Colors.ENDC}")
+                    print(f"{self.Colors.RED}Error building swww with cargo.{self.Colors.ENDC}")
             else:
                 print(f"{self.Colors.RED}Error cloning swww repository.{self.Colors.ENDC}")
 
