@@ -33,7 +33,6 @@ class ExoInstaller:
     def run(self):
         self.print_header("Welcome to the Exo Installer")
 
-        # Only show "Install as Command" if not already installed
         command_exists = shutil.which("exoupdate") is not None
 
         try:
@@ -45,11 +44,12 @@ class ExoInstaller:
                 print("1: Full Installation")
                 print("2: Update Existing Installation")
                 print("3: Run in Test Mode (Dry Run)")
+                print(f"{self.Colors.RED}4: Uninstall Exo{self.Colors.ENDC}")
                 print("q: Quit")
-                options = ["1", "2", "3", "q"]
+                options = ["1", "2", "3", "4", "q"]
                 choice = self.get_user_choice("Select an option: ", options)
-                # Automatically install exoupdate if not present
-                if not command_exists:
+
+                if not command_exists and choice in ['1', '2']:
                     self.install_as_command()
 
                 if choice == '1':
@@ -58,6 +58,8 @@ class ExoInstaller:
                     self.update_install()
                 elif choice == '3':
                     self.enter_test_mode()
+                elif choice == '4':
+                    self.uninstall_exo()
                 elif choice == 'q':
                     print("Quitting.")
         except Exception as e:
@@ -94,13 +96,16 @@ class ExoInstaller:
         print("\nWhich workflow would you like to test?")
         print("1: Full Installation")
         print("2: Update Existing Installation")
+        print(f"{self.Colors.RED}3: Uninstall Exo{self.Colors.ENDC}")
         print("q: Back to Main Menu")
-        test_choice = self.get_user_choice("Select a test option: ", ["1", "2", "q"])
+        test_choice = self.get_user_choice("Select a test option: ", ["1", "2", "3", "q"])
 
         if test_choice == '1':
             self.full_install()
         elif test_choice == '2':
             self.update_install()
+        elif test_choice == '3':
+            self.uninstall_exo()
         elif test_choice == 'q':
             self.dry_run = False
             self.config_dir = self.default_config_dir
@@ -123,13 +128,9 @@ class ExoInstaller:
         print(f"{self.Colors.HEADER}{self.Colors.BOLD}{'='*50}{self.Colors.ENDC}")
 
     def get_user_choice(self, prompt, options):
-        # Check if we can use a raw terminal for immediate input
         try:
-            # Unix-like systems (Linux, macOS)
             import termios, tty
-
             print(f"{self.Colors.YELLOW}{prompt}{self.Colors.ENDC}", end='', flush=True)
-
             fd = sys.stdin.fileno()
             old_settings = termios.tcgetattr(fd)
             try:
@@ -137,14 +138,11 @@ class ExoInstaller:
                 while True:
                     char = sys.stdin.read(1)
                     if char.lower() in options:
-                        print(char) # Echo the key press
+                        print(char)
                         return char.lower()
-
             finally:
                 termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-
-        except ImportError:
-            # Fallback to standard line-buffered input if neither works
+        except (ImportError, termios.error):
             print(f"\n{self.Colors.YELLOW}Warning: Immediate input is not supported. Please press 'Enter' after your choice.{self.Colors.ENDC}")
             while True:
                 option = input(f"{self.Colors.YELLOW}{prompt}{self.Colors.ENDC}").lower()
@@ -307,7 +305,6 @@ class ExoInstaller:
         else:
             print(f"{self.Colors.YELLOW}No automatic dependency installation for your distribution.{self.Colors.ENDC}")
 
-        # Dart-sass handling for Fedora/Ubuntu
         if self.distro in ["fedora", "ubuntu"]:
             print("\nChecking for dart-sass...")
             if not shutil.which("sass"):
@@ -318,7 +315,6 @@ class ExoInstaller:
                         print(f"{self.Colors.RED}Failed to install dart-sass via npm. You may need to add ~/.local/bin to your PATH if using user-local install.{self.Colors.ENDC}")
                     else:
                         print(f"{self.Colors.GREEN}Installed dart-sass locally via npm. Add ~/.local/bin to your PATH if not already present.{self.Colors.ENDC}")
-                        # Check if ~/.local/bin is in PATH
                         user_local_bin = os.path.expanduser("~/.local/bin")
                         if user_local_bin not in os.environ.get("PATH", ""):
                             print(f"{self.Colors.YELLOW}Reminder: ~/.local/bin is not in your PATH. Add it to use 'sass' globally.{self.Colors.ENDC}")
@@ -333,13 +329,8 @@ class ExoInstaller:
         gvc_repo_dir = os.path.join(gvc_temp_dir, "ignis-gvc")
         self.run_command(["git", "clone", gvc_repo_url, gvc_repo_dir])
 
-        # Check for gobject-introspection-1.0.pc and set PKG_CONFIG_PATH if needed
         def check_pkgconfig_file(pc_name):
-            paths = [
-                "/usr/lib64/pkgconfig",
-                "/usr/lib/pkgconfig",
-                "/usr/share/pkgconfig"
-            ]
+            paths = ["/usr/lib64/pkgconfig", "/usr/lib/pkgconfig", "/usr/share/pkgconfig"]
             for path in paths:
                 if os.path.exists(os.path.join(path, pc_name)):
                     return path
@@ -352,7 +343,6 @@ class ExoInstaller:
         else:
             print(f"{self.Colors.RED}gobject-introspection-1.0.pc not found. Please install gobject-introspection-devel.{self.Colors.ENDC}")
 
-        # Build with meson
         result = self.run_command(["meson", "setup", "build", "--prefix=/usr"], cwd=gvc_repo_dir, env=env)
         if result is None or (hasattr(result, "returncode") and result.returncode != 0):
             print(f"{self.Colors.RED}Failed to run meson setup for ignis-gvc.{self.Colors.ENDC}")
@@ -377,18 +367,6 @@ class ExoInstaller:
             print(f"Cloning {swww_repo_url} to {swww_repo_dir}...")
             result = self.run_command(["git", "clone", swww_repo_url, swww_repo_dir], cwd=temp_dir)
             if result and result.returncode == 0:
-                # Check for wayland-protocols.pc and set PKG_CONFIG_PATH if needed
-                def check_pkgconfig_file(pc_name):
-                    paths = [
-                        "/usr/lib64/pkgconfig",
-                        "/usr/lib/pkgconfig",
-                        "/usr/share/pkgconfig"
-                    ]
-                    for path in paths:
-                        if os.path.exists(os.path.join(path, pc_name)):
-                            return path
-                    return None
-
                 env = os.environ.copy()
                 pc_path = check_pkgconfig_file("wayland-protocols.pc")
                 if pc_path:
@@ -399,7 +377,6 @@ class ExoInstaller:
                 print("Building swww with cargo...")
                 result = self.run_command(["cargo", "build", "--release"], cwd=swww_repo_dir, env=env)
                 if result and result.returncode == 0:
-                    # Copy binaries to /usr/local/bin
                     for binary in ["swww", "swww-daemon"]:
                         src = os.path.join(swww_repo_dir, "target", "release", binary)
                         dest = os.path.join("/usr/local/bin", binary)
@@ -417,7 +394,6 @@ class ExoInstaller:
             else:
                 print(f"{self.Colors.RED}Error cloning swww repository.{self.Colors.ENDC}")
 
-            # Clean up temporary directory
             shutil.rmtree(temp_dir)
         else:
             print("swww found in PATH.")
@@ -452,7 +428,7 @@ class ExoInstaller:
         install_cmd = ["sudo", self.package_manager]
         if self.distro == "fedora":
             install_cmd.extend(["install", "-y"])
-        else: # arch and ubuntu
+        else:
             install_cmd.extend(["-S", "--noconfirm"] if self.distro == "arch" else ["install", "-y"])
 
         if choice == "1":
@@ -551,7 +527,6 @@ class ExoInstaller:
             with open(user_settings_path, 'w') as f:
                 f.write('{}')
 
-        # Automatically install exoupdate command if not present
         if shutil.which("exoupdate") is None:
             self.install_as_command()
 
@@ -725,11 +700,10 @@ class ExoInstaller:
     def update_installed_command_if_needed(self):
         installed_path = "/usr/local/bin/exoupdate"
         cloned_script = sys.argv[0]
-        # If running from /usr/local/bin/exoupdate, use the cloned repo's script
         if os.path.basename(cloned_script) == "exoupdate":
             cloned_script = os.path.join(self.source_dir, "exoinstall.py")
         if not os.path.exists(installed_path):
-            return  # Nothing to update
+            return
 
         def file_hash(path):
             hasher = hashlib.sha256()
@@ -754,12 +728,103 @@ class ExoInstaller:
         else:
             print(f"{self.Colors.GREEN}Installed exoupdate command is up to date.{self.Colors.ENDC}")
 
+    def uninstall_exo(self):
+        self.print_header("Exo Uninstaller")
+        print(f"{self.Colors.RED}{self.Colors.BOLD}WARNING: This will remove Exo configuration files.{self.Colors.ENDC}")
+        print("This action is irreversible. Backup files (.bak) will NOT be removed.")
+
+        choice = self.get_user_choice("Are you sure you want to continue? (y/n): ", ['y', 'n'])
+        if choice == 'n':
+            print("Uninstallation cancelled.")
+            return
+
+        paths_to_remove = {
+            "ignis config": os.path.join(self.config_dir, "ignis"),
+            "matugen config": os.path.join(self.config_dir, "matugen"),
+            "Niri config file": os.path.join(self.config_dir, "niri", "config.kdl"),
+            "Hyprland config file": os.path.join(self.config_dir, "hypr", "hyprland.conf"),
+        }
+
+        print("\nThe following Exo configuration items will be removed if they exist:")
+        items_found = False
+        for name, path in paths_to_remove.items():
+             if os.path.exists(path):
+                print(f"- {name} ({path})")
+                items_found = True
+
+        command_path = "/usr/local/bin/exoupdate"
+        if os.path.exists(command_path):
+            print(f"- exoupdate command ({command_path})")
+            items_found = True
+        
+        if not items_found and not self.dry_run:
+            print(f"{self.Colors.YELLOW}No Exo files found to uninstall.{self.Colors.ENDC}")
+            return
+
+        choice = self.get_user_choice("\nProceed with removal? (y/n): ", ['y', 'n'])
+        if choice == 'n':
+            print("Uninstallation cancelled.")
+            return
+
+        for name, path in paths_to_remove.items():
+            if os.path.exists(path):
+                if self.dry_run:
+                    print(f"{self.Colors.YELLOW}[DRY RUN] Would remove {name} at {path}{self.Colors.ENDC}")
+                    continue
+                try:
+                    if os.path.isdir(path):
+                        shutil.rmtree(path)
+                    else:
+                        os.remove(path)
+                    print(f"{self.Colors.GREEN}Removed {name}.{self.Colors.ENDC}")
+                except OSError as e:
+                    print(f"{self.Colors.RED}Error removing {name}: {e}{self.Colors.ENDC}")
+                    print(f"{self.Colors.YELLOW}You may need to remove it manually.{self.Colors.ENDC}")
+
+        if os.path.exists(command_path):
+            print("Removing exoupdate command (requires sudo)...")
+            cmd = ["sudo", "rm", command_path]
+            result = self.run_command(cmd)
+            if not self.dry_run:
+                if result and result.returncode == 0:
+                    print(f"{self.Colors.GREEN}Removed exoupdate command.{self.Colors.ENDC}")
+                else:
+                    print(f"{self.Colors.RED}Failed to remove exoupdate command.{self.Colors.ENDC}")
+                    print(f"{self.Colors.YELLOW}Please remove it manually: sudo rm {command_path}{self.Colors.ENDC}")
+        
+        wallpaper_path = os.path.expanduser("~/Pictures/Wallpapers/default.png")
+        if self.dry_run:
+            wallpaper_path = os.path.join(self.config_dir, "Pictures/Wallpapers/default.png")
+
+        if os.path.exists(wallpaper_path):
+            choice = self.get_user_choice(f"\nAlso remove the default wallpaper at '{wallpaper_path}'? (y/n): ", ['y', 'n'])
+            if choice == 'y':
+                if self.dry_run:
+                    print(f"{self.Colors.YELLOW}[DRY RUN] Would remove wallpaper: {wallpaper_path}{self.Colors.ENDC}")
+                else:
+                    try:
+                        os.remove(wallpaper_path)
+                        print(f"{self.Colors.GREEN}Removed default wallpaper.{self.Colors.ENDC}")
+                    except OSError as e:
+                        print(f"{self.Colors.RED}Error removing wallpaper: {e}{self.Colors.ENDC}")
+
+        self.print_header("Post-Uninstall Steps")
+        print(f"{self.Colors.YELLOW}Uninstallation of configuration files is complete.{self.Colors.ENDC}")
+        print("This script does NOT remove dependencies to avoid breaking other parts of your system.")
+        print("If you wish to remove them, you can do so with your package manager.")
+        print("Dependencies to consider removing:")
+        print("- Niri or Hyprland, python-ignis-git, ignis-gvc, matugen, swww, gnome-bluetooth, adw-gtk-theme, dart-sass")
 
 
 if __name__ == "__main__":
     if os.geteuid() == 0:
         print("This script should not be run as root. Please run as a regular user.")
         sys.exit(1)
+    
+    if len(sys.argv) > 1 and sys.argv[1] == "--uninstall":
+        installer = ExoInstaller()
+        installer.uninstall_exo()
+    else:
+        installer = ExoInstaller()
+        installer.run()
 
-    installer = ExoInstaller()
-    installer.run()
