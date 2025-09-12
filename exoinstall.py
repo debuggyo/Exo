@@ -260,7 +260,7 @@ class ExoInstaller:
                 "scdoc", "libxkbcommon-devel", "wayland-devel", "libdisplay-info-devel",
                 "libliftoff-devel", "pulseaudio-libs-devel", "lz4-devel",
                 "glib2-devel", "gobject-introspection-devel", "libgee-devel", "vala", "gcc", "make",
-                "wayland-protocols-devel"
+                "wayland-protocols-devel", "python3-devel"
             ],
             "ubuntu": ["python3-pip", "cargo", "libgnome-bluetooth-3.0-13", "adw-gtk-theme", "dart-sass", "fonts-material-design-icons-iconfont", "meson", "ninja-build", "pkg-config", "scdoc", "libxkbcommon-dev", "wayland-dev", "libdisplay-info-dev", "libliftoff-dev"]
         }
