@@ -254,7 +254,7 @@ class ExoInstaller:
 
         dependencies = {
             "arch": ["python-ignis-git", "ignis-gvc", "ttf-material-symbols-variable-git", "matugen-bin", "swww", "gnome-bluetooth-3.0", "adw-gtk-theme", "dart-sass"],
-            "fedora": ["python3-pip", "cargo", "gnome-bluetooth-libs", "adw-gtk3-theme", "google-noto-sans-symbols-fonts", "meson", "ninja-build", "pkg-config", "scdoc", "libxkbcommon-devel", "wayland-devel", "libdisplay-info-devel", "libliftoff-devel"],
+            "fedora": ["python3-pip", "cargo", "gnome-bluetooth-libs", "adw-gtk3-theme", "google-noto-sans-symbols-fonts", "meson", "ninja-build", "pkg-config", "scdoc", "libxkbcommon-devel", "wayland-devel", "libdisplay-info-devel", "libliftoff-devel", "pulseaudio-libs-devel", "lz4-devel"],
             "ubuntu": ["python3-pip", "cargo", "libgnome-bluetooth-3.0-13", "adw-gtk-theme", "dart-sass", "fonts-material-design-icons-iconfont", "meson", "ninja-build", "pkg-config", "scdoc", "libxkbcommon-dev", "wayland-dev", "libdisplay-info-dev", "libliftoff-dev"]
         }
 
