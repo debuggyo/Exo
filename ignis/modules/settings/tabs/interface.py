@@ -1,7 +1,7 @@
 import os
 
 from ignis import widgets
-from modules.m3components import Button
+from modules.m3components import Button, Slider
 from scripts import Wallpaper, BarStyles, DockStyles, send_notification
 from user_settings import user_settings
 from ..widgets import CategoryLabel, make_toggle_buttons, SwitchRow, SettingsRow
@@ -150,14 +150,15 @@ class DockCategory(widgets.Box):
             title="Size",
             description="Set a size for your dock icons.",
             child=[
-                widgets.Scale(
+                Slider.slider(
                     vertical=False,
                     min=16,
                     max=128,
                     step=1,
                     value=user_settings.interface.dock.size,
                     on_change=lambda x: DockStyles.setSize(x.value),
-                    draw_value=True
+                    draw_value=True,
+                    value_pos="right"
                 )
             ]
         ))

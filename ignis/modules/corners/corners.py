@@ -13,13 +13,13 @@ class Corners:
     def corner(cls, anchors: list, name, exclusivity, corner_type, size: int = 25):
         css_classes = [f"{corner_type}-corner"]
         image = ('-'.join(anchors) + "-symbolic")
-        
+
         for win in cls._windows:
             if win.namespace == name:
                 return win
 
         win = widgets.Window(
-            css_classes=css_classes,     
+            css_classes=css_classes,
             anchor=anchors,
             visible=True,
             namespace=name,
@@ -77,7 +77,7 @@ class Corners:
                 cls.screen(["top", "right"], 25)
                 cls.screen(["bottom", "left"], 25)
                 cls.screen(["bottom", "right"], 25)
-                
+
         is_not_floating_and_uncentered = not user_settings.interface.bar.floating and not bar_centered
         if is_not_floating_and_uncentered and user_settings.interface.bar.corners:
             if bar_vertical:

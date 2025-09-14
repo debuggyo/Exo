@@ -381,6 +381,26 @@ switch {
     }
 }
 
+.m3-slider {
+    trough {
+        background-color: colors.$secondary_container;
+        highlight {
+            background-color: colors.$primary;
+            min-height: 32px;
+        }
+
+        &:active {
+            highlight {
+                border-radius: 8px;
+            }
+        }
+
+        slider {
+            opacity: 0;
+        }
+    }
+}
+
 .navigation-rail {
     padding: 10px;
     .rail-button {
@@ -399,7 +419,8 @@ switch {
             color: colors.$on_surface_variant;
             font-size: 8pt;
         }
-        &:hover, &:focus-visible {
+        &:hover,
+        &:focus-visible {
             background-color: transparent;
             outline: none;
 
@@ -411,7 +432,7 @@ switch {
             .m3-button-icon {
                 background-color: colors.$secondary_container;
                 color: colors.$on_secondary_container;
-                font-variation-settings: 'FILL' 1;
+                font-variation-settings: "FILL" 1;
             }
         }
     }

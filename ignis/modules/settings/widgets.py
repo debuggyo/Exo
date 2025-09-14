@@ -100,6 +100,8 @@ def SwitchRow(label: str, active, on_change, **kwargs):
         **kwargs
     )
 
+    row_content.remove_css_class("settings-row")
+
     def on_button_click(_):
         new_active_state = not switch.active
         on_change(switch, new_active_state)
@@ -110,5 +112,5 @@ def SwitchRow(label: str, active, on_change, **kwargs):
         on_click=on_button_click,
         hexpand=True,
         halign="fill",
-        css_classes=["row-button"]
+        css_classes=["settings-row", "row-button"]
     )
