@@ -19,7 +19,7 @@ sudo pacman -S curl git python3   # For Arch
 ```
 
 ```sh
-curl -sSL https://raw.githubusercontent.com/debuggyo/Exo/main/exoinstall.py | python3 -
+curl -sSL https://raw.githubusercontent.com/debuggyo/Exo/main/exoinstall.py -o exoinstall.py && python3 exoinstall.py
 ```
 
 ## Updating and Uninstalling
