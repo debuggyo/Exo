@@ -1,10 +1,5 @@
-import os
-from ignis import widgets, utils
-from ignis.icon_manager import IconManager
+from ignis import widgets
 from user_settings import user_settings
-
-icon_manager = IconManager.get_default()
-icon_manager.add_icons(os.path.join(utils.get_current_dir(), "corners"))
 
 class Corners:
     _windows = []
@@ -12,7 +7,6 @@ class Corners:
     @classmethod
     def corner(cls, anchors: list, name, exclusivity, corner_type, size: int = 25):
         css_classes = [f"{corner_type}-corner"]
-        image = ('-'.join(anchors) + "-symbolic")
 
         for win in cls._windows:
             if win.namespace == name:
@@ -26,9 +20,8 @@ class Corners:
             height_request=size,
             width_request=size,
             exclusivity=exclusivity,
-            child=widgets.Icon(
-                image=image,
-                pixel_size=size
+            child=widgets.Corner(
+                orientation='-'.join(anchors)
             )
         )
         cls._windows.append(win)
@@ -63,20 +56,18 @@ class Corners:
 
         if user_settings.interface.misc.screen_corners:
             if is_floating_and_uncentered:
-                top_left_size = optimal_size if bar_side in ["top", "left"] else 25
-                top_right_size = optimal_size if bar_side in ["top", "right"] else 25
-                bottom_left_size = optimal_size if bar_side in ["bottom", "left"] else 25
-                bottom_right_size = optimal_size if bar_side in ["bottom", "right"] else 25
+                corners = [
+                    (["top", "left"], optimal_size if bar_side in ["top", "left"] else 25),
+                    (["top", "right"], optimal_size if bar_side in ["top", "right"] else 25),
+                    (["bottom", "left"], optimal_size if bar_side in ["bottom", "left"] else 25),
+                    (["bottom", "right"], optimal_size if bar_side in ["bottom", "right"] else 25),
+                ]
 
-                cls.screen(["top", "left"], top_left_size)
-                cls.screen(["top", "right"], top_right_size)
-                cls.screen(["bottom", "left"], bottom_left_size)
-                cls.screen(["bottom", "right"], bottom_right_size)
+                for corner, size in corners:
+                    cls.screen(corner, size)
             else:
-                cls.screen(["top", "left"], 25)
-                cls.screen(["top", "right"], 25)
-                cls.screen(["bottom", "left"], 25)
-                cls.screen(["bottom", "right"], 25)
+                for corner in [["top", "left"], ["top", "right"], ["bottom", "left"], ["bottom", "right"]]:
+                    cls.screen(corner, 25)
 
         is_not_floating_and_uncentered = not user_settings.interface.bar.floating and not bar_centered
         if is_not_floating_and_uncentered and user_settings.interface.bar.corners:

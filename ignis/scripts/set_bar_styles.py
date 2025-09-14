@@ -220,6 +220,7 @@ class BarStyles:
                 else:
                     win.set_height_request(height)
 
+        rebuild_corners()
         BarStyles._update_all_layouts()
 
     @staticmethod
