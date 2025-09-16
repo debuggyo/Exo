@@ -1,0 +1,151 @@
+@import "preview-colors.scss";
+
+.content-preview {
+    .primary {
+        background-color: $palette-content-primary;
+    }
+    .secondary {
+        background-color: $palette-content-secondary-container;
+    }
+    .tertiary {
+        background-color: $palette-content-tertiary-fixed;
+    }
+}
+
+.expressive-preview {
+    .primary {
+        background-color: $palette-expressive-primary;
+    }
+    .secondary {
+        background-color: $palette-expressive-secondary-container;
+    }
+    .tertiary {
+        background-color: $palette-expressive-tertiary-fixed;
+    }
+}
+
+.fidelity-preview {
+    .primary {
+        background-color: $palette-fidelity-primary;
+    }
+    .secondary {
+        background-color: $palette-fidelity-secondary-container;
+    }
+    .tertiary {
+        background-color: $palette-fidelity-tertiary-fixed;
+    }
+}
+
+.fruit-salad-preview {
+    .primary {
+        background-color: $palette-fruit-salad-primary;
+    }
+    .secondary {
+        background-color: $palette-fruit-salad-secondary-container;
+    }
+    .tertiary {
+        background-color: $palette-fruit-salad-tertiary-fixed;
+    }
+}
+
+.monochrome-preview {
+    .primary {
+        background-color: $palette-monochrome-primary;
+    }
+    .secondary {
+        background-color: $palette-monochrome-secondary-container;
+    }
+    .tertiary {
+        background-color: $palette-monochrome-tertiary-fixed;
+    }
+}
+
+.neutral-preview {
+    .primary {
+        background-color: $palette-neutral-primary;
+    }
+    .secondary {
+        background-color: $palette-neutral-secondary-container;
+    }
+    .tertiary {
+        background-color: $palette-neutral-tertiary-fixed;
+    }
+}
+
+.rainbow-preview {
+    .primary {
+        background-color: $palette-rainbow-primary;
+    }
+    .secondary {
+        background-color: $palette-rainbow-secondary-container;
+    }
+    .tertiary {
+        background-color: $palette-rainbow-tertiary-fixed;
+    }
+}
+
+.tonal-spot-preview {
+    .primary {
+        background-color: $palette-tonal-spot-primary;
+    }
+    .secondary {
+        background-color: $palette-tonal-spot-secondary-container;
+    }
+    .tertiary {
+        background-color: $palette-tonal-spot-tertiary-fixed;
+    }
+}
+
+.light-preview {
+    label {
+        color: $theme-light-on-surface;
+    }
+    .container {
+        background-color: $theme-light-surface;
+        .surface_low {
+            background-color: $theme-light-surface-container-lowest;
+        }
+        .surface {
+            background-color: $theme-light-surface-container;
+        }
+        .surface_high {
+            background-color: $theme-light-surface-container-highest;
+        }
+        .btn-1 {
+            background-color: $theme-light-primary;
+        }
+        .btn-2 {
+            background-color: $theme-light-secondary_container;
+        }
+        .btn-3 {
+            background-color: $theme-light-tertiary_container;
+        }
+    }
+}
+
+.dark-preview {
+    label {
+        color: $theme-dark-on-surface;
+    }
+    .container {
+        background-color: $theme-dark-surface;
+        .surface_low {
+            background-color: $theme-dark-surface-container-lowest;
+        }
+        .surface {
+            background-color: $theme-dark-surface-container;
+        }
+        .surface_high {
+            background-color: $theme-dark-surface-container-highest;
+        }
+        .btn-1 {
+            background-color: $theme-dark-primary;
+        }
+        .btn-2 {
+            background-color: $theme-dark-secondary_container;
+        }
+        .btn-3 {
+            background-color: $theme-dark-tertiary_container;
+        }
+    }
+}
