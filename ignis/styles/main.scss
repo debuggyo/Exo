@@ -8,11 +8,14 @@
 @use "quickcenter.scss";
 @use "notifications.scss";
 @use "m3.scss";
+@use "previews.scss";
 
 *:focus {
     outline-color: colors.$secondary;
 }
 
-.popup-close, .popup-close button, .popup-close .background {
+.popup-close,
+.popup-close button,
+.popup-close .background {
     background-color: transparent;
 }

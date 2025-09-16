@@ -3,7 +3,7 @@
 // Settings Window
 .settings-window {
     padding: 0px;
-    background-color: colors.$surface;
+    background-color: colors.$surface_container;
     color: colors.$on_background;
     min-width: 950px;
 
@@ -22,13 +22,14 @@
     }
 
     scrolledwindow viewport {
-        margin: 0px 5px 5px 0px;
-        border-radius: 15px;
-        background-color: colors.$surface_container;
+        margin: 0px 0px 0px 0px;
+        border-radius: 25px 0px 0px 0px;
+        background-color: colors.$surface;
     }
 
     .settings-body {
         padding: 20px 10px;
+        max-width: 800px;
         .settings-category {
             margin: 0px;
             border-radius: 10px;
@@ -129,10 +130,10 @@
 }
 
 .settings-row,
-.switch-row {
+.row-button {
     min-width: 800px;
     padding: 0.5rem 1rem;
-    background-color: colors.$surface_container_high;
+    background-color: colors.$surface_container;
     border-radius: 8px;
 
     .settings-row-header {
@@ -149,25 +150,49 @@
         }
     }
 
-    &.switch-row {
+    &.row-button {
         transition: 100ms;
         &:hover {
             background-color: colors.$surface_container_highest;
         }
-        .switch-row {
+        .row-button {
             padding-right: 10px;
         }
     }
 
-    &:first-child {
-        border-top-left-radius: 15px;
-        border-top-right-radius: 15px;
+    &:nth-child(2) {
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
     }
     &:last-child {
-        border-bottom-left-radius: 15px;
-        border-bottom-right-radius: 15px;
+        border-bottom-left-radius: 16px;
+        border-bottom-right-radius: 16px;
     }
 }
-.row-button {
+
+.palette-preview-btn {
     padding: 0px;
+    border-radius: 50px;
+    &.selected {
+        outline: 2px solid colors.$primary;
+        outline-offset: 2px;
+    }
+}
+
+.theme-preview-btn {
+    padding: 0px;
+    border-radius: 20px;
+    &.selected {
+        outline: 2px solid colors.$primary;
+        outline-offset: 2px;
+    }
+    .container {
+        padding: 5px;
+        box {
+            border-radius: 15px;
+        }
+    }
+    .icon {
+        font-family: "Material Symbols Outlined";
+    }
 }

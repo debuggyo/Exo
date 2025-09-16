@@ -204,7 +204,7 @@
         background-color: transparent;
 
         &:hover {
-            background-color: colors.$surface_container_high;
+            background-color: colors.$surface_container_highest;
         }
 
         &.active {
@@ -236,20 +236,18 @@
     &.dots {
         padding: 0px 15px;
         .workspace {
-            opacity: 0.5;
             font-size: 0pt;
             padding: 0px;
             min-width: 6px;
             min-height: 6px;
             color: colors.$on_background;
-            background-color: colors.$on_background;
+            background-color: rgba(colors.$primary, 0.5);
             border-radius: 2rem;
 
             &.active {
-                opacity: 1;
                 min-height: 10px;
                 min-width: 20px;
-                background-color: colors.$on_background;
+                background-color: colors.$primary;
             }
         }
     }
@@ -597,8 +595,8 @@
         }
         &:not(.windows) .workspaces:not(.dots) {
             padding: 0px;
-            .workspace.active {
-                padding: 3px 0px;
+            .workspace {
+                padding: 1px 0px;
             }
         }
     }

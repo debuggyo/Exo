@@ -14,7 +14,7 @@ class BarCategory(widgets.Box):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
-            spacing=2,
+            spacing=5,
         )
 
         self.append(CategoryLabel("Bar"))
@@ -109,7 +109,7 @@ class DockCategory(widgets.Box):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
-            spacing=2,
+            spacing=5,
         )
 
         self.append(CategoryLabel("Dock"))
@@ -189,7 +189,7 @@ class NotificationsCategory(widgets.Box):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
-            spacing=2,
+            spacing=5,
         )
 
         self.append(CategoryLabel("Notifications"))
@@ -231,7 +231,7 @@ class MiscCategory(widgets.Box):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
-            spacing=2,
+            spacing=5,
             child=[
                 CategoryLabel("Miscellaneous"),
                 SwitchRow(

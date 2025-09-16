@@ -15,6 +15,8 @@ from ignis import utils
 from scripts import BarStyles, DockStyles, Wallpaper
 from user_settings import user_settings
 
+Wallpaper.generatePreviews()
+
 css_manager = CssManager.get_default()
 css_manager.apply_css(
     CssInfoPath(
