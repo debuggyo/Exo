@@ -528,7 +528,7 @@ class ExoInstaller:
                 f.write('{}')
 
         preview_colors = os.path.join(self.source_dir, "exodefaults", "preview-colors.scss")
-        preview_colors_dest = os.path.join(wallpaper_dir, "default.png")
+        preview_colors_dest = os.path.join(self.config_dir, "ignis", "styles", "preview-colors.scss")
         if not os.path.exists(preview_colors_dest):
             print("Copying default preview-colors.scss...")
             shutil.copyfile(preview_colors, preview_colors_dest)
@@ -631,7 +631,7 @@ class ExoInstaller:
                         self.prompt_and_delete(dest_file)
 
         preview_colors = os.path.join(self.source_dir, "exodefaults", "preview-colors.scss")
-        preview_colors_dest = os.path.join(wallpaper_dir, "default.png")
+        preview_colors_dest = os.path.join(self.config_dir, "ignis", "styles", "preview-colors.scss")
         if not os.path.exists(preview_colors_dest):
             print("Copying default preview-colors.scss...")
             shutil.copyfile(preview_colors, preview_colors_dest)
