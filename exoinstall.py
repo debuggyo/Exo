@@ -527,6 +527,12 @@ class ExoInstaller:
             with open(user_settings_path, 'w') as f:
                 f.write('{}')
 
+        preview_colors = os.path.join(self.source_dir, "exodefaults", "preview-colors.scss")
+        preview_colors_dest = os.path.join(wallpaper_dir, "default.png")
+        if not os.path.exists(preview_colors_dest):
+            print("Copying default preview-colors.scss...")
+            shutil.copyfile(preview_colors, preview_colors_dest)
+
         if shutil.which("exoupdate") is None:
             self.install_as_command()
 
@@ -623,6 +629,12 @@ class ExoInstaller:
 
                     if not os.path.exists(source_file):
                         self.prompt_and_delete(dest_file)
+
+        preview_colors = os.path.join(self.source_dir, "exodefaults", "preview-colors.scss")
+        preview_colors_dest = os.path.join(wallpaper_dir, "default.png")
+        if not os.path.exists(preview_colors_dest):
+            print("Copying default preview-colors.scss...")
+            shutil.copyfile(preview_colors, preview_colors_dest)
 
         print(f"\n{self.Colors.GREEN}Update check complete.{self.Colors.ENDC}")
 
@@ -756,7 +768,7 @@ class ExoInstaller:
         if os.path.exists(command_path):
             print(f"- exoupdate command ({command_path})")
             items_found = True
-        
+
         if not items_found and not self.dry_run:
             print(f"{self.Colors.YELLOW}No Exo files found to uninstall.{self.Colors.ENDC}")
             return
@@ -791,7 +803,7 @@ class ExoInstaller:
                 else:
                     print(f"{self.Colors.RED}Failed to remove exoupdate command.{self.Colors.ENDC}")
                     print(f"{self.Colors.YELLOW}Please remove it manually: sudo rm {command_path}{self.Colors.ENDC}")
-        
+
         wallpaper_path = os.path.expanduser("~/Pictures/Wallpapers/default.png")
         if self.dry_run:
             wallpaper_path = os.path.join(self.config_dir, "Pictures/Wallpapers/default.png")
@@ -820,11 +832,10 @@ if __name__ == "__main__":
     if os.geteuid() == 0:
         print("This script should not be run as root. Please run as a regular user.")
         sys.exit(1)
-    
+
     if len(sys.argv) > 1 and sys.argv[1] == "--uninstall":
         installer = ExoInstaller()
         installer.uninstall_exo()
     else:
         installer = ExoInstaller()
         installer.run()
-
