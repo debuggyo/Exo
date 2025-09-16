@@ -1,151 +1,151 @@
-@import "preview-colors.scss";
+@use "preview-colors.scss";
 
 .content-preview {
     .primary {
-        background-color: $palette-content-primary;
+        background-color: preview-colors.$palette-content-primary;
     }
     .secondary {
-        background-color: $palette-content-secondary-container;
+        background-color: preview-colors.$palette-content-secondary-container;
     }
     .tertiary {
-        background-color: $palette-content-tertiary-fixed;
+        background-color: preview-colors.$palette-content-tertiary-fixed;
     }
 }
 
 .expressive-preview {
     .primary {
-        background-color: $palette-expressive-primary;
+        background-color: preview-colors.$palette-expressive-primary;
     }
     .secondary {
-        background-color: $palette-expressive-secondary-container;
+        background-color: preview-colors.$palette-expressive-secondary-container;
     }
     .tertiary {
-        background-color: $palette-expressive-tertiary-fixed;
+        background-color: preview-colors.$palette-expressive-tertiary-fixed;
     }
 }
 
 .fidelity-preview {
     .primary {
-        background-color: $palette-fidelity-primary;
+        background-color: preview-colors.$palette-fidelity-primary;
     }
     .secondary {
-        background-color: $palette-fidelity-secondary-container;
+        background-color: preview-colors.$palette-fidelity-secondary-container;
     }
     .tertiary {
-        background-color: $palette-fidelity-tertiary-fixed;
+        background-color: preview-colors.$palette-fidelity-tertiary-fixed;
     }
 }
 
 .fruit-salad-preview {
     .primary {
-        background-color: $palette-fruit-salad-primary;
+        background-color: preview-colors.$palette-fruit-salad-primary;
     }
     .secondary {
-        background-color: $palette-fruit-salad-secondary-container;
+        background-color: preview-colors.$palette-fruit-salad-secondary-container;
     }
     .tertiary {
-        background-color: $palette-fruit-salad-tertiary-fixed;
+        background-color: preview-colors.$palette-fruit-salad-tertiary-fixed;
     }
 }
 
 .monochrome-preview {
     .primary {
-        background-color: $palette-monochrome-primary;
+        background-color: preview-colors.$palette-monochrome-primary;
     }
     .secondary {
-        background-color: $palette-monochrome-secondary-container;
+        background-color: preview-colors.$palette-monochrome-secondary-container;
     }
     .tertiary {
-        background-color: $palette-monochrome-tertiary-fixed;
+        background-color: preview-colors.$palette-monochrome-tertiary-fixed;
     }
 }
 
 .neutral-preview {
     .primary {
-        background-color: $palette-neutral-primary;
+        background-color: preview-colors.$palette-neutral-primary;
     }
     .secondary {
-        background-color: $palette-neutral-secondary-container;
+        background-color: preview-colors.$palette-neutral-secondary-container;
     }
     .tertiary {
-        background-color: $palette-neutral-tertiary-fixed;
+        background-color: preview-colors.$palette-neutral-tertiary-fixed;
     }
 }
 
 .rainbow-preview {
     .primary {
-        background-color: $palette-rainbow-primary;
+        background-color: preview-colors.$palette-rainbow-primary;
     }
     .secondary {
-        background-color: $palette-rainbow-secondary-container;
+        background-color: preview-colors.$palette-rainbow-secondary-container;
     }
     .tertiary {
-        background-color: $palette-rainbow-tertiary-fixed;
+        background-color: preview-colors.$palette-rainbow-tertiary-fixed;
     }
 }
 
 .tonal-spot-preview {
     .primary {
-        background-color: $palette-tonal-spot-primary;
+        background-color: preview-colors.$palette-tonal-spot-primary;
     }
     .secondary {
-        background-color: $palette-tonal-spot-secondary-container;
+        background-color: preview-colors.$palette-tonal-spot-secondary-container;
     }
     .tertiary {
-        background-color: $palette-tonal-spot-tertiary-fixed;
+        background-color: preview-colors.$palette-tonal-spot-tertiary-fixed;
     }
 }
 
 .light-preview {
     label {
-        color: $theme-light-on-surface;
+        color: preview-colors.$theme-light-on-surface;
     }
     .container {
-        background-color: $theme-light-surface;
+        background-color: preview-colors.$theme-light-surface;
         .surface_low {
-            background-color: $theme-light-surface-container-lowest;
+            background-color: preview-colors.$theme-light-surface-container-lowest;
         }
         .surface {
-            background-color: $theme-light-surface-container;
+            background-color: preview-colors.$theme-light-surface-container;
         }
         .surface_high {
-            background-color: $theme-light-surface-container-highest;
+            background-color: preview-colors.$theme-light-surface-container-highest;
         }
         .btn-1 {
-            background-color: $theme-light-primary;
+            background-color: preview-colors.$theme-light-primary;
         }
         .btn-2 {
-            background-color: $theme-light-secondary_container;
+            background-color: preview-colors.$theme-light-secondary_container;
         }
         .btn-3 {
-            background-color: $theme-light-tertiary_container;
+            background-color: preview-colors.$theme-light-tertiary_container;
         }
     }
 }
 
 .dark-preview {
     label {
-        color: $theme-dark-on-surface;
+        color: preview-colors.$theme-dark-on-surface;
     }
     .container {
-        background-color: $theme-dark-surface;
+        background-color: preview-colors.$theme-dark-surface;
         .surface_low {
-            background-color: $theme-dark-surface-container-lowest;
+            background-color: preview-colors.$theme-dark-surface-container-lowest;
         }
         .surface {
-            background-color: $theme-dark-surface-container;
+            background-color: preview-colors.$theme-dark-surface-container;
         }
         .surface_high {
-            background-color: $theme-dark-surface-container-highest;
+            background-color: preview-colors.$theme-dark-surface-container-highest;
         }
         .btn-1 {
-            background-color: $theme-dark-primary;
+            background-color: preview-colors.$theme-dark-primary;
         }
         .btn-2 {
-            background-color: $theme-dark-secondary_container;
+            background-color: preview-colors.$theme-dark-secondary_container;
         }
         .btn-3 {
-            background-color: $theme-dark-tertiary_container;
+            background-color: preview-colors.$theme-dark-tertiary_container;
         }
     }
 }
