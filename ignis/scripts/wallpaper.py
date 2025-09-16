@@ -40,6 +40,7 @@ class Wallpaper:
             asyncio.create_task(utils.exec_sh_async(f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'"))
 
         user_settings.appearance.wallcolors.set_color_scheme(colorScheme)
+        Wallpaper.generatePreviews()
         utils.Timeout(ms=3000, target=lambda: css_manager.reload_all_css())
 
 
@@ -72,6 +73,8 @@ class Wallpaper:
 
             current_mode = "dark" if user_settings.appearance.wallcolors.dark_mode else "light"
             current_scheme = user_settings.appearance.wallcolors.color_scheme
+            if current_scheme not in schemes:
+                current_scheme = "tonal-spot"
 
             scss_content = ""
 
@@ -80,7 +83,16 @@ class Wallpaper:
                 command = f"matugen image -t scheme-{scheme} '{path}' -m {current_mode} --json hex --dry-run"
                 tasks_palette.append(utils.exec_sh_async(command))
 
-            results_palette = await asyncio.gather(*tasks_palette)
+            tasks_theme = []
+            for mode in ["light", "dark"]:
+                command = f"matugen image -t scheme-{current_scheme} '{path}' -m {mode} --json hex --dry-run"
+                tasks_theme.append(utils.exec_sh_async(command))
+
+            all_results = await asyncio.gather(*(tasks_palette + tasks_theme))
+
+            results_palette = all_results[:len(schemes)]
+            results_theme = all_results[len(schemes):]
+
 
             for i, result in enumerate(results_palette):
                 scheme = schemes[i]
@@ -90,18 +102,11 @@ class Wallpaper:
                         if current_mode in data.get('colors', {}):
                             for color_name, color_value in data['colors'][current_mode].items():
                                 variable_name = f"palette-{scheme}-{color_name.replace('_', '-')}"
-                                scss_content += '$' + variable_name + ': ' + color_value + ';\n'
+                                scss_content += f"${variable_name}: {color_value};\n"
                     except json.JSONDecodeError as e:
                         stderr = result.stderr if result.stderr else ''
                         print(f"Failed to decode json for palette {scheme}: {stderr} | {e}")
                         pass
-
-            tasks_theme = []
-            for mode in ["light", "dark"]:
-                command = f"matugen image -t scheme-{current_scheme} '{path}' -m {mode} --json hex --dry-run"
-                tasks_theme.append(utils.exec_sh_async(command))
-
-            results_theme = await asyncio.gather(*tasks_theme)
 
             for i, result in enumerate(results_theme):
                 mode = ["light", "dark"][i]
@@ -111,7 +116,7 @@ class Wallpaper:
                         if mode in data.get('colors', {}):
                             for color_name, color_value in data['colors'][mode].items():
                                 variable_name = f"theme-{mode}-{color_name.replace('_', '-')}"
-                                scss_content += '$' + variable_name + ': ' + color_value + ';\n'
+                                scss_content += f"${variable_name}: {color_value};\n"
                     except json.JSONDecodeError as e:
                         stderr = result.stderr if result.stderr else ''
                         print(f"Failed to decode json for theme preview {mode}: {stderr} | {e}")

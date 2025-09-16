@@ -241,13 +241,13 @@
             min-width: 6px;
             min-height: 6px;
             color: colors.$on_background;
-            background-color: rgba(colors.$primary, 0.5);
+            background-color: rgba(colors.$on_background, 0.5);
             border-radius: 2rem;
 
             &.active {
                 min-height: 10px;
                 min-width: 20px;
-                background-color: colors.$primary;
+                background-color: colors.$on_background;
             }
         }
     }
