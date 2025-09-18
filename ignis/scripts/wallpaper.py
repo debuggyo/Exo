@@ -99,10 +99,18 @@ class Wallpaper:
                 if result.stdout:
                     try:
                         data = json.loads(result.stdout)
+                        # matugen-bin
                         if current_mode in data.get('colors', {}):
                             for color_name, color_value in data['colors'][current_mode].items():
                                 variable_name = f"palette-{scheme}-{color_name.replace('_', '-')}"
                                 scss_content += f"${variable_name}: {color_value};\n"
+                        # matugen-git (as of r107.ga49399b)
+                        else:
+                            for color_name, values in data['colors'].items():
+                                if current_mode in values:
+                                    color_value = values[current_mode]
+                                    variable_name = f"palette-{scheme}-{color_name.replace('_', '-')}"
+                                    scss_content += f"${variable_name}: {color_value};\n"
                     except json.JSONDecodeError as e:
                         stderr = result.stderr if result.stderr else ''
                         print(f"Failed to decode json for palette {scheme}: {stderr} | {e}")
@@ -112,16 +120,25 @@ class Wallpaper:
                 mode = ["light", "dark"][i]
                 if result.stdout:
                     try:
+                        # matugen-bin
                         data = json.loads(result.stdout)
                         if mode in data.get('colors', {}):
                             for color_name, color_value in data['colors'][mode].items():
                                 variable_name = f"theme-{mode}-{color_name.replace('_', '-')}"
                                 scss_content += f"${variable_name}: {color_value};\n"
+                        # matugen-git (as of r107.ga49399b)
+                        else:
+                            for color_name, values in data['colors'].items():
+                                if mode in values:
+                                    color_value = values[mode]
+                                    variable_name = f"theme-{mode}-{color_name.replace('_', '-')}"
+                                    scss_content += f"${variable_name}: {color_value};\n"
                     except json.JSONDecodeError as e:
                         stderr = result.stderr if result.stderr else ''
                         print(f"Failed to decode json for theme preview {mode}: {stderr} | {e}")
                         pass
-
+            if not scss_content:
+                return
             scss_file_path = os.path.expanduser("~/.config/ignis/styles/preview-colors.scss")
             os.makedirs(os.path.dirname(scss_file_path), exist_ok=True)
             with open(scss_file_path, "w") as f:
