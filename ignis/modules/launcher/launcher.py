@@ -275,7 +275,7 @@ class Launcher(widgets.Window):
             height_request=550
         )
         self._scroll_container.set_overflow(Gtk.Overflow.HIDDEN)
-        
+
         self._scroll_revealer = widgets.Revealer(
             transition_type='slide_down',
             reveal_child=False
@@ -319,7 +319,7 @@ class Launcher(widgets.Window):
             kb_mode="exclusive",
             anchor=["left", "right", "top", "bottom"],
             default_width=600,
-            setup=lambda self: self.connect("notify::visible", self.__on_open),
+            setup=lambda self: self.connect("notify::visible", self.__on_visibility_change),
             child=main_overlay
         )
 
@@ -406,15 +406,14 @@ class Launcher(widgets.Window):
         self._entry.grab_focus()
         self.__search()
 
-    def __on_open(self, *args) -> None:
-        if not self.visible:
-            return
-
-        self._entry.text = ""
-        self._entry.grab_focus()
-        self._entry.set_position(-1)
-        self.__populate_pinned_apps_list()
-        self.__search()
+    def __on_visibility_change(self, *args) -> None:
+        if self.visible:
+            self._entry.grab_focus()
+            self._entry.set_position(-1)
+        else:
+            self._entry.text = ""
+            self.__populate_pinned_apps_list()
+            self.__search()
 
     def __on_accept(self, *args) -> None:
         if self._first_row and self._first_row.child:
