@@ -129,7 +129,7 @@ class Wallpaper:
                         # matugen-git (as of r107.ga49399b)
                         else:
                             for color_name, values in data['colors'].items():
-                                if current_mode in values:
+                                if mode in values:
                                     color_value = values[mode]
                                     variable_name = f"theme-{mode}-{color_name.replace('_', '-')}"
                                     scss_content += f"${variable_name}: {color_value};\n"
