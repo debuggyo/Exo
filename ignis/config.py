@@ -40,8 +40,8 @@ BarStyles._apply_css(bar.build())
 
 dock = Dock()
 DockStyles.set_dock_instance(dock)
-
 DockStyles._apply_dock_css(dock.build())
+
 if not user_settings.appearance.wallcolors.wallpaper_path:
     default_wallpaper_path = os.path.expanduser("~/Pictures/Wallpapers/default.png")
     if os.path.exists(default_wallpaper_path):
@@ -50,7 +50,7 @@ if not user_settings.appearance.wallcolors.wallpaper_path:
     else:
         print("No wallpaper set and default wallpaper file not found.")
 
-if user_settings.interface.misc.screen_corners or user_settings.interface.bar.corners:
+if user_settings.interface.misc.screen_corners or user_settings.interface.misc.shell_corners:
     Corners.build()
 Settings()
 Launcher()

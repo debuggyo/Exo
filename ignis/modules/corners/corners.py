@@ -39,28 +39,25 @@ class Corners:
 
     @classmethod
     def build(cls):
-        bar_side = user_settings.interface.bar.side
-        bar_centered = user_settings.interface.bar.centered
-        bar_vertical = user_settings.interface.bar.vertical
-        compact_mode = user_settings.interface.bar.density
+        bar = user_settings.interface.bar
+        dock = user_settings.interface.dock
+        misc = user_settings.interface.misc
 
         optimal_size = 25
-        if compact_mode == 1:
+        if bar.density == 1:
             optimal_size = 22.5
-        elif compact_mode == 2:
+        elif bar.density == 2:
             optimal_size = 20
-        elif compact_mode == 3:
+        elif bar.density == 3:
             optimal_size = 17.5
 
-        is_floating_and_uncentered = user_settings.interface.bar.floating and not bar_centered
-
-        if user_settings.interface.misc.screen_corners:
-            if is_floating_and_uncentered:
+        if misc.screen_corners:
+            if bar.floating and not bar.centered:
                 corners = [
-                    (["top", "left"], optimal_size if bar_side in ["top", "left"] else 25),
-                    (["top", "right"], optimal_size if bar_side in ["top", "right"] else 25),
-                    (["bottom", "left"], optimal_size if bar_side in ["bottom", "left"] else 25),
-                    (["bottom", "right"], optimal_size if bar_side in ["bottom", "right"] else 25),
+                    (["top", "left"], optimal_size if bar.side in ["top", "left"] else 25),
+                    (["top", "right"], optimal_size if bar.side in ["top", "right"] else 25),
+                    (["bottom", "left"], optimal_size if bar.side in ["bottom", "left"] else 25),
+                    (["bottom", "right"], optimal_size if bar.side in ["bottom", "right"] else 25),
                 ]
 
                 for corner, size in corners:
@@ -69,14 +66,33 @@ class Corners:
                 for corner in [["top", "left"], ["top", "right"], ["bottom", "left"], ["bottom", "right"]]:
                     cls.screen(corner, 25)
 
-        is_not_floating_and_uncentered = not user_settings.interface.bar.floating and not bar_centered
-        if is_not_floating_and_uncentered and user_settings.interface.bar.corners:
-            if bar_vertical:
-                cls.bar(["top", bar_side])
-                cls.bar(["bottom", bar_side])
-            else:
-                cls.bar([bar_side, "left"])
-                cls.bar([bar_side, "right"])
+        if misc.shell_corners:
+            dock = user_settings.interface.dock
+            corners = []
+
+            bar_is_not_floating_and_uncentered = not bar.floating and not bar.centered
+            if bar_is_not_floating_and_uncentered:
+                if bar.vertical:
+                    corners.append(["top", bar.side])
+                    corners.append(["bottom", bar.side])
+                else:
+                    corners.append([bar.side, "left"])
+                    corners.append([bar.side, "right"])
+
+            if dock.enabled:
+                dock_is_not_floating_and_uncentered = not dock.floating and not dock.centered
+                if dock_is_not_floating_and_uncentered:
+                    if dock.vertical:
+                        corners.append(["top", dock.side])
+                        corners.append(["bottom", dock.side])
+                    else:
+                        corners.append([dock.side, "left"])
+                        corners.append([dock.side, "right"])
+
+            corners = list(map(list, set(map(tuple, corners)))) # remove duplicates
+
+            for corner in corners:
+                cls.bar(corner)
 
     @classmethod
     def destroy_all(cls):

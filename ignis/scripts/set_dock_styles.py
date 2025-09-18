@@ -1,6 +1,12 @@
 import os
 from ignis import widgets, utils
+from modules.corners import Corners
 from user_settings import user_settings
+
+def rebuild_corners():
+    Corners.destroy_all()
+    if user_settings.interface.misc.screen_corners or user_settings.interface.misc.shell_corners:
+        Corners.build()
 
 class DockStyles:
     dock_instance = None
@@ -22,17 +28,17 @@ class DockStyles:
         all_possible_classes = {"floating", "hug", "centered", "not-centered", "vertical", "horizontal", "top", "bottom", "left", "right"}
         for css_class in all_possible_classes:
             window.remove_css_class(css_class)
-        
+
         if floating:
             window.add_css_class("floating")
         else:
             window.add_css_class("hug")
-            
+
         if centered:
             window.add_css_class("centered")
         else:
             window.add_css_class("not-centered")
-        
+
         if vertical:
             window.add_css_class("vertical")
         else:
@@ -67,6 +73,7 @@ class DockStyles:
             else:
                 win.exclusivity = "normal"
                 win.visible = False
+        rebuild_corners()
 
     @staticmethod
     def setSide(side: str):
@@ -95,7 +102,7 @@ class DockStyles:
 
         win.child.vertical = vertical
         win.child.get_center_widget().vertical = vertical
-        
+
         dock.dock_box.set_vertical(vertical)
 
         DockStyles._apply_dock_css(win)
@@ -104,6 +111,7 @@ class DockStyles:
         win.queue_resize()
         win.child.queue_resize()
 
+        rebuild_corners()
 
     @staticmethod
     def setFloating(enabled: bool):
@@ -114,10 +122,16 @@ class DockStyles:
             side = user_settings.interface.dock.side
             win.margin_top, win.margin_left, win.margin_right, win.margin_bottom = DockStyles._compute_margins(side, enabled)
             DockStyles.dock_instance._update_dock()
-            
+
             win.queue_resize()
             win.child.queue_resize()
 
+            if enabled:
+                win.exclusivity = "normal"
+                rebuild_corners()
+                win.exclusivity = "exclusive"
+            else:
+                rebuild_corners()
 
     @staticmethod
     def setCentered(enabled: bool):
@@ -135,6 +149,8 @@ class DockStyles:
             win.queue_resize()
             win.child.queue_resize()
 
+        rebuild_corners()
+
     @staticmethod
     def setSize(size: int):
         user_settings.interface.dock.set_size(size)
@@ -147,6 +163,6 @@ class DockStyles:
             win.set_width_request(height if vertical else -1)
             win.set_height_request(height if not vertical else -1)
             dock._update_dock()
-            
+
             win.queue_resize()
             win.child.queue_resize()

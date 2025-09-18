@@ -93,17 +93,6 @@ class BarCategory(widgets.Box):
                 on_change=lambda x, active: BarStyles.setBarCenter(not active)
             ))
 
-        self._rounded_corners_row = SwitchRow(
-                label="Rounded Bar Corners",
-                description="Add a curve outside the bar that warps around the screen.",
-                active=user_settings.interface.bar.corners,
-                on_change=lambda x, active: BarStyles.setBarCorners(active)
-            )
-
-        self.append(self._rounded_corners_row)
-        BarStyles.set_rounded_corners_row(self._rounded_corners_row)
-        BarStyles._update_rounded_corners_visibility()
-
 class DockCategory(widgets.Box):
     def __init__(self):
         super().__init__(
@@ -234,6 +223,12 @@ class MiscCategory(widgets.Box):
             spacing=5,
             child=[
                 CategoryLabel("Miscellaneous"),
+                SwitchRow(
+                        label="Rounded Shell Corners",
+                        description="Add a curve outside the shell that warps around the screen.",
+                        active=user_settings.interface.misc.shell_corners,
+                        on_change=lambda x, active: BarStyles.setShellCorners(active)
+                ),
                 SwitchRow(
                     label="Rounded Screen Corners",
                     description="Add rounded corners to the screen.",

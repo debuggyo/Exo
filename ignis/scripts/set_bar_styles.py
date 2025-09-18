@@ -8,7 +8,7 @@ from .wallpaper import Wallpaper
 
 def rebuild_corners():
     Corners.destroy_all()
-    if user_settings.interface.misc.screen_corners or user_settings.interface.bar.corners:
+    if user_settings.interface.misc.screen_corners or user_settings.interface.misc.shell_corners:
         Corners.build()
 
 class BarStyles:
@@ -256,11 +256,10 @@ class BarStyles:
         BarStyles.setSide(user_settings.interface.bar.side)
         rebuild_corners()
         BarStyles._update_all_layouts()
-        BarStyles._update_rounded_corners_visibility()
 
     @staticmethod
-    def setBarCorners(enabled: bool):
-        user_settings.interface.bar.set_corners(enabled)
+    def setShellCorners(enabled: bool):
+        user_settings.interface.misc.set_shell_corners(enabled)
         rebuild_corners()
 
     @staticmethod
@@ -275,17 +274,8 @@ class BarStyles:
         rebuild_corners()
         if BarStyles.bar_instance:
             BarStyles._apply_css(BarStyles.bar_instance.get_window())
-        BarStyles._update_rounded_corners_visibility()
 
     @staticmethod
     def setMilitaryTime(enabled: bool):
         user_settings.interface.bar.modules.set_military_time(enabled)
         BarStyles._update_all_layouts()
-
-    @staticmethod
-    def _update_rounded_corners_visibility():
-        if BarStyles._rounded_corners_row:
-            is_floating = user_settings.interface.bar.floating
-            is_centered = user_settings.interface.bar.centered
-
-            BarStyles._rounded_corners_row.visible = (not is_floating) and (not is_centered)

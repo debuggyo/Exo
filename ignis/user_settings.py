@@ -25,7 +25,6 @@ class UserSettings(OptionsManager):
             side: str = "top"
             vertical: bool = False
             density: int = 0
-            corners: bool = True
             floating: bool = False
             separation: bool = False
             centered: bool = False
@@ -50,6 +49,7 @@ class UserSettings(OptionsManager):
             anchor: list = ["top", "right"]
 
         class Misc(OptionsGroup):
+            shell_corners: bool = True
             screen_corners: bool = True
 
         bar = Bar()
