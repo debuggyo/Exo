@@ -424,10 +424,10 @@
     }
 }
 
-.system-info-tray-container {
-    padding: 0px;
-    .system-info-tray {
-        padding: 0px 10px;
+.system-info-tray {
+    padding: 0px 10px;
+    .system-info-tray-container {
+        padding: 0px;
         .icon {
             font-family: "Material Symbols Outlined";
             font-size: 13.5pt;
@@ -439,6 +439,8 @@
         background-color: colors.$primary_container;
         color: colors.$on_primary_container;
     }
+
+    transition: 200ms;
 }
 
 // Vertical Bar

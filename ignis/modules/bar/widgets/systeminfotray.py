@@ -16,16 +16,15 @@ system_tray = SystemTrayService.get_default()
 
 class TrayItem(widgets.Button):
     __gtype_name__ = "TrayItem"
+    menu = None
 
     def __init__(self, item: SystemTrayItem, on_removed_callback=None):
-        menu = None
         if item.menu:
             menu = item.menu.copy()
-            menu.add_css_class("tray-menu")
+        else:
+            menu = None
 
-        icon_box_children = [
-            widgets.Icon(image=item.bind("icon"), pixel_size=16, css_classes=["tray-icon"])
-        ]
+
 
         def on_item_removed(x):
             if on_removed_callback:
@@ -33,11 +32,16 @@ class TrayItem(widgets.Button):
             self.unparent()
 
         super().__init__(
-            child=widgets.Box(child=icon_box_children),
+            child=widgets.Box(
+                child=[
+                    widgets.Icon(image=item.bind("icon"), pixel_size=16, css_classes=["tray-icon"]),
+                    menu
+                ]
+            ),
             tooltip_text=item.bind("tooltip"),
             on_click=lambda _: asyncio.create_task(item.activate_async()),
             setup=lambda self: item.connect("removed", on_item_removed),
-            on_right_click=menu.popup if menu else None,
+            on_right_click=lambda _: menu.popup() if menu else None,
             css_classes=["tray-item", "unset"],
             halign="center",
             valign="center",
@@ -186,8 +190,14 @@ class SystemInfoTray:
         self.bluetooth_service = BluetoothService.get_default()
         self.audio_service = AudioService.get_default()
 
-        self.container = widgets.Box(css_classes=["system-info-tray"])
-        self.button = widgets.Button(child=self.container, css_classes=["system-info-tray-container"], on_click=lambda x: window_manager.toggle_window("QuickCenter"))
+        self.main_container = widgets.Box(css_classes=["system-info-tray"])
+
+        button_content = widgets.Box()
+        self.button = widgets.Button(
+            child=button_content,
+            css_classes=["system-info-tray-container"],
+            on_click=lambda x: window_manager.toggle_window("QuickCenter"),
+        )
 
         self.wifi = widgets.Label(label=None, css_classes=["icon"])
         self.bluetooth = widgets.Label(label=None, css_classes=["icon"])
@@ -198,17 +208,21 @@ class SystemInfoTray:
             on_scroll_up=self._on_audio_scroll_up,
             on_scroll_down=self._on_audio_scroll_down,
             halign="center",
-            valign="center"
+            valign="center",
         )
-        self.audio = widgets.Label(label=None, halign="center", valign="fill", css_classes=["icon"])
+        self.audio = widgets.Label(
+            label=None, halign="center", valign="fill", css_classes=["icon"]
+        )
         self.audio_container.append(self.audio)
 
-        self.container.append(self.tray_widget.widget())
-        self.container.append(self.wifi)
-        self.container.append(self.bluetooth)
-        self.container.append(self.audio_container)
-        self.container.append(self.battery_widget.widget())
-        self.container.append(self.clock_widget.widget())
+        self.main_container.append(self.tray_widget.widget())
+        self.main_container.append(self.button)
+
+        button_content.append(self.wifi)
+        button_content.append(self.bluetooth)
+        button_content.append(self.audio_container)
+        button_content.append(self.battery_widget.widget())
+        button_content.append(self.clock_widget.widget())
 
         self.network_service.wifi.connect("notify::is-connected", self._update_ui)
         self.network_service.ethernet.connect("notify::is-connected", self._update_ui)
@@ -240,21 +254,26 @@ class SystemInfoTray:
 
     def update_layout(self):
         is_vertical = user_settings.interface.bar.vertical
+        button_content = self.button.get_child()
 
         if is_vertical:
-            self.container.set_spacing(5)
-            self.container.set_halign("fill")
-            self.container.set_valign("center")
-            self.container.set_hexpand(True)
-            self.container.set_vexpand(False)
-            self.container.set_vertical(True)
+            self.main_container.set_spacing(5)
+            self.main_container.set_halign("fill")
+            self.main_container.set_valign("center")
+            self.main_container.set_hexpand(True)
+            self.main_container.set_vexpand(False)
+            self.main_container.set_vertical(True)
+            button_content.set_vertical(True)
+            button_content.set_spacing(5)
         else:
-            self.container.set_spacing(10)
-            self.container.set_halign("center")
-            self.container.set_valign("fill")
-            self.container.set_hexpand(False)
-            self.container.set_vexpand(True)
-            self.container.set_vertical(False)
+            self.main_container.set_spacing(10)
+            self.main_container.set_halign("center")
+            self.main_container.set_valign("fill")
+            self.main_container.set_hexpand(False)
+            self.main_container.set_vexpand(True)
+            self.main_container.set_vertical(False)
+            button_content.set_vertical(False)
+            button_content.set_spacing(10)
 
         self.tray_widget.update_layout()
         self.clock_widget.update_layout()
@@ -310,4 +329,4 @@ class SystemInfoTray:
                 self.audio.set_label("volume_up")
 
     def widget(self):
-        return self.button
+        return self.main_container
