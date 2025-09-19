@@ -1,14 +1,14 @@
 @use "../colors.scss";
 
-
 .dock {
     background-color: transparent;
     transition: 200ms;
-    
+
     &.floating {
         border-radius: 50rem;
+        border: 1px solid rgba(colors.$outline_variant, 0.5);
     }
-    
+
     &.top:not(.vertical) {
         .dock-container {
             border-bottom-left-radius: 20px;
@@ -21,7 +21,7 @@
             border-top-right-radius: 20px;
         }
     }
-    
+
     &.vertical.left {
         .dock-container {
             border-top-right-radius: 20px;
@@ -43,35 +43,73 @@
     }
 }
 
-
 .dock-container {
     background-color: colors.$background;
     padding: 5px;
 }
 
 .app-button {
-    min-width: 30px;
-    min-height: 30px;
     padding: 5px;
-    
+
     border-radius: 50rem;
     background-color: transparent;
     color: colors.$on_surface;
     transition: 200ms cubic-bezier(0.19, 1, 0.22, 1);
 
-    &:hover {
-        background-color: colors.$surface_container_high;
-    }
-
-    &:active {
-        background-color: colors.$primary_container;
-        color: colors.$on_primary_container;
-    }
-    
     &.open-app {
-        background-color: colors.$surface_container;
+        /* background-color: colors.$surface_container; */
     }
 
+    .app-indicator {
+        background-color: colors.$on_surface;
+        border-radius: 50rem;
+        transition: 200ms cubic-bezier(0.19, 1, 0.22, 1);
+        transition-property: padding;
+
+        &.top {
+            margin-top: -5px;
+            margin-bottom: 8px;
+            min-width: 5px;
+            min-height: 2px;
+        }
+        &.bottom {
+            margin-top: 8px;
+            margin-bottom: -5px;
+            min-width: 5px;
+            min-height: 2px;
+        }
+        &.left {
+            margin-left: -5px;
+            margin-right: 8px;
+            min-height: 5px;
+            min-width: 2px;
+        }
+        &.right {
+            margin-right: -5px;
+            margin-left: 8px;
+            min-height: 5px;
+            min-width: 2px;
+        }
+    }
+
+    &:hover {
+        background-color: colors.$surface_container_highest;
+    }
+
+    &.active-app {
+        /* background-color: colors.$secondary_container; */
+        .app-indicator {
+            background-color: colors.$secondary;
+            &.top,
+            &.bottom {
+                padding: 0px 5px;
+            }
+            &.left,
+            &.right {
+                padding: 5px 0px;
+            }
+        }
+    }
 
     .icon {
         background-color: transparent;

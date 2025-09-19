@@ -1,10 +1,14 @@
 import os
 from ignis import widgets, utils
+
 from user_settings import user_settings
 from ignis.services.applications import ApplicationsService
+from ignis.window_manager import WindowManager
 from modules.m3components import Button
 from modules import Corners
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk, Gdk, GLib
+
+window_manager = WindowManager.get_default()
 
 try:
     from ignis.services.niri import NiriService
@@ -73,6 +77,7 @@ class Dock:
         self.applications_service.connect("notify::pinned", lambda *args: self._update_dock())
         if SERVICE:
             SERVICE.connect("notify::windows", lambda *args: self._update_dock())
+            SERVICE.connect("notify::active-window", lambda *args: self._update_dock())
 
         return self.__win
 
@@ -96,12 +101,12 @@ class Dock:
                     return app
         return None
 
-    def _handle_app_click(self, app):
+    def _handle_app_click(self, app, widget):
         if not SERVICE:
             app.launch()
             return
 
-        found_window = None
+        app_windows = []
         for window in SERVICE.windows:
             window_id = None
             if isinstance(SERVICE, NiriService):
@@ -110,35 +115,127 @@ class Dock:
                 window_id = window.class_name
 
             if self._is_same_app(app.id, window_id):
-                found_window = window
-                break
+                app_windows.append(window)
 
-        if found_window:
-            found_window.focus()
-        else:
+        if not app_windows:
             app.launch()
+        elif len(app_windows) == 1:
+            self._focus_window(app_windows[0])
+        else:
+            self._show_window_list_popover(app_windows, widget)
 
-    def _create_app_button(self, app, is_open: bool):
+    def _focus_window(self, window):
+        if isinstance(SERVICE, NiriService):
+            GLib.idle_add(window.focus)
+        elif isinstance(SERVICE, HyprlandService):
+            SERVICE.send_command(f"dispatch focuswindow address:{window.address}")
+
+    def _show_window_list_popover(self, windows, parent_widget):
+        popover = Gtk.Popover.new()
+        popover.set_parent(parent_widget)
+
+        menu_box = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
+        popover.set_child(menu_box)
+
+        for window in windows:
+            window_title = "Untitled Window"
+            if hasattr(window, 'title') and window.title:
+                window_title = window.title
+
+            button = widgets.Button(label=window_title, css_classes=["menu-button"])
+            button.connect("clicked", lambda _, w=window, p=popover: self._focus_and_close_popover(w, p))
+            menu_box.append(button)
+
+        popover.popup()
+
+    def _focus_and_close_popover(self, window, popover):
+        self._focus_window(window)
+        popover.popdown()
+
+    def _create_app_button(self, app, is_open: bool, is_active: bool = False):
         icon = widgets.Icon(image=app.icon, pixel_size=self.icon_size)
 
+        overlay = Gtk.Overlay()
+        overlay.set_child(icon)
+
+        if is_open:
+            indicator = widgets.Box(css_classes=["app-indicator"])
+            side = user_settings.interface.dock.side
+            vertical = user_settings.interface.dock.vertical
+
+            if vertical:
+                indicator.set_valign("center")
+                if side == "left":
+                    indicator.set_halign("start")
+                else:
+                    indicator.set_halign("end")
+            else:  # horizontal
+                indicator.set_halign("center")
+                if side == "top":
+                    indicator.set_valign("start")
+                else:
+                    indicator.set_valign("end")
+
+            overlay.add_overlay(indicator)
+
         app_button = Button(
-            child=icon,
-            on_click=lambda _: self._handle_app_click(app),
+            child=overlay,
+            on_click=lambda btn: self._handle_app_click(app, btn),
             css_classes=["app-button"]
         )
 
         if is_open:
             app_button.add_css_class("open-app")
 
+        if is_active:
+            app_button.add_css_class("active-app")
+
         popover = Gtk.Popover.new()
         menu_box = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
         popover.set_child(menu_box)
 
-        is_pinned = app in self.applications_service.pinned
+        app_name_label = Gtk.Label(label=app.get_name())
+        app_name_label.add_css_class("menu-label")
+        menu_box.append(app_name_label)
+
+        separator = Gtk.Separator.new(Gtk.Orientation.HORIZONTAL)
+        menu_box.append(separator)
+
+        is_pinned = app.is_pinned
         label = "Unpin from Dock" if is_pinned else "Pin to Dock"
         pin_button = widgets.Button(label=label, css_classes=["menu-button"])
-        pin_button.connect("clicked", lambda b: self.applications_service.toggle_pinned(app))
+
+        def on_pin_clicked(btn):
+            if app.is_pinned:
+                app.unpin()
+            else:
+                app.pin()
+            popover.popdown()
+
+        pin_button.connect("clicked", on_pin_clicked)
         menu_box.append(pin_button)
+
+        has_extra_actions = is_open or app.actions
+        if has_extra_actions:
+            separator = Gtk.Separator.new(Gtk.Orientation.HORIZONTAL)
+            menu_box.append(separator)
+
+        if is_open:
+            new_window_button = widgets.Button(label="New Window", css_classes=["menu-button"])
+            def on_new_window_clicked(btn):
+                app.launch()
+                popover.popdown()
+            new_window_button.connect("clicked", on_new_window_clicked)
+            menu_box.append(new_window_button)
+
+        if app.actions:
+            for action in app.actions:
+                action_button = widgets.Button(label=action.name, css_classes=["menu-button"])
+                def on_action_clicked(btn, act=action):
+                    act.launch()
+                    popover.popdown()
+                action_button.connect("clicked", on_action_clicked)
+                menu_box.append(action_button)
 
         app_button.on_right_click = lambda w: self._show_popover(w, popover)
 
@@ -149,8 +246,21 @@ class Dock:
         popover.popup()
 
     def _update_dock(self, *args):
+        active_app = None
+        if SERVICE and hasattr(SERVICE, "active_window"):
+            active_window = SERVICE.active_window
+            if active_window:
+                active_app = self._get_app_from_window(active_window)
+
         for child in list(self.dock_box):
             child.unparent()
+
+        launcher_button = Button(
+            child=widgets.Icon(image="view-app-grid-symbolic", pixel_size=self.icon_size),
+            on_click=lambda _: window_manager.toggle_window("Launcher"),
+            css_classes=["app-button", "launcher-button"],
+        )
+        self.dock_box.append(launcher_button)
 
         pinned_apps = self.applications_service.pinned
 
@@ -166,7 +276,8 @@ class Dock:
 
         for app in pinned_apps:
             is_open = app.id in open_app_ids
-            self.dock_box.append(self._create_app_button(app, is_open))
+            is_active = app and active_app and app.id == active_app.id
+            self.dock_box.append(self._create_app_button(app, is_open, is_active))
 
         if SERVICE:
             for window in SERVICE.windows:
@@ -182,7 +293,8 @@ class Dock:
             self.dock_box.append(separator)
 
             for app in open_unpinned_apps:
-                self.dock_box.append(self._create_app_button(app, True))
+                is_active = app and active_app and app.id == active_app.id
+                self.dock_box.append(self._create_app_button(app, True, is_active))
 
     def get_window(self):
         return self.__win

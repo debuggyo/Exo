@@ -45,18 +45,42 @@ class AppItem(widgets.Button):
         popover = Gtk.Popover.new()
         popover.set_parent(self)
 
-        box = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
+        menu_box = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
+        popover.set_child(menu_box)
 
-        if self._application.is_pinned:
-            action_button = Gtk.Button.new_with_label("Unpin")
-            action_button.connect("clicked", lambda b: self.__unpin_app(popover))
-        else:
-            action_button = Gtk.Button.new_with_label("Pin")
-            action_button.connect("clicked", lambda b: self.__pin_app(popover))
+        app_name_label = Gtk.Label(label=self._application.name)
+        app_name_label.add_css_class("menu-label")
+        menu_box.append(app_name_label)
 
-        box.append(action_button)
+        separator = Gtk.Separator.new(Gtk.Orientation.HORIZONTAL)
+        menu_box.append(separator)
 
-        popover.set_child(box)
+        is_pinned = self._application.is_pinned
+        label = "Unpin App" if is_pinned else "Pin App"
+        pin_button = widgets.Button(label=label, css_classes=["menu-button"])
+
+        def on_pin_clicked(btn):
+            if self._application.is_pinned:
+                self.__unpin_app(popover)
+            else:
+                self.__pin_app(popover)
+
+        pin_button.connect("clicked", on_pin_clicked)
+        menu_box.append(pin_button)
+
+        if self._application.actions:
+            separator = Gtk.Separator.new(Gtk.Orientation.HORIZONTAL)
+            menu_box.append(separator)
+
+            for action in self._application.actions:
+                action_button = widgets.Button(label=action.name, css_classes=["menu-button"])
+                def on_action_clicked(btn, act=action):
+                    act.launch()
+                    popover.popdown()
+                    window_manager.close_window("Launcher")
+                action_button.connect("clicked", on_action_clicked)
+                menu_box.append(action_button)
+
         popover.popup()
 
     def __pin_app(self, popover):
@@ -107,17 +131,43 @@ class FeaturedAppItem(widgets.Button):
     def __on_right_click_released(self, gesture, n_press, x, y):
         popover = Gtk.Popover.new()
         popover.set_parent(self)
-        box = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
 
-        if self._application.is_pinned:
-            action_button = Gtk.Button.new_with_label("Unpin")
-            action_button.connect("clicked", lambda b: self.__unpin_app(popover))
-        else:
-            action_button = Gtk.Button.new_with_label("Pin")
-            action_button.connect("clicked", lambda b: self.__pin_app(popover))
+        menu_box = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
+        popover.set_child(menu_box)
 
-        box.append(action_button)
-        popover.set_child(box)
+        app_name_label = Gtk.Label(label=self._application.name)
+        app_name_label.add_css_class("menu-label")
+        menu_box.append(app_name_label)
+
+        separator = Gtk.Separator.new(Gtk.Orientation.HORIZONTAL)
+        menu_box.append(separator)
+
+        is_pinned = self._application.is_pinned
+        label = "Unpin App" if is_pinned else "Pin App"
+        pin_button = widgets.Button(label=label, css_classes=["menu-button"])
+
+        def on_pin_clicked(btn):
+            if self._application.is_pinned:
+                self.__unpin_app(popover)
+            else:
+                self.__pin_app(popover)
+
+        pin_button.connect("clicked", on_pin_clicked)
+        menu_box.append(pin_button)
+
+        if self._application.actions:
+            separator = Gtk.Separator.new(Gtk.Orientation.HORIZONTAL)
+            menu_box.append(separator)
+
+            for action in self._application.actions:
+                action_button = widgets.Button(label=action.name, css_classes=["menu-button"])
+                def on_action_clicked(btn, act=action):
+                    act.launch()
+                    popover.popdown()
+                    window_manager.close_window("Launcher")
+                action_button.connect("clicked", on_action_clicked)
+                menu_box.append(action_button)
+
         popover.popup()
 
     def __pin_app(self, popover):
@@ -158,17 +208,43 @@ class PinnedAppItem(widgets.Button):
     def __on_right_click_released(self, gesture, n_press, x, y):
         popover = Gtk.Popover.new()
         popover.set_parent(self)
-        box = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
 
-        if self._application.is_pinned:
-            action_button = Gtk.Button.new_with_label("Unpin")
-            action_button.connect("clicked", lambda b: self.__unpin_app(popover))
-        else:
-            action_button = Gtk.Button.new_with_label("Pin")
-            action_button.connect("clicked", lambda b: self.__pin_app(popover))
+        menu_box = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
+        popover.set_child(menu_box)
 
-        box.append(action_button)
-        popover.set_child(box)
+        app_name_label = Gtk.Label(label=self._application.name)
+        app_name_label.add_css_class("menu-label")
+        menu_box.append(app_name_label)
+
+        separator = Gtk.Separator.new(Gtk.Orientation.HORIZONTAL)
+        menu_box.append(separator)
+
+        is_pinned = self._application.is_pinned
+        label = "Unpin App" if is_pinned else "Pin App"
+        pin_button = widgets.Button(label=label, css_classes=["menu-button"])
+
+        def on_pin_clicked(btn):
+            if self._application.is_pinned:
+                self.__unpin_app(popover)
+            else:
+                self.__pin_app(popover)
+
+        pin_button.connect("clicked", on_pin_clicked)
+        menu_box.append(pin_button)
+
+        if self._application.actions:
+            separator = Gtk.Separator.new(Gtk.Orientation.HORIZONTAL)
+            menu_box.append(separator)
+
+            for action in self._application.actions:
+                action_button = widgets.Button(label=action.name, css_classes=["menu-button"])
+                def on_action_clicked(btn, act=action):
+                    act.launch()
+                    popover.popdown()
+                    window_manager.close_window("Launcher")
+                action_button.connect("clicked", on_action_clicked)
+                menu_box.append(action_button)
+
         popover.popup()
 
     def __pin_app(self, popover):

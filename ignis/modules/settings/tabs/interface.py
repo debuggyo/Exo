@@ -114,8 +114,13 @@ class DockCategory(widgets.Box):
         self._settings_box = widgets.Box(
             css_classes=["dock-settings-container"],
             vertical=True,
-            spacing=2,
+            spacing=5,
         )
+
+        self._settings_box.append(SettingsRow(
+            title="Note",
+            description="Some configurations might look off when shell corners are enabled."
+        ))
 
         self._settings_box.append(SettingsRow(
             title="Position",
@@ -138,16 +143,14 @@ class DockCategory(widgets.Box):
         self._settings_box.append(SettingsRow(
             title="Size",
             description="Set a size for your dock icons.",
+            vertical=False,
             child=[
-                Slider.slider(
-                    vertical=False,
+                widgets.SpinButton(
                     min=16,
                     max=128,
                     step=1,
                     value=user_settings.interface.dock.size,
-                    on_change=lambda x: DockStyles.setSize(x.value),
-                    draw_value=True,
-                    value_pos="right"
+                    on_change=lambda x, value: DockStyles.setSize(value),
                 )
             ]
         ))

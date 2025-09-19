@@ -440,3 +440,53 @@ switch {
         min-height: 60px;
     }
 }
+
+spinbutton {
+    background-color: transparent;
+    border-radius: 20px;
+    text {
+        border-radius: 20px 8px 8px 20px;
+        background-color: colors.$surface_container_highest;
+    }
+    button {
+        border: none;
+        background-color: colors.$surface_container_highest;
+        margin-left: 2px;
+        border-radius: 8px;
+        &:last-child {
+            border-radius: 8px 20px 20px 8px;
+        }
+    }
+    outline-color: colors.$tertiary;
+    outline-offset: 2px;
+}
+
+popover {
+    contents {
+        background-color: colors.$surface_container;
+        border: 1px solid rgba(colors.$outline_variant, 0.5);
+        padding: 5px;
+        border-radius: 15px;
+        box {
+            background-color: transparent;
+            & > label {
+                color: colors.$on_surface_variant;
+                padding: 5px;
+            }
+            button {
+                background-color: transparent;
+                border-radius: 10px;
+                min-width: 100px;
+                &:hover {
+                    background-color: colors.$surface_container_highest;
+                }
+                label {
+                    font-weight: 400;
+                }
+            }
+        }
+    }
+    arrow {
+        background-color: transparent;
+    }
+}
