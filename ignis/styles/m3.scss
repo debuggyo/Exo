@@ -490,3 +490,8 @@ popover {
         background-color: transparent;
     }
 }
+
+tooltip {
+    background-color: colors.$surface_container_high;
+    border: 1px solid rgba(colors.$outline_variant, 0.5);
+}

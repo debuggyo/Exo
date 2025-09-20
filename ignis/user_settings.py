@@ -48,6 +48,9 @@ class UserSettings(OptionsManager):
         class Notifications(OptionsGroup):
             anchor: list = ["top", "right"]
 
+        class Launcher(OptionsGroup):
+            layout: str = "grid"
+
         class Misc(OptionsGroup):
             shell_corners: bool = True
             screen_corners: bool = True
@@ -55,6 +58,7 @@ class UserSettings(OptionsManager):
         bar = Bar()
         dock = Dock()
         notifications = Notifications()
+        launcher = Launcher()
         misc = Misc()
     appearance = Appearance()
     interface = Interface()
