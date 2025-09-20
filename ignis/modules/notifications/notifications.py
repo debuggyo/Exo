@@ -20,6 +20,7 @@ def relative_time(timestamp: float) -> str:
 class ExoNotification(widgets.Box):
     def __init__(self, notification: Notification) -> None:
         self._timestamp = notification.time
+        self._is_expanded = False
 
         self._age_label = widgets.Label(
             css_classes=["notification-age"],
@@ -27,6 +28,24 @@ class ExoNotification(widgets.Box):
             halign="start",
             ellipsize="end"
         )
+
+        self._body_label = widgets.Label(
+            css_classes=["notification-body"],
+            label=notification.body,
+            halign="start",
+            ellipsize="end",
+            wrap_mode="word_char"
+        ) if notification.body else None
+
+        self._expand_button = Button.button(
+            css_classes=["notification-expand"],
+            icon="arrow_drop_down",
+            valign="start",
+            vexpand=False,
+            size="xs",
+            on_click=self._toggle_expand,
+        ) if self._body_label else None
+
 
         super().__init__(
             vertical=True,
@@ -69,12 +88,7 @@ class ExoNotification(widgets.Box):
                                         self._age_label,
                                     ]
                                 ),
-                                widgets.Label(
-                                    css_classes=["notification-body"],
-                                    label=notification.body,
-                                    halign="start",
-                                    ellipsize="end"
-                                ) if notification.body else None,
+                                self._body_label,
                                 widgets.Box(
                                     css_classes=["notification-actions-container"],
                                     child=[
@@ -89,13 +103,20 @@ class ExoNotification(widgets.Box):
                                 ) if notification.actions else None
                             ]
                         ),
-                        Button.button(
-                            css_classes=["notification-close"],
-                            icon="close",
-                            valign="start",
-                            vexpand=False,
-                            size="xs",
-                            on_click=lambda x: notification.close(),
+                        widgets.Box(
+                            vertical=True,
+                            spacing=5,
+                            child=[
+                                Button.button(
+                                    css_classes=["notification-close"],
+                                    icon="close",
+                                    valign="start",
+                                    vexpand=False,
+                                    size="xs",
+                                    on_click=lambda x: notification.close(),
+                                ),
+                                self._expand_button
+                            ]
                         )
                     ],
                 ),
@@ -105,6 +126,15 @@ class ExoNotification(widgets.Box):
         self._update_age_label()
 
         self._poll = utils.Poll(timeout=60_000, callback=self._on_poll)
+
+    def _toggle_expand(self, _):
+        self._is_expanded = not self._is_expanded
+        if self._body_label:
+            self._body_label.set_ellipsize("none" if self._is_expanded else "end")
+            self._body_label.set_wrap(self._is_expanded)
+
+        if self._expand_button:
+            self._expand_button.set_icon("arrow_drop_up" if self._is_expanded else "arrow_drop_down")
 
     def _on_poll(self, poll: utils.Poll | None = None):
         """Update the label on each poll tick."""

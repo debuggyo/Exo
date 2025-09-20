@@ -125,8 +125,13 @@
             & > box,
             & > button:not(.active) {
                 background-color: transparent;
+                border-radius: 20px;
             }
             padding: 2px 5px;
+        }
+        .system-info-tray:hover {
+            background-color: colors.$primary_container;
+            color: colors.$on_primary_container;
         }
     }
     &.ultracompact {
@@ -136,8 +141,13 @@
             & > box,
             & > button {
                 background-color: transparent;
+                border-radius: 20px;
             }
             padding: 0px 5px;
+        }
+        .system-info-tray:hover {
+            background-color: colors.$primary_container;
+            color: colors.$on_primary_container;
         }
     }
 }
@@ -341,16 +351,6 @@
     .tray-icon {
         margin: 0px;
         padding: 0px;
-    }
-}
-
-// Quick Center Button
-.quickcenter-button {
-    padding: 0px 10px;
-    font-family: "Material Symbols Outlined";
-    &:hover {
-        background-color: colors.$primary_container;
-        color: colors.$on_primary_container;
     }
 }
 

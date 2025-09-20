@@ -1,6 +1,7 @@
 @use "../colors";
 
-.notification, .notification-popup {
+.notification,
+.notification-popup {
     background-color: colors.$surface_container;
     padding: 10px;
     border-radius: 20px;
@@ -12,15 +13,16 @@
         color: colors.$on_background;
     }
 
-    .m3-button.notification-close {
+    .m3-button.notification-close,
+    .m3-button.notification-expand {
         background-color: colors.$surface_container_high;
         padding: 0px;
-        min-width: 24px;
-        min-height: 24px;
+        min-width: 5px;
+        min-height: 16px;
 
         &:hover {
             background-color: colors.$surface_container_highest;
-        } 
+        }
 
         .m3-button-icon {
             font-size: 16px;
@@ -35,7 +37,8 @@
             font-weight: 600;
             color: colors.$on_surface;
         }
-        .notification-seperator, .notification-age {
+        .notification-seperator,
+        .notification-age {
             font-size: 8pt;
             opacity: 0.75;
         }

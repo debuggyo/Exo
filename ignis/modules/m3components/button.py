@@ -1,6 +1,15 @@
 from ignis import widgets
 
 class Button(widgets.Button):
+    def set_icon(self, icon: str):
+        child_box = self.get_child()
+        if not child_box:
+            return
+
+        icon_label = child_box.get_first_child()
+        if icon_label and "m3-button-icon" in icon_label.get_css_classes():
+            icon_label.set_label(icon)
+
     @staticmethod
     def button(
         icon: str = None,
@@ -11,8 +20,8 @@ class Button(widgets.Button):
         shape="round",
         css_classes: list = None,
         ialign: str = "center",
-        vertical: bool = False,  # NEW
-        **kwargs  # catch-all for extra args
+        vertical: bool = False,
+        **kwargs
     ):
         if on_click is None:
             on_click = lambda *_: None
@@ -29,7 +38,6 @@ class Button(widgets.Button):
         if label:
             children.append(widgets.Label(label=label, css_classes=["m3-button-label"]))
 
-        # spacing between icon + label depends on size
         gap = {
             "xs": 8,
             "s": 8,
@@ -38,11 +46,11 @@ class Button(widgets.Button):
             "xl": 16
         }.get(size, 8)
 
-        return widgets.Button(
+        return Button(
             css_classes=classes,
             on_click=on_click,
             child=widgets.Box(
-                vertical=vertical,     # 👈 stack vertically when requested
+                vertical=vertical,
                 spacing=gap,
                 child=children,
                 halign=ialign,
