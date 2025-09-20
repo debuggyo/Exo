@@ -1,6 +1,5 @@
 import os
 from ignis import widgets, utils
-from ignis.menu_model import IgnisMenuModel, IgnisMenuItem, IgnisMenuSeparator
 
 from user_settings import user_settings
 from ignis.services.applications import ApplicationsService
@@ -8,6 +7,7 @@ from ignis.window_manager import WindowManager
 from modules.m3components import Button
 from modules import Corners
 from gi.repository import Gtk, GLib
+from ignis.menu_model import IgnisMenuModel, IgnisMenuItem, IgnisMenuSeparator
 
 window_manager = WindowManager.get_default()
 
@@ -132,19 +132,21 @@ class Dock:
             SERVICE.send_command(f"dispatch focuswindow address:{window.address}")
 
     def _show_window_list_popover(self, windows, parent_widget):
-        menu_items = [
-            IgnisMenuItem(
-                label=w.title or "Untitled Window",
-                on_activate=lambda _, win=w: self._focus_window(win),
-            )
-            for w in windows
-        ]
-        popover = widgets.PopoverMenu(model=IgnisMenuModel(*menu_items))
+        menu_items = []
+        for window in windows:
+            window_title = "Untitled Window"
+            if hasattr(window, 'title') and window.title:
+                window_title = window.title
 
+            menu_items.append(IgnisMenuItem(
+                label=window_title,
+                on_activate=lambda item, w=window: (print(f"Focusing window: {w}"), self._focus_window(w))
+            ))
+
+        popover = widgets.PopoverMenu(model=IgnisMenuModel(*menu_items))
         container = parent_widget.get_child()
-        if isinstance(container, Gtk.Overlay):
+        if container and isinstance(container, Gtk.Overlay):
             container.add_overlay(popover)
-            popover.connect("closed", lambda p: container.remove_overlay(p))
             popover.popup()
 
     def _create_app_button(self, app, is_open: bool, is_active: bool = False):
@@ -176,7 +178,7 @@ class Dock:
         app_button = Button(
             child=overlay,
             on_click=lambda btn: self._handle_app_click(app, btn),
-            css_classes=["app-button"],
+            css_classes=["app-button"]
         )
 
         if is_open:
@@ -185,41 +187,41 @@ class Dock:
         if is_active:
             app_button.add_css_class("active-app")
 
-        def on_right_click(widget):
-            menu_items = [
-                IgnisMenuItem(label=app.get_name(), enabled=False),
-                IgnisMenuSeparator(),
-                IgnisMenuItem(
-                    label="Unpin from Dock" if app.is_pinned else "Pin to Dock",
-                    on_activate=lambda _: app.unpin() if app.is_pinned else app.pin(),
-                ),
-            ]
+        menu_items = []
 
-            has_extra_actions = is_open or app.actions
-            if has_extra_actions:
-                menu_items.append(IgnisMenuSeparator())
+        menu_items.append(IgnisMenuItem(label=app.get_name(), enabled=False))
+        menu_items.append(IgnisMenuSeparator())
 
-            if is_open:
-                menu_items.append(
-                    IgnisMenuItem(label="New Window", on_activate=lambda _: app.launch())
-                )
+        menu_items.append(IgnisMenuItem(
+            label="Unpin from Dock" if app.is_pinned else "Pin to Dock",
+            on_activate=lambda item, app=app: (print(f"Pin/Unpin clicked for app: {app.get_name()}"), app.unpin() if app.is_pinned else app.pin()),
+        ))
 
-            if app.actions:
-                for action in app.actions:
-                    menu_items.append(
-                        IgnisMenuItem(
-                            label=action.name,
-                            on_activate=lambda _, act=action: act.launch(),
-                        )
-                    )
+        has_extra_actions = is_open or app.actions
+        if has_extra_actions:
+            menu_items.append(IgnisMenuSeparator())
 
+        if is_open:
+            menu_items.append(IgnisMenuItem(
+                label="New Window",
+                on_activate=lambda item, app=app: (print(f"New Window clicked for app: {app.get_name()}"), app.launch()),
+            ))
+
+        if app.actions:
+            for action in app.actions:
+                menu_items.append(IgnisMenuItem(
+                    label=action.name,
+                    on_activate=lambda item, act=action: (print(f"Action clicked: {action.name} for app: {app.get_name()}"), act.launch()),
+                ))
+
+        def show_menu(widget):
             popover = widgets.PopoverMenu(model=IgnisMenuModel(*menu_items))
-            overlay.add_overlay(popover)
-            popover.connect("closed", lambda p: overlay.remove_overlay(p))
-            popover.popup()
+            container = widget.get_child()
+            if container and isinstance(container, Gtk.Overlay):
+                container.add_overlay(popover)
+                popover.popup()
 
-        app_button.on_right_click = on_right_click
-
+        app_button.on_right_click = show_menu
         return app_button
 
     def _update_dock(self, *args):

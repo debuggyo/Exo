@@ -49,7 +49,7 @@ class AppItem(widgets.Button):
             IgnisMenuSeparator(),
             IgnisMenuItem(
                 label="Unpin App" if self._application.is_pinned else "Pin App",
-                on_activate=lambda _: self.__unpin_app() if self._application.is_pinned else self.__pin_app(),
+                on_activate=lambda item, app=self._application: (self.__unpin_app() if app.is_pinned else self.__pin_app()),
             ),
         ]
 
@@ -59,7 +59,7 @@ class AppItem(widgets.Button):
                 menu_items.append(
                     IgnisMenuItem(
                         label=action.name,
-                        on_activate=lambda _, act=action: (
+                        on_activate=lambda item, act=action: (
                             act.launch(),
                             window_manager.close_window("Launcher"),
                         ),
@@ -68,9 +68,9 @@ class AppItem(widgets.Button):
 
         popover = widgets.PopoverMenu(model=IgnisMenuModel(*menu_items))
         container = self.get_child()
-        container.append(popover)
-        popover.connect("closed", lambda p: container.remove(p))
-        popover.popup()
+        if container and hasattr(container, "append"):
+            container.append(popover)
+            popover.popup()
 
     def __pin_app(self):
         self._application.pin()
@@ -121,7 +121,7 @@ class FeaturedAppItem(widgets.Button):
             IgnisMenuSeparator(),
             IgnisMenuItem(
                 label="Unpin App" if self._application.is_pinned else "Pin App",
-                on_activate=lambda _: self.__unpin_app() if self._application.is_pinned else self.__pin_app(),
+                on_activate=lambda item, app=self._application: (self.__unpin_app() if app.is_pinned else self.__pin_app()),
             ),
         ]
 
@@ -131,7 +131,7 @@ class FeaturedAppItem(widgets.Button):
                 menu_items.append(
                     IgnisMenuItem(
                         label=action.name,
-                        on_activate=lambda _, act=action: (
+                        on_activate=lambda item, act=action: (
                             act.launch(),
                             window_manager.close_window("Launcher"),
                         ),
@@ -140,9 +140,9 @@ class FeaturedAppItem(widgets.Button):
 
         popover = widgets.PopoverMenu(model=IgnisMenuModel(*menu_items))
         container = self.get_child()
-        container.append(popover)
-        popover.connect("closed", lambda p: container.remove(p))
-        popover.popup()
+        if container and hasattr(container, "append"):
+            container.append(popover)
+            popover.popup()
 
     def __pin_app(self):
         self._application.pin()
@@ -187,7 +187,7 @@ class PinnedAppItem(widgets.Button):
             IgnisMenuSeparator(),
             IgnisMenuItem(
                 label="Unpin App" if self._application.is_pinned else "Pin App",
-                on_activate=lambda _: self.__unpin_app() if self._application.is_pinned else self.__pin_app(),
+                on_activate=lambda item, app=self._application: (self.__unpin_app() if app.is_pinned else self.__pin_app()),
             ),
         ]
 
@@ -197,7 +197,7 @@ class PinnedAppItem(widgets.Button):
                 menu_items.append(
                     IgnisMenuItem(
                         label=action.name,
-                        on_activate=lambda _, act=action: (
+                        on_activate=lambda item, act=action: (
                             act.launch(),
                             window_manager.close_window("Launcher"),
                         ),
@@ -208,7 +208,6 @@ class PinnedAppItem(widgets.Button):
         container = self.get_child()
         if container and hasattr(container, "append"):
             container.append(popover)
-            popover.connect("closed", lambda p: container.remove(p))
             popover.popup()
 
     def __pin_app(self):
