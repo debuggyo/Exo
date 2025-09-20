@@ -465,7 +465,7 @@ popover {
     contents {
         background-color: colors.$surface_container;
         border: 1px solid rgba(colors.$outline_variant, 0.5);
-        padding: 5px;
+        padding: 0px;
         border-radius: 15px;
         box {
             background-color: transparent;

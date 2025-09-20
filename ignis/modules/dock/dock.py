@@ -1,12 +1,13 @@
 import os
 from ignis import widgets, utils
+from ignis.menu_model import IgnisMenuModel, IgnisMenuItem, IgnisMenuSeparator
 
 from user_settings import user_settings
 from ignis.services.applications import ApplicationsService
 from ignis.window_manager import WindowManager
 from modules.m3components import Button
 from modules import Corners
-from gi.repository import Gtk, Gdk, GLib
+from gi.repository import Gtk, GLib
 
 window_manager = WindowManager.get_default()
 
@@ -131,26 +132,20 @@ class Dock:
             SERVICE.send_command(f"dispatch focuswindow address:{window.address}")
 
     def _show_window_list_popover(self, windows, parent_widget):
-        popover = Gtk.Popover.new()
-        popover.set_parent(parent_widget)
+        menu_items = [
+            IgnisMenuItem(
+                label=w.title or "Untitled Window",
+                on_activate=lambda _, win=w: self._focus_window(win),
+            )
+            for w in windows
+        ]
+        popover = widgets.PopoverMenu(model=IgnisMenuModel(*menu_items))
 
-        menu_box = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
-        popover.set_child(menu_box)
-
-        for window in windows:
-            window_title = "Untitled Window"
-            if hasattr(window, 'title') and window.title:
-                window_title = window.title
-
-            button = widgets.Button(label=window_title, css_classes=["menu-button"])
-            button.connect("clicked", lambda _, w=window, p=popover: self._focus_and_close_popover(w, p))
-            menu_box.append(button)
-
-        popover.popup()
-
-    def _focus_and_close_popover(self, window, popover):
-        self._focus_window(window)
-        popover.popdown()
+        container = parent_widget.get_child()
+        if isinstance(container, Gtk.Overlay):
+            container.add_overlay(popover)
+            popover.connect("closed", lambda p: container.remove_overlay(p))
+            popover.popup()
 
     def _create_app_button(self, app, is_open: bool, is_active: bool = False):
         icon = widgets.Icon(image=app.icon, pixel_size=self.icon_size)
@@ -181,7 +176,7 @@ class Dock:
         app_button = Button(
             child=overlay,
             on_click=lambda btn: self._handle_app_click(app, btn),
-            css_classes=["app-button"]
+            css_classes=["app-button"],
         )
 
         if is_open:
@@ -190,60 +185,42 @@ class Dock:
         if is_active:
             app_button.add_css_class("active-app")
 
-        popover = Gtk.Popover.new()
-        menu_box = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
-        popover.set_child(menu_box)
+        def on_right_click(widget):
+            menu_items = [
+                IgnisMenuItem(label=app.get_name(), enabled=False),
+                IgnisMenuSeparator(),
+                IgnisMenuItem(
+                    label="Unpin from Dock" if app.is_pinned else "Pin to Dock",
+                    on_activate=lambda _: app.unpin() if app.is_pinned else app.pin(),
+                ),
+            ]
 
-        app_name_label = Gtk.Label(label=app.get_name())
-        app_name_label.add_css_class("menu-label")
-        menu_box.append(app_name_label)
+            has_extra_actions = is_open or app.actions
+            if has_extra_actions:
+                menu_items.append(IgnisMenuSeparator())
 
-        separator = Gtk.Separator.new(Gtk.Orientation.HORIZONTAL)
-        menu_box.append(separator)
+            if is_open:
+                menu_items.append(
+                    IgnisMenuItem(label="New Window", on_activate=lambda _: app.launch())
+                )
 
-        is_pinned = app.is_pinned
-        label = "Unpin from Dock" if is_pinned else "Pin to Dock"
-        pin_button = widgets.Button(label=label, css_classes=["menu-button"])
+            if app.actions:
+                for action in app.actions:
+                    menu_items.append(
+                        IgnisMenuItem(
+                            label=action.name,
+                            on_activate=lambda _, act=action: act.launch(),
+                        )
+                    )
 
-        def on_pin_clicked(btn):
-            if app.is_pinned:
-                app.unpin()
-            else:
-                app.pin()
-            popover.popdown()
+            popover = widgets.PopoverMenu(model=IgnisMenuModel(*menu_items))
+            overlay.add_overlay(popover)
+            popover.connect("closed", lambda p: overlay.remove_overlay(p))
+            popover.popup()
 
-        pin_button.connect("clicked", on_pin_clicked)
-        menu_box.append(pin_button)
-
-        has_extra_actions = is_open or app.actions
-        if has_extra_actions:
-            separator = Gtk.Separator.new(Gtk.Orientation.HORIZONTAL)
-            menu_box.append(separator)
-
-        if is_open:
-            new_window_button = widgets.Button(label="New Window", css_classes=["menu-button"])
-            def on_new_window_clicked(btn):
-                app.launch()
-                popover.popdown()
-            new_window_button.connect("clicked", on_new_window_clicked)
-            menu_box.append(new_window_button)
-
-        if app.actions:
-            for action in app.actions:
-                action_button = widgets.Button(label=action.name, css_classes=["menu-button"])
-                def on_action_clicked(btn, act=action):
-                    act.launch()
-                    popover.popdown()
-                action_button.connect("clicked", on_action_clicked)
-                menu_box.append(action_button)
-
-        app_button.on_right_click = lambda w: self._show_popover(w, popover)
+        app_button.on_right_click = on_right_click
 
         return app_button
-
-    def _show_popover(self, widget, popover):
-        popover.set_parent(widget)
-        popover.popup()
 
     def _update_dock(self, *args):
         active_app = None

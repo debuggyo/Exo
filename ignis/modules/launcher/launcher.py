@@ -6,6 +6,8 @@ from ignis import widgets
 from ignis.window_manager import WindowManager
 from ignis.services.applications import ApplicationsService
 from modules.m3components import Button
+from ignis.menu_model import IgnisMenuModel, IgnisMenuItem, IgnisMenuSeparator
+
 applications = ApplicationsService.get_default()
 window_manager = WindowManager.get_default()
 
@@ -42,54 +44,39 @@ class AppItem(widgets.Button):
         self._application.connect("unpinned", self.__on_app_state_change)
 
     def __on_right_click_released(self, gesture, n_press, x, y):
-        popover = Gtk.Popover.new()
-        popover.set_parent(self)
-
-        menu_box = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
-        popover.set_child(menu_box)
-
-        app_name_label = Gtk.Label(label=self._application.name)
-        app_name_label.add_css_class("menu-label")
-        menu_box.append(app_name_label)
-
-        separator = Gtk.Separator.new(Gtk.Orientation.HORIZONTAL)
-        menu_box.append(separator)
-
-        is_pinned = self._application.is_pinned
-        label = "Unpin App" if is_pinned else "Pin App"
-        pin_button = widgets.Button(label=label, css_classes=["menu-button"])
-
-        def on_pin_clicked(btn):
-            if self._application.is_pinned:
-                self.__unpin_app(popover)
-            else:
-                self.__pin_app(popover)
-
-        pin_button.connect("clicked", on_pin_clicked)
-        menu_box.append(pin_button)
+        menu_items = [
+            IgnisMenuItem(label=self._application.name, enabled=False),
+            IgnisMenuSeparator(),
+            IgnisMenuItem(
+                label="Unpin App" if self._application.is_pinned else "Pin App",
+                on_activate=lambda _: self.__unpin_app() if self._application.is_pinned else self.__pin_app(),
+            ),
+        ]
 
         if self._application.actions:
-            separator = Gtk.Separator.new(Gtk.Orientation.HORIZONTAL)
-            menu_box.append(separator)
-
+            menu_items.append(IgnisMenuSeparator())
             for action in self._application.actions:
-                action_button = widgets.Button(label=action.name, css_classes=["menu-button"])
-                def on_action_clicked(btn, act=action):
-                    act.launch()
-                    popover.popdown()
-                    window_manager.close_window("Launcher")
-                action_button.connect("clicked", on_action_clicked)
-                menu_box.append(action_button)
+                menu_items.append(
+                    IgnisMenuItem(
+                        label=action.name,
+                        on_activate=lambda _, act=action: (
+                            act.launch(),
+                            window_manager.close_window("Launcher"),
+                        ),
+                    )
+                )
 
+        popover = widgets.PopoverMenu(model=IgnisMenuModel(*menu_items))
+        container = self.get_child()
+        container.append(popover)
+        popover.connect("closed", lambda p: container.remove(p))
         popover.popup()
 
-    def __pin_app(self, popover):
+    def __pin_app(self):
         self._application.pin()
-        popover.popdown()
 
-    def __unpin_app(self, popover):
+    def __unpin_app(self):
         self._application.unpin()
-        popover.popdown()
 
     def __on_app_state_change(self, app):
         self._launcher.refresh_pinned_apps_list()
@@ -129,54 +116,39 @@ class FeaturedAppItem(widgets.Button):
         self._application.connect("unpinned", self.__on_app_state_change)
 
     def __on_right_click_released(self, gesture, n_press, x, y):
-        popover = Gtk.Popover.new()
-        popover.set_parent(self)
-
-        menu_box = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
-        popover.set_child(menu_box)
-
-        app_name_label = Gtk.Label(label=self._application.name)
-        app_name_label.add_css_class("menu-label")
-        menu_box.append(app_name_label)
-
-        separator = Gtk.Separator.new(Gtk.Orientation.HORIZONTAL)
-        menu_box.append(separator)
-
-        is_pinned = self._application.is_pinned
-        label = "Unpin App" if is_pinned else "Pin App"
-        pin_button = widgets.Button(label=label, css_classes=["menu-button"])
-
-        def on_pin_clicked(btn):
-            if self._application.is_pinned:
-                self.__unpin_app(popover)
-            else:
-                self.__pin_app(popover)
-
-        pin_button.connect("clicked", on_pin_clicked)
-        menu_box.append(pin_button)
+        menu_items = [
+            IgnisMenuItem(label=self._application.name, enabled=False),
+            IgnisMenuSeparator(),
+            IgnisMenuItem(
+                label="Unpin App" if self._application.is_pinned else "Pin App",
+                on_activate=lambda _: self.__unpin_app() if self._application.is_pinned else self.__pin_app(),
+            ),
+        ]
 
         if self._application.actions:
-            separator = Gtk.Separator.new(Gtk.Orientation.HORIZONTAL)
-            menu_box.append(separator)
-
+            menu_items.append(IgnisMenuSeparator())
             for action in self._application.actions:
-                action_button = widgets.Button(label=action.name, css_classes=["menu-button"])
-                def on_action_clicked(btn, act=action):
-                    act.launch()
-                    popover.popdown()
-                    window_manager.close_window("Launcher")
-                action_button.connect("clicked", on_action_clicked)
-                menu_box.append(action_button)
+                menu_items.append(
+                    IgnisMenuItem(
+                        label=action.name,
+                        on_activate=lambda _, act=action: (
+                            act.launch(),
+                            window_manager.close_window("Launcher"),
+                        ),
+                    )
+                )
 
+        popover = widgets.PopoverMenu(model=IgnisMenuModel(*menu_items))
+        container = self.get_child()
+        container.append(popover)
+        popover.connect("closed", lambda p: container.remove(p))
         popover.popup()
 
-    def __pin_app(self, popover):
+    def __pin_app(self):
         self._application.pin()
-        popover.popdown()
 
-    def __unpin_app(self, popover):
+    def __unpin_app(self):
         self._application.unpin()
-        popover.popdown()
 
     def __on_app_state_change(self, app):
         self._launcher.refresh_pinned_apps_list()
@@ -193,7 +165,11 @@ class PinnedAppItem(widgets.Button):
         super().__init__(
             on_click=lambda x: self.launch(),
             css_classes=["pinned-item"],
-            child=widgets.Icon(image=application.icon, pixel_size=32, halign="center")
+            child=widgets.Box(
+                halign="center",
+                valign="center",
+                child=[widgets.Icon(image=application.icon, pixel_size=32, halign="center")]
+            )
         )
         self.set_size_request(64, 64)
 
@@ -206,54 +182,40 @@ class PinnedAppItem(widgets.Button):
         self._application.connect("unpinned", self.__on_app_state_change)
 
     def __on_right_click_released(self, gesture, n_press, x, y):
-        popover = Gtk.Popover.new()
-        popover.set_parent(self)
-
-        menu_box = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
-        popover.set_child(menu_box)
-
-        app_name_label = Gtk.Label(label=self._application.name)
-        app_name_label.add_css_class("menu-label")
-        menu_box.append(app_name_label)
-
-        separator = Gtk.Separator.new(Gtk.Orientation.HORIZONTAL)
-        menu_box.append(separator)
-
-        is_pinned = self._application.is_pinned
-        label = "Unpin App" if is_pinned else "Pin App"
-        pin_button = widgets.Button(label=label, css_classes=["menu-button"])
-
-        def on_pin_clicked(btn):
-            if self._application.is_pinned:
-                self.__unpin_app(popover)
-            else:
-                self.__pin_app(popover)
-
-        pin_button.connect("clicked", on_pin_clicked)
-        menu_box.append(pin_button)
+        menu_items = [
+            IgnisMenuItem(label=self._application.name, enabled=False),
+            IgnisMenuSeparator(),
+            IgnisMenuItem(
+                label="Unpin App" if self._application.is_pinned else "Pin App",
+                on_activate=lambda _: self.__unpin_app() if self._application.is_pinned else self.__pin_app(),
+            ),
+        ]
 
         if self._application.actions:
-            separator = Gtk.Separator.new(Gtk.Orientation.HORIZONTAL)
-            menu_box.append(separator)
-
+            menu_items.append(IgnisMenuSeparator())
             for action in self._application.actions:
-                action_button = widgets.Button(label=action.name, css_classes=["menu-button"])
-                def on_action_clicked(btn, act=action):
-                    act.launch()
-                    popover.popdown()
-                    window_manager.close_window("Launcher")
-                action_button.connect("clicked", on_action_clicked)
-                menu_box.append(action_button)
+                menu_items.append(
+                    IgnisMenuItem(
+                        label=action.name,
+                        on_activate=lambda _, act=action: (
+                            act.launch(),
+                            window_manager.close_window("Launcher"),
+                        ),
+                    )
+                )
 
-        popover.popup()
+        popover = widgets.PopoverMenu(model=IgnisMenuModel(*menu_items))
+        container = self.get_child()
+        if container and hasattr(container, "append"):
+            container.append(popover)
+            popover.connect("closed", lambda p: container.remove(p))
+            popover.popup()
 
-    def __pin_app(self, popover):
+    def __pin_app(self):
         self._application.pin()
-        popover.popdown()
 
-    def __unpin_app(self, popover):
+    def __unpin_app(self):
         self._application.unpin()
-        popover.popdown()
 
     def __on_app_state_change(self, app):
         self._launcher.refresh_pinned_apps_list()
