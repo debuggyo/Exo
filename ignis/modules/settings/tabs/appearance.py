@@ -70,11 +70,11 @@ class WallColorCategory(widgets.Box):
         wallpaper_overlay.add_overlay(file_chooser_button)
         wallpaper_overlay.add_overlay(self.wallpaper_filename_label)
 
-        self.palettes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot"]
+        self.palettes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot", "vibrant"]
 
         palette_selector_row = widgets.Grid(
-            column_spacing=10,
-            row_spacing=10,
+            column_spacing=5,
+            row_spacing=5,
             css_classes=["palette-selector-row"]
         )
 
@@ -87,35 +87,43 @@ class WallColorCategory(widgets.Box):
 
         def make_palette_button(palette_name):
             css_class = f"{palette_name}-preview"
+            preview = widgets.Box(
+                css_classes=["preview", css_class],
+                vertical=True,
+                height_request=50,
+                width_request=50,
+                halign="center",
+                hexpand=False,
+                valign="center",
+                vexpand=False,
+                tooltip_text=palette_name,
+                child=[
+                    widgets.Box(css_classes=["primary"], height_request=25, width_request=50, hexpand=False, halign="start"),
+                    widgets.Box(
+                        vertical=False,
+                        child=[
+                            widgets.Box(css_classes=["secondary"], height_request=25, width_request=25),
+                            widgets.Box(css_classes=["tertiary"], height_request=25, width_request=25),
+                        ]
+                    )
+                ]
+            )
+
             btn = widgets.Button(
                 on_click=lambda btn, p=palette_name: on_palette_selected(btn, p),
-                child=widgets.Box(
-                    css_classes=[css_class],
-                    vertical=True,
-                    height_request=50,
-                    width_request=50,
-                    tooltip_text=palette_name,
-                    child=[
-                        widgets.Box(css_classes=["primary"], height_request=25, width_request=50, hexpand=False, halign="start"),
-                        widgets.Box(
-                            vertical=False,
-                            child=[
-                                widgets.Box(css_classes=["secondary"], height_request=25, width_request=25),
-                                widgets.Box(css_classes=["tertiary"], height_request=25, width_request=25),
-                            ]
-                        )
-                    ]
-                ),
-                css_classes=["palette-preview-btn"]
+                css_classes=["palette-preview-btn"],
+                hexpand=True,
+                halign="fill",
+                child=preview
             )
             btn.palette_name = palette_name
-            btn.set_overflow(Gtk.Overflow.HIDDEN)
+            preview.set_overflow(Gtk.Overflow.HIDDEN)
             return btn
 
         for i, palette in enumerate(self.palettes):
             btn = make_palette_button(palette)
             self.palette_buttons.append(btn)
-            palette_selector_row.attach(btn, i % 4, i // 4, 1, 1)
+            palette_selector_row.attach(btn, i % 3, i // 3, 1, 1)
 
         theme_selector_row = widgets.Box(
             vertical=False,
@@ -158,21 +166,6 @@ class WallColorCategory(widgets.Box):
                             spacing=5,
                             child=[
                                 widgets.Box(
-                                    css_classes=["surface_low"],
-                                    width_request=40,
-                                    vexpand=True,
-                                    valign="fill",
-                                    child=[
-                                        widgets.Box(
-                                            halign="center",
-                                            hexpand=True,
-                                            valign="center",
-                                            vexpand=True,
-                                            spacing=2,
-                                        )
-                                    ]
-                                ),
-                                widgets.Box(
                                     css_classes=["surface"],
                                     width_request=40,
                                     vexpand=True,
@@ -188,21 +181,6 @@ class WallColorCategory(widgets.Box):
                                                 widgets.Label(label=icon, css_classes=["icon"]),
                                                 widgets.Label(label=label)
                                             ]
-                                        )
-                                    ]
-                                ),
-                                widgets.Box(
-                                    css_classes=["surface_high"],
-                                    width_request=40,
-                                    vexpand=True,
-                                    valign="fill",
-                                    child=[
-                                        widgets.Box(
-                                            halign="center",
-                                            hexpand=True,
-                                            valign="center",
-                                            vexpand=True,
-                                            spacing=2,
                                         )
                                     ]
                                 ),
@@ -386,6 +364,7 @@ class WallColorCategory(widgets.Box):
                     halign="fill",
                     css_classes=["wallpaper-thumbnail"] + (["selected"] if is_selected else [])
                 )
+                btn.wallpaper_path = file_path
                 gallery_grid.attach(btn, idx % columns, idx // columns, 1, 1)
                 temp_thumbnails.append(btn)
 

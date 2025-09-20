@@ -168,30 +168,3 @@
         border-bottom-right-radius: 16px;
     }
 }
-
-.palette-preview-btn {
-    padding: 0px;
-    border-radius: 50px;
-    &.selected {
-        outline: 2px solid colors.$primary;
-        outline-offset: 2px;
-    }
-}
-
-.theme-preview-btn {
-    padding: 0px;
-    border-radius: 20px;
-    &.selected {
-        outline: 2px solid colors.$primary;
-        outline-offset: 2px;
-    }
-    .container {
-        padding: 5px;
-        box {
-            border-radius: 15px;
-        }
-    }
-    .icon {
-        font-family: "Material Symbols Outlined";
-    }
-}

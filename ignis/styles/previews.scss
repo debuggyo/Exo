@@ -1,3 +1,4 @@
+@use "../colors.scss";
 @use "preview-colors.scss";
 
 .content-preview {
@@ -96,6 +97,18 @@
     }
 }
 
+.vibrant-preview {
+    .primary {
+        background-color: preview-colors.$palette-vibrant-primary;
+    }
+    .secondary {
+        background-color: preview-colors.$palette-vibrant-secondary-container;
+    }
+    .tertiary {
+        background-color: preview-colors.$palette-vibrant-tertiary-fixed;
+    }
+}
+
 .light-preview {
     label {
         color: preview-colors.$theme-light-on-surface;
@@ -147,5 +160,51 @@
         .btn-3 {
             background-color: preview-colors.$theme-dark-tertiary_container;
         }
+    }
+}
+
+.palette-preview-btn {
+    border-radius: 8px;
+    background-color: colors.$surface_container_highest;
+
+    .preview {
+        border-radius: 50px;
+        outline: 2px solid colors.$surface_container;
+    }
+    &.selected {
+        outline: 2px solid colors.$primary;
+        outline-offset: 2px;
+        border-radius: 16px;
+    }
+
+    &:first-child {
+        border-top-left-radius: 16px;
+    }
+    &:nth-child(3) {
+        border-top-right-radius: 16px;
+    }
+    &:nth-last-child(3) {
+        border-bottom-left-radius: 16px;
+    }
+    &:last-child {
+        border-bottom-right-radius: 16px;
+    }
+}
+
+.theme-preview-btn {
+    padding: 0px;
+    border-radius: 20px;
+    &.selected {
+        outline: 2px solid colors.$primary;
+        outline-offset: 2px;
+    }
+    .container {
+        padding: 5px;
+        box {
+            border-radius: 15px;
+        }
+    }
+    .icon {
+        font-family: "Material Symbols Outlined";
     }
 }
