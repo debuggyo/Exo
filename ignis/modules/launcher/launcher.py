@@ -87,7 +87,8 @@ class AppItem(widgets.Button):
                 )
 
         popover = widgets.PopoverMenu(model=IgnisMenuModel(*menu_items))
-        popover.set_parent(self)
+        if self.get_child():
+            self.get_child().append(popover)
         popover.popup()
 
     def __pin_app(self):
@@ -150,7 +151,8 @@ class PinnedAppItem(widgets.Button):
                 )
 
         popover = widgets.PopoverMenu(model=IgnisMenuModel(*menu_items))
-        popover.set_parent(self)
+        if self.get_child():
+            self.get_child().append(popover)
         popover.popup()
 
     def __pin_app(self):
