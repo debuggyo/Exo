@@ -214,6 +214,48 @@ class NotificationsCategory(widgets.Box):
             )]
         ))
 
+class ExtraBarCategory(widgets.Box):
+    media_widget = user_settings.interface.bar.modules.media_widget
+    military_time = user_settings.interface.bar.modules.military_time
+
+    def __init__(self):
+        super().__init__(
+            css_classes=["settings-category"],
+            vertical=True,
+            spacing=5,
+            child=[
+                CategoryLabel("Extra Bar Settings"),
+                SwitchRow(
+                    label="Media Widget",
+                    description="Adds a media widget to the bar.",
+                    active=self.media_widget,
+                    on_change=lambda x, active: BarStyles.setMediaWidget(active)
+                ),
+                SwitchRow(
+                    label="Use 24 hour time.",
+                    description="Toggle between 12-hour (AM/PM) and 24-hour time formats.",
+                    active=self.military_time,
+                    on_change=lambda x, active: BarStyles.setMilitaryTime(active)
+                ),
+                SettingsRow(
+                    title="Recording Indicator",
+                    description="Show a recording indicator in the bar when recording with Exo.",
+                    child=[
+                        make_toggle_buttons(
+                            [
+                                ("Always", "always", "visibility"),
+                                ("When Recording", "recording", "screen_record"),
+                                ("Never", "never", "visibility_off"),
+                            ],
+                            lambda: user_settings.interface.bar.modules.recording_indicator,
+                            BarStyles.setRecordingIndicator,
+                            on_any_click=None
+                        ),
+                    ]
+                ),
+            ]
+        )
+
 class MiscCategory(widgets.Box):
     screen_corners = user_settings.interface.misc.screen_corners
     media_widget = user_settings.interface.bar.modules.media_widget
@@ -238,34 +280,6 @@ class MiscCategory(widgets.Box):
                     active=self.screen_corners,
                     on_change=lambda x, active: BarStyles.setScreenCorners(active)
                 ),
-                SwitchRow(
-                    label="Media Widget",
-                    description="Adds a media widget to the bar.",
-                    active=self.media_widget,
-                    on_change=lambda x, active: BarStyles.setMediaWidget(active)
-                ),
-                SettingsRow(
-                    title="Recording Indicator",
-                    description="Show a recording indicator in the bar when recording with Exo.",
-                    child=[
-                        make_toggle_buttons(
-                            [
-                                ("Always", "always", "visibility"),
-                                ("When Recording", "recording", "screen_record"),
-                                ("Never", "never", "visibility_off"),
-                            ],
-                            lambda: user_settings.interface.bar.modules.recording_indicator,
-                            BarStyles.setRecordingIndicator,
-                            on_any_click=None
-                        ),
-                    ]
-                ),
-                SwitchRow(
-                    label="Use 24 hour time.",
-                    description="Toggle between 12-hour (AM/PM) and 24-hour time formats.",
-                    active=self.military_time,
-                    on_change=lambda x, active: BarStyles.setMilitaryTime(active)
-                ),
             ]
         )
 
@@ -274,6 +288,7 @@ class InterfaceTab(widgets.Box):
     def __init__(self):
         super().__init__(vertical=True, spacing=20, css_classes=["settings-body"], hexpand=False, halign="center", width_request=800)
         self.append(BarCategory())
+        self.append(ExtraBarCategory())
         self.append(DockCategory())
         self.append(NotificationsCategory())
         self.append(MiscCategory())
