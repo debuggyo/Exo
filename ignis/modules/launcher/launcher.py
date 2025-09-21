@@ -178,12 +178,13 @@ class Launcher(widgets.Window):
             hexpand=True
         )
 
-        self._pinned_apps_container = widgets.Box(
-            spacing=10,
+        self._pinned_apps_container = widgets.Grid(
             css_classes=["pinned-apps-container"],
             height_request=64,
             vexpand=True,
         )
+        self._pinned_apps_container.set_column_spacing(10)
+        self._pinned_apps_container.set_row_spacing(10)
 
         self._pin_icon = widgets.Label(
             label="push_pin",
@@ -224,6 +225,7 @@ class Launcher(widgets.Window):
             icon="close",
             visible=False,
             size="xs",
+            type="text",
             vexpand=False,
             css_classes=["clear-button"]
         )
@@ -233,28 +235,22 @@ class Launcher(widgets.Window):
             icon="",
             visible=False,
             size="xs",
+            type="text",
             vexpand=False,
             css_classes=["layout-toggle-button"]
         )
 
-        search_bar_container = widgets.Box(
-            child=[search_icon, self._entry, self._clear_button],
+        self._search_bar_container = widgets.Box(
+            child=[search_icon, self._entry, self._clear_button, self._layout_button],
             spacing=5,
             css_classes=["search-bar-container"],
             hexpand=True
         )
 
-        self._search_container = widgets.Box(
-            child=[search_bar_container, self._layout_button],
-            spacing=5,
-            halign="fill",
-            css_classes=["search-group-container"]
-        )
-
         self.__update_layout_button_icon()
         self.__populate_pinned_apps_list()
 
-        self._main_content_container.append(self._search_container)
+        self._main_content_container.append(self._search_bar_container)
 
         self._pinned_revealer = widgets.Revealer(
             transition_type='slide_down',
@@ -334,13 +330,14 @@ class Launcher(widgets.Window):
         self._layout_button = Button.button(
             on_click=self.__toggle_layout,
             icon=new_icon,
+            size="xs",
             type="text",
             vexpand=False,
             css_classes=["layout-toggle-button"]
         )
 
         # Re-add the button to the search container
-        self._search_container.append(self._layout_button)
+        self._search_bar_container.append(self._layout_button)
 
     def __toggle_layout(self, *args):
         current_layout = user_settings.interface.launcher.layout
@@ -365,20 +362,20 @@ class Launcher(widgets.Window):
         pinned_apps = applications.pinned
 
         if not pinned_apps:
-            self._pinned_apps_container.set_orientation(Gtk.Orientation.VERTICAL)
             self._pinned_apps_container.set_halign("center")
-            self._pinned_apps_container.set_spacing(5)
-            self._pinned_apps_container.append(self._pin_icon)
-            self._pinned_apps_container.append(self._pin_hint_label)
+            self._pinned_apps_container.attach(self._pin_icon, 0, 0, 1, 1)
+            self._pinned_apps_container.attach(self._pin_hint_label, 0, 1, 1, 1)
             self._pinned_apps_container.visible = True
         else:
-            self._pinned_apps_container.set_orientation(Gtk.Orientation.HORIZONTAL)
             self._pinned_apps_container.set_halign("start")
-            self._pinned_apps_container.set_spacing(10)
+            self._pinned_apps_container.remove(self._pin_icon)
+            self._pinned_apps_container.remove(self._pin_hint_label)
             self._pinned_apps_container.visible = True
-            for app in pinned_apps:
+            for i, app in enumerate(pinned_apps):
                 item = PinnedAppItem(app, self)
-                self._pinned_apps_container.append(item)
+                col = i % 8
+                row = i // 8
+                self._pinned_apps_container.attach(item, col, row, 1, 1)
 
     def __populate_apps(self, apps: list[Application], featured_app: Application | None = None) -> None:
         while self._app_container.get_last_child():
@@ -395,7 +392,7 @@ class Launcher(widgets.Window):
         if layout == "list":
             for app in apps:
                 self._app_container.append(AppItem(app, self, layout="list"))
-        else: # grid layout
+        else:  # grid layout
             app_grid = widgets.Grid(
                 column_spacing=0,
                 row_spacing=0,
