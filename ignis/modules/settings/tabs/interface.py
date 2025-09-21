@@ -105,7 +105,7 @@ class DockCategory(widgets.Box):
 
         self._enable_switch = SwitchRow(
             label="Enable",
-            description="Enable a Dock with your pinned apps. (experimental, scuffed)",
+            description="Enable a Dock with your pinned apps.",
             active=user_settings.interface.dock.enabled,
             on_change=lambda x, active: self._on_enable_change(active)
         )
