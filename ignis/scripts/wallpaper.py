@@ -64,6 +64,7 @@ class Wallpaper:
         Wallpaper.generatePreviews()
         utils.Timeout(ms=2000, target=lambda: css_manager.reload_all_css())
 
+    @staticmethod
     def generatePreviews():
         async def do_generate():
             schemes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot", "vibrant"]
