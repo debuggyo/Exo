@@ -35,7 +35,7 @@ class QuickSliders(widgets.Box):
             children.append(self.backlight_slider)
 
         super().__init__(
-            css_classes=["quick-toggles-container"],
+            css_classes=["quick-sliders-container"],
             hexpand=True,
             halign="fill",
             spacing=2,
