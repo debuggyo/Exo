@@ -1,41 +1,70 @@
 from ignis import widgets
 from ignis.window_manager import WindowManager
-from .widgets import NotificationCenter
-from modules.m3components import NavigationRail
+from ignis.services.notifications import NotificationService
+from modules.m3components import Button
+from .widgets import NotificationCenter, QuickSliders
 from user_settings import user_settings
 from ignis.services.niri import NiriService
-import os
 
+window_manager = WindowManager.get_default()
+notifications = NotificationService.get_default()
 
 class QuickCenter(widgets.RevealerWindow):
+    def open_window(self, window):
+        window_manager.close_window("QuickCenter")
+        window_manager.open_window(window)
+
     def __init__(self):
-        window_manager = WindowManager.get_default()
-
-        content_stack = widgets.Stack(vexpand=True)
         notification_center = NotificationCenter()
-        content_stack.add_named(notification_center, "notifications")
-
-        tabs = {
-            "notifications": ("notifications", "Notifications"),
-        }
-
-        def toggle_view_local(key):
-            content_stack.visible_child_name = key
-
-        navigation_rail = NavigationRail(
-            tabs=tabs,
-            on_select=toggle_view_local,
-            default="notifications",
-            vertical=False,
+        quick_sliders = QuickSliders()
+        bottom_controls = widgets.Box(
+            css_classes=["bottom-controls"],
+            hexpand=True,
+            halign="fill",
+            homogeneous=False,
+            spacing=5,
+            child=[
+                Button.button(
+                    icon="power_settings_new",
+                    halign="start",
+                    hexpand=False,
+                    on_click=lambda x: self.open_window("PowerMenu"),
+                    vexpand=False,
+                    valign="center",
+                    size="xs"
+                ),
+                Button.button(
+                    icon="settings",
+                    halign="start",
+                    hexpand=False,
+                    on_click=lambda x: self.open_window("Settings"),
+                    vexpand=False,
+                    valign="center",
+                    size="xs"
+                ),
+                Button.button(
+                    icon="clear_all",
+                    label="Clear all",
+                    halign="end",
+                    hexpand=True,
+                    on_click=lambda x: notifications.clear_all(),
+                    css_classes=["notification-clear-all"],
+                    vexpand=True,
+                    valign="center",
+                    size="xs",
+                    visible=notifications.bind(
+                        "notifications", lambda value: len(value) != 0
+                    ),
+                ),
+            ]
         )
-        navigation_rail.halign = "center"
 
         self.content_box = widgets.Box(
             vertical=True,
             spacing=0,
             hexpand=False,
             css_classes=["quick-center"],
-            child=[navigation_rail, content_stack],
+            child=[notification_center, quick_sliders, bottom_controls],
         )
         self.content_box.width_request = 400
 
@@ -71,10 +100,7 @@ class QuickCenter(widgets.RevealerWindow):
         )
 
         self.window_manager = window_manager
-        self.content_stack = content_stack
         self.notification_center = notification_center
-        self.tabs = tabs
-        self.navigation_rail = navigation_rail
         self.revealer = revealer
         self.actual_content_box = revealer
 

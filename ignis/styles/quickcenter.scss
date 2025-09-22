@@ -15,6 +15,12 @@
         scrolledwindow viewport {
             border-radius: 20px;
         }
+        .notification-center-info-icon {
+            font-family: "Material Symbols Outlined";
+            font-size: 24pt;
+            color: colors.$on_surface_variant;
+            margin-bottom: 5px;
+        }
         .notification-center-info-label {
             font-weight: 500;
         }
@@ -29,6 +35,11 @@
                 }
             }
         }
+    }
+
+    .bottom-controls {
+        padding: 10px;
+        padding-top: 0px;
     }
 
     .quick-toggles-container {

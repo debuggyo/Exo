@@ -178,7 +178,7 @@ class M3Test(widgets.RegularWindow):
 
                         # Radio Buttons
                         widgets.Label(label="Radio Buttons", css_classes=["settings-category-label"]),
-                        Slider.slider(0, 100, 10)
+                        Slider.slider(0, 100, 10, icon="volume_up")
 
 
                         # Notifications

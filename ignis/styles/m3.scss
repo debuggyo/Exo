@@ -382,21 +382,54 @@ switch {
 }
 
 .m3-slider {
-    trough {
-        background-color: colors.$secondary_container;
-        highlight {
-            background-color: colors.$primary;
-            min-height: 32px;
-        }
-
-        &:active {
+    background-color: colors.$surface_container;
+    border-radius: 20px;
+    padding: 16px;
+    .m3-slider-icon {
+        font-family: "Material Symbols Outlined";
+        font-size: 24px;
+        color: colors.$on_surface;
+        margin-right: 10px;
+    }
+    scale {
+        padding: 0px;
+        trough {
+            background-color: colors.$secondary_container;
+            border-radius: 8px;
             highlight {
-                border-radius: 8px;
+                background-color: colors.$primary;
+                min-height: 24px;
+                border-radius: 0px;
+            }
+            slider {
+                min-height: 44px;
+                min-width: 4px;
+                padding: 0px;
+                margin: -20px 0px;
+                outline: 6px solid colors.$surface_container;
+                outline-offset: 0px;
+                border-radius: 20px;
+                background-color: colors.$primary;
+                transition: 100ms;
             }
         }
 
-        slider {
+        value {
+            margin-top: -48px;
+            background-color: colors.$surface_container_high;
+            border-radius: 20px;
+            padding: 0.2rem 1rem;
             opacity: 0;
+        }
+
+        &:active {
+            slider {
+                outline-width: 4px;
+                min-width: 2px;
+            }
+            value {
+                opacity: 1;
+            }
         }
     }
 }

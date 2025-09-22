@@ -58,8 +58,19 @@ class Notifications(widgets.Box):
 
         contents.append(
             widgets.Label(
+                label="notifications_off",
+                valign="end",
+                vexpand=True,
+                css_classes=["notification-center-info-icon"],
+                visible=notifications.bind(
+                    "notifications", lambda value: len(value) == 0
+                ),
+            )
+        )
+        contents.append(
+            widgets.Label(
                 label="No notifications",
-                valign="center",
+                valign="start",
                 vexpand=True,
                 css_classes=["notification-center-info-label"],
                 visible=notifications.bind(
@@ -73,10 +84,6 @@ class Notifications(widgets.Box):
 class NotificationCenter(widgets.Box):
     __gtype_name__ = "NotificationCenter"
 
-    def open_window(self, window):
-        window_manager.close_window("QuickCenter")
-        window_manager.open_window(window)
-
     def __init__(self):
         scroll = widgets.Scroll(child=Notifications(), vexpand=True)
         scroll.set_overflow(Gtk.Overflow.HIDDEN)
@@ -88,45 +95,5 @@ class NotificationCenter(widgets.Box):
             spacing=10,
             child=[
                 scroll,
-                widgets.Box(
-                    hexpand=True,
-                    halign="fill",
-                    homogeneous=False,
-                    spacing=5,
-                    child=[
-                        Button.button(
-                            icon="power_settings_new",
-                            halign="start",
-                            hexpand=False,
-                            on_click=lambda x: self.open_window("PowerMenu"),
-                            vexpand=False,
-                            valign="center",
-                            size="xs"
-                        ),
-                        Button.button(
-                            icon="settings",
-                            halign="start",
-                            hexpand=False,
-                            on_click=lambda x: self.open_window("Settings"),
-                            vexpand=False,
-                            valign="center",
-                            size="xs"
-                        ),
-                        Button.button(
-                            icon="clear_all",
-                            label="Clear all",
-                            halign="end",
-                            hexpand=True,
-                            on_click=lambda x: notifications.clear_all(),
-                            css_classes=["notification-clear-all"],
-                            vexpand=True,
-                            valign="center",
-                            size="xs",
-                            visible=notifications.bind(
-                                "notifications", lambda value: len(value) != 0
-                            ),
-                        ),
-                    ]
-                )
             ],
         )
