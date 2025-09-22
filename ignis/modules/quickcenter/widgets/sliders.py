@@ -1,3 +1,4 @@
+from termios import VREPRINT
 from ignis import widgets
 from ignis.services.audio import AudioService
 from ignis.services.backlight import BacklightService
@@ -38,6 +39,7 @@ class QuickSliders(widgets.Box):
             hexpand=True,
             halign="fill",
             spacing=2,
+            vertical=True,
             child=children
         )
 
