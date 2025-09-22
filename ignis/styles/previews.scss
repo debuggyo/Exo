@@ -97,18 +97,6 @@
     }
 }
 
-.vibrant-preview {
-    .primary {
-        background-color: preview-colors.$palette-vibrant-primary;
-    }
-    .secondary {
-        background-color: preview-colors.$palette-vibrant-secondary-container;
-    }
-    .tertiary {
-        background-color: preview-colors.$palette-vibrant-tertiary-fixed;
-    }
-}
-
 .light-preview {
     label {
         color: preview-colors.$theme-light-on-surface;

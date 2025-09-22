@@ -9,7 +9,7 @@ from .send_notification import send_notification
 
 class Wallpaper:
     def setWall(path):
-        schemes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot", "vibrant"]
+        schemes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot"]
         colorScheme = user_settings.appearance.wallcolors.color_scheme
         if user_settings.appearance.wallcolors.dark_mode:
             mode = "dark"
@@ -27,7 +27,7 @@ class Wallpaper:
         utils.Timeout(ms=3000, target=lambda: css_manager.reload_all_css())
 
     def setColors(colorScheme):
-        schemes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot", "vibrant"]
+        schemes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot"]
         path = user_settings.appearance.wallcolors.wallpaper_path
         if user_settings.appearance.wallcolors.dark_mode:
             mode = "dark"
@@ -45,7 +45,7 @@ class Wallpaper:
 
 
     def setDarkMode(active):
-        schemes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot", "vibrant"]
+        schemes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot"]
         colorScheme = user_settings.appearance.wallcolors.color_scheme
         path = user_settings.appearance.wallcolors.wallpaper_path
         if active:
@@ -67,7 +67,7 @@ class Wallpaper:
     @staticmethod
     def generatePreviews():
         async def do_generate():
-            schemes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot", "vibrant"]
+            schemes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot"]
             path = user_settings.appearance.wallcolors.wallpaper_path
             if not path or not os.path.exists(path):
                 return

@@ -24,7 +24,7 @@ class ExoInstaller:
         self.config_dir = self.default_config_dir
         self.aur_helper = None
         self.dry_run = False
-        self.protected_files = ["user_settings.json", "colors.scss"]
+        self.protected_files = ["user_settings.json", "colors.scss", "preview-colors.scss"]
         self.auto_confirm_overwrite = False
         self.auto_confirm_delete = False
         self.distro = None

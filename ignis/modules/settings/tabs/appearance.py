@@ -70,7 +70,8 @@ class WallColorCategory(widgets.Box):
         wallpaper_overlay.add_overlay(file_chooser_button)
         wallpaper_overlay.add_overlay(self.wallpaper_filename_label)
 
-        self.palettes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot", "vibrant"]
+        self.palettes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot"]
+
 
         palette_selector_row = widgets.Grid(
             column_spacing=5,
