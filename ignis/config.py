@@ -60,5 +60,4 @@ Launcher()
 PowerMenu()
 M3Test()
 
-for monitor in range(utils.get_n_monitors()):
-    NotificationPopup(monitor)
+NotificationPopup(1)
