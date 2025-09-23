@@ -5,15 +5,30 @@ fetch = FetchService.get_default()
 
 class SoftwareCategory(widgets.Box):
     def __init__(self):
+        if fetch.os_logo:
+            self.logo = widgets.Picture(image=fetch.os_logo, css_classes=["settings-logo"], height=30)
+
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
-            spacing=2,
+            spacing=5,
             child=[
                 CategoryLabel("Software"),
-                SettingsRow(title="Operating System", description=fetch.os_name),
+                SettingsRow(title="Operating System", description=fetch.os_name, vertical=False, child=[self.logo]),
                 SettingsRow(title="Desktop", description=fetch.current_desktop),
                 SettingsRow(title="Hostname", description=fetch.hostname.replace("\n", "")), # .replace("\n", "") makes it a single line because for some reason there was an empty line under.
+            ]
+        )
+class AppearanceCategory(widgets.Box):
+    def __init__(self):
+        super().__init__(
+            css_classes=["settings-category"],
+            vertical=True,
+            spacing=5,
+            child=[
+                CategoryLabel("Appearance"),
+                SettingsRow(title="GTK Theme", description=fetch.gtk_theme),
+                SettingsRow(title="Icon Theme", description=fetch.icon_theme),
             ]
         )
 class HardwareCategory(widgets.Box):
@@ -21,7 +36,7 @@ class HardwareCategory(widgets.Box):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
-            spacing=2,
+            spacing=5,
             child=[
                 CategoryLabel("Hardware"),
                 SettingsRow(title="CPU", description=fetch.cpu),
@@ -34,9 +49,13 @@ class AboutTab(widgets.Box):
         super().__init__(
             css_classes=["settings-body"],
             vertical=True,
-            spacing=2,
+            spacing=10,
+            hexpand=False,
+            halign="center",
+            width_request=800,
             child=[
                 SoftwareCategory(),
+                AppearanceCategory(),
                 HardwareCategory()
             ]
         )
