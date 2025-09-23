@@ -1,6 +1,5 @@
 from ignis import widgets, utils
 from modules.m3components import Button, Slider
-# from modules import ExoNotification
 from ignis.services.notifications import Notification, NotificationService
 from gi.repository import GLib
 notifications = NotificationService.get_default()
@@ -70,7 +69,7 @@ class NotificationList(widgets.Box):
 class M3Test(widgets.RegularWindow):
     def __init__(self) -> None:
         super().__init__(
-            css_classes=["settings-window"],
+            css_classes=["m3-testing-window"],
             hide_on_close=True,
             visible=False,
             title="Material 3 Testing Window",
@@ -176,8 +175,8 @@ class M3Test(widgets.RegularWindow):
                         widgets.CheckButton(group=widgets.CheckButton(label='Radio Button 4'), label="Radio Button 3", halign="center"),
                         widgets.CheckButton(group=widgets.CheckButton(label='radiobutton'), label="Radio Button 4", halign="center"),
 
-                        # Radio Buttons
-                        widgets.Label(label="Radio Buttons", css_classes=["settings-category-label"]),
+                        # Sliders
+                        widgets.Label(label="Sliders", css_classes=["settings-category-label"]),
                         Slider.slider(0, 100, 10, icon="volume_up")
 
 

@@ -7,6 +7,10 @@ $elevation-4: 0px 2px 3px rgba(colors.$shadow, 0.6);
 $elevation-5: 0px 4px 4px rgba(colors.$shadow, 0.6);
 $square-radius: 12px;
 
+.m3-testing-window {
+    background-color: colors.$background;
+}
+
 .m3-button {
     /* Base */
     transition-timing-function: cubic-bezier(0.3, 0, 0, 1);
@@ -382,10 +386,11 @@ switch {
     }
 }
 
+/* Sliders */
 .m3-slider {
     background-color: colors.$surface_container;
-    border-radius: 20px;
-    padding: 16px;
+    border-radius: 24px;
+    padding: 8px 16px;
     .m3-slider-icon {
         font-family: "Material Symbols Outlined";
         font-size: 24px;
@@ -399,14 +404,14 @@ switch {
             border-radius: 8px;
             highlight {
                 background-color: colors.$primary;
-                min-height: 24px;
+                min-height: 16px;
                 border-radius: 0px;
             }
             slider {
-                min-height: 44px;
+                min-height: 24px;
                 min-width: 4px;
                 padding: 0px;
-                margin: -20px 0px;
+                margin: -16px 0px;
                 outline: 6px solid colors.$surface_container;
                 outline-offset: 0px;
                 border-radius: 20px;
@@ -416,7 +421,7 @@ switch {
         }
 
         value {
-            margin-top: -48px;
+            margin-top: -36px;
             background-color: colors.$surface_container_high;
             border-radius: 20px;
             padding: 0.2rem 1rem;
@@ -435,6 +440,7 @@ switch {
     }
 }
 
+/* Navigation Rail */
 .navigation-rail {
     padding: 10px;
     .rail-button {
@@ -475,6 +481,7 @@ switch {
     }
 }
 
+/* Spin Buttons */
 spinbutton {
     background-color: transparent;
     border-radius: 20px;
@@ -495,6 +502,7 @@ spinbutton {
     outline-offset: 2px;
 }
 
+/* Popovers */
 popover {
     contents {
         background-color: colors.$surface_container;
@@ -525,7 +533,43 @@ popover {
     }
 }
 
+/* Tooltips */
 tooltip {
+    border-radius: 15px;
     background-color: colors.$surface_container_high;
     border: 1px solid rgba(colors.$outline_variant, 0.5);
+    padding: 0.6rem 1rem;
+}
+
+/* Checkboxes */
+checkbutton {
+    check,
+    radio {
+        border-radius: 4px;
+        background-color: transparent;
+        box-shadow: inset 0px 0px 0px 2px rgba(colors.$on_surface_variant, 0.5);
+        margin-right: 0.5rem;
+        &:hover {
+            background-color: colors.$surface_container_highest;
+        }
+        &:checked {
+            background-color: colors.$primary;
+            border-color: colors.$primary;
+            color: colors.$on_primary;
+            box-shadow: none;
+        }
+    }
+    radio {
+        border-radius: 100%;
+    }
+}
+
+/* Scrollbars */
+scrollbar {
+    background-color: transparent;
+    slider {
+        background-color: colors.$tertiary;
+        border-radius: 10px;
+        margin: 2px;
+    }
 }
