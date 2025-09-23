@@ -11,7 +11,7 @@ class NetworkTab(widgets.Box):
     def __init__(self):
         super().__init__(
             vertical=True,
-            spacing=20,
+            spacing=10,
             css_classes=["settings-body"],
             hexpand=False,
             halign="center",
@@ -24,24 +24,35 @@ class NetworkTab(widgets.Box):
 
         self.append(self.network_category)
 
-        self.append(SettingsRow(
-            title="Open Network Settings",
-            description="Open the network panel in the GNOME Settings application for advanced configuration.",
-            child=[Button.button(
-                icon="barefoot",
-                label="Open Settings",
-                on_click=lambda x: self._open_gnome_settings(),
-            )]
-        ))
-
-        self.append(SettingsRow(
-            title="Refresh Network Status",
-            description="Manually refresh the status of all network connections.",
-            child=[Button.button(
-                icon="refresh",
-                label="Refresh",
-                on_click=lambda x: asyncio.create_task(self.update_ui()),
-            )]
+        self.append(widgets.Box(
+            css_classes=["settings-category"],
+            vertical=True,
+            spacing=5,
+            child=[
+                CategoryLabel("Miscellaneous"),
+                SettingsRow(
+                    title="Open Network Settings",
+                    description="Open the network panel in the GNOME Settings application for advanced configuration.",
+                    child=[Button.button(
+                        icon="barefoot",
+                        label="Open Settings",
+                        on_click=lambda x: self._open_gnome_settings(),
+                        hexpand=False,
+                        halign="start"
+                    )]
+                ),
+                SettingsRow(
+                    title="Refresh Network Status",
+                    description="Manually refresh the status of all network connections.",
+                    child=[Button.button(
+                        icon="refresh",
+                        label="Refresh",
+                        on_click=lambda x: asyncio.create_task(self.update_ui()),
+                        hexpand=False,
+                        halign="start"
+                    )]
+                )
+            ]
         ))
 
         self.network_service.wifi.connect("notify::enabled", self._on_property_changed)
@@ -143,7 +154,7 @@ class NetworkTab(widgets.Box):
         return row_button
 
     def create_network_category(self):
-        box = widgets.Box(css_classes=["settings-category"], vertical=True, spacing=2)
+        box = widgets.Box(css_classes=["settings-category"], vertical=True, spacing=5)
         box.append(CategoryLabel("Wi-Fi & Ethernet"))
 
         self.wifi_switch_row = SwitchRow(
