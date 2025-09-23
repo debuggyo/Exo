@@ -1,6 +1,6 @@
 from ignis import widgets
 from ignis.services.niri import NiriService, NiriWorkspace, NiriWindow
-from ignis.services.hyprland import HyprlandService, HyprlandWorkspace, HyprlandWindow
+from ignis.services.hyprland import HyprlandService, HyprlandWindow
 from ignis.services.applications import ApplicationsService
 from user_settings import user_settings
 
@@ -35,19 +35,19 @@ class WorkspaceButton(widgets.Button):
 
         self.workspace = workspace
         self._label = widgets.Label(label=label_text, halign="center", valign="center")
-        
+
         children = [self._label]
         self._icons_box = None
 
         if style == "windows":
             self._icons_box = widgets.Box(spacing=5, css_classes=["workspace-icons"])
             children.append(self._icons_box)
-        
+
         self._main_content_box = widgets.Box(
             halign="center",
             valign="center",
             spacing=4,
-            child=children  
+            child=children
         )
 
         super().__init__(
@@ -68,7 +68,7 @@ class WorkspaceButton(widgets.Button):
             if isinstance(SERVICE, HyprlandService):
                 SERVICE.connect("notify::active-workspace", update_css_classes)
             update_css_classes()
-        
+
         self.update_layout()
         if style == "windows":
             self._update_icons()
@@ -92,7 +92,7 @@ class WorkspaceButton(widgets.Button):
             last_child = self._icons_box.get_last_child()
 
         windows = self._get_windows_for_workspace()
-        
+
         self._icons_box.set_visible(bool(windows))
 
         for window in windows:
@@ -101,13 +101,13 @@ class WorkspaceButton(widgets.Button):
                 app_id = window.app_id
             elif isinstance(window, HyprlandWindow):
                 app_id = window.class_name
-            
+
             icon_name = None
             if app_id:
                 apps = APPLICATIONS.search(APPLICATIONS.apps, app_id)
                 if apps and apps[0].icon:
                     icon_name = apps[0].icon
-            
+
             if not icon_name:
                 icon_name = "application-x-executable-symbolic"
 
@@ -116,7 +116,7 @@ class WorkspaceButton(widgets.Button):
                 pixel_size=16
             )
             self._icons_box.append(icon_widget)
-        
+
         self._main_content_box.queue_resize()
 
 
@@ -126,7 +126,7 @@ class WorkspaceButton(widgets.Button):
 
         if self._icons_box:
             self._icons_box.set_vertical(vertical)
-        
+
         if vertical:
             self._main_content_box.set_vertical(True)
             self.set_halign("center")
@@ -154,7 +154,7 @@ class Workspaces(widgets.EventBox):
             valign="center",
             vexpand=True,
         )
-        
+
         super().__init__(
             child=[self._workspace_box],
             on_scroll_up=lambda self: self.workspaces_scroll(+1),
@@ -166,10 +166,10 @@ class Workspaces(widgets.EventBox):
             self.update_workspaces()
 
         self.update_layout()
-    
+
     def update_workspaces(self, *args):
         style = user_settings.interface.bar.modules.workspaces_style
-        
+
         self._workspace_box.remove_css_class("dots")
         self._workspace_box.remove_css_class("windows")
         self._workspace_box.remove_css_class("numbers")
@@ -196,10 +196,10 @@ class Workspaces(widgets.EventBox):
 
     def update_layout(self):
         vertical = user_settings.interface.bar.vertical
-        
+
         style = user_settings.interface.bar.modules.workspaces_style
 
-        
+
         if style == "windows":
             spacing = 2
         else:

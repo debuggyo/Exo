@@ -2,7 +2,6 @@ import asyncio
 from ignis import widgets
 from ignis import utils
 from ignis.window_manager import WindowManager
-from typing import Callable
 
 window_manager = WindowManager.get_default()
 

@@ -1,11 +1,8 @@
-import os
-from ignis import widgets, utils
-
+from ignis import widgets
 from user_settings import user_settings
 from ignis.services.applications import ApplicationsService
 from ignis.window_manager import WindowManager
 from modules.m3components import Button
-from modules import Corners
 from gi.repository import Gtk, GLib
 from ignis.menu_model import IgnisMenuModel, IgnisMenuItem, IgnisMenuSeparator
 

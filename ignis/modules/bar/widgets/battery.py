@@ -1,7 +1,6 @@
 import asyncio
 from ignis import widgets
-from ignis.services.upower import UPowerService, UPowerDevice
-from ignis import utils
+from ignis.services.upower import UPowerService
 from gi.repository import Gtk
 from user_settings import user_settings
 

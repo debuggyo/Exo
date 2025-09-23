@@ -3,7 +3,6 @@ from ignis.services.notifications import Notification, NotificationService
 from ignis.window_manager import WindowManager
 from gi.repository import GLib, Gtk
 from ...notifications import ExoNotification
-from modules.m3components import Button
 
 notifications = NotificationService.get_default()
 window_manager = WindowManager.get_default()

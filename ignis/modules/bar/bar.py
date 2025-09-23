@@ -1,9 +1,6 @@
-import os
-from ignis import widgets, utils
+from ignis import widgets
 from user_settings import user_settings
 from .widgets import WindowInfo, Workspaces, Media, Battery, SystemInfoTray
-from modules.m3components import Button
-from modules.corners import Corners
 from ignis.css_manager import CssManager
 from ignis.window_manager import WindowManager
 from scripts import BarStyles

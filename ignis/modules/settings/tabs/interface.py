@@ -1,8 +1,7 @@
-import os
 
 from ignis import widgets
-from modules.m3components import Button, Slider
-from scripts import Wallpaper, BarStyles, DockStyles, send_notification
+from modules.m3components import Button
+from scripts import BarStyles, DockStyles, send_notification
 from user_settings import user_settings
 from ..widgets import CategoryLabel, make_toggle_buttons, SwitchRow, SettingsRow
 from ignis.app import IgnisApp

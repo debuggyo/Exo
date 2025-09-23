@@ -1,5 +1,3 @@
-import os
-from ignis import widgets, utils
 from modules.corners import Corners
 from user_settings import user_settings
 

@@ -1,5 +1,4 @@
 from user_settings import user_settings
-from modules.launcher.launcher import Launcher
 
 class LauncherLayout:
     launcher_instance = None

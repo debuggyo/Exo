@@ -1,4 +1,3 @@
-from termios import VREPRINT
 from ignis import widgets
 from ignis.services.audio import AudioService
 from ignis.services.backlight import BacklightService

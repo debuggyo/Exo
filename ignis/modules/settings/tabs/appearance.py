@@ -3,10 +3,9 @@ import threading
 from gi.repository import GLib, Gtk
 
 from ignis import widgets
-from modules.m3components import Button
 from scripts import Wallpaper
 from user_settings import user_settings
-from ..widgets import CategoryLabel, make_toggle_buttons, SwitchRow, SettingsRow
+from ..widgets import CategoryLabel, SettingsRow
 from ignis.app import IgnisApp
 
 app = IgnisApp.get_initialized()

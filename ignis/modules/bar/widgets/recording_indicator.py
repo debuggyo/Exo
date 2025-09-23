@@ -1,9 +1,7 @@
 import datetime
-import threading
-import time
 from ignis import widgets, utils
 from user_settings import user_settings
-from scripts.recorder import stop_recording, pause_recording, unpause_recording, recorder, record_portal, record_screen, record_region
+from scripts.recorder import stop_recording, pause_recording, unpause_recording, recorder, record_screen, record_region
 
 class RecordingIndicator:
     def __init__(self):
@@ -14,7 +12,7 @@ class RecordingIndicator:
             tooltip_text="Click to start/stop recording. \nRight click to pause/unpause."
         )
         self.container.set_name("recording-indicator")
-        
+
         self.is_recording = False
         self.is_paused = False
         self._start_time = 0
@@ -22,7 +20,7 @@ class RecordingIndicator:
         self.icon = widgets.Label(label="screen_record", css_classes=["recording-icon"])
         self.timer_label_hms = widgets.Label(label="00:00")
         self.timer_label_s = widgets.Label(label="")
-        
+
         self.timer_box = widgets.Box(css_classes=["timer-box"])
         self.timer_box.append(self.timer_label_hms)
         self.timer_box.append(self.timer_label_s)
@@ -35,7 +33,7 @@ class RecordingIndicator:
 
         self.update_layout()
         self.update_visibility()
-        
+
         utils.Poll(1000, lambda _: self._update_timer())
         utils.Poll(1000, lambda _: self.update_layout())
 
@@ -45,9 +43,9 @@ class RecordingIndicator:
 
         elapsed_time = datetime.datetime.now() - self._start_time
         seconds = int(elapsed_time.total_seconds())
-        
+
         m, s = divmod(seconds, 60)
-        
+
         is_vertical = user_settings.interface.bar.vertical
         if is_vertical:
             self.timer_label_hms.set_label(f"{m:02d}")
@@ -55,10 +53,10 @@ class RecordingIndicator:
         else:
             self.timer_label_hms.set_label(f"{m:02d}:{s:02d}")
             self.timer_label_s.set_label("")
-    
+
     def handle_click(self):
         mode = user_settings.interface.bar.modules.recording_indicator
-        
+
         if mode == "always":
             if recorder.active:
                 stop_recording()
@@ -79,7 +77,7 @@ class RecordingIndicator:
         elif mode == "recording":
             if recorder.active:
                 stop_recording()
-    
+
     def toggle_pause_recording(self):
         if self.is_paused:
             unpause_recording()
@@ -97,7 +95,7 @@ class RecordingIndicator:
 
     def update_layout(self):
         is_vertical = user_settings.interface.bar.vertical
-        
+
         self.content_box.set_vertical(is_vertical)
         self.content_box.set_spacing(0)
         self.content_box.set_halign("center")
@@ -106,7 +104,7 @@ class RecordingIndicator:
 
         self.timer_box.set_vertical(is_vertical)
         self.timer_box.set_spacing(0)
-        
+
         if is_vertical:
             self.timer_label_s.set_visible(True)
             self.timer_label_s.set_halign("center")
@@ -114,10 +112,10 @@ class RecordingIndicator:
         else:
             self.timer_label_s.set_visible(False)
             self.content_box.set_homogeneous(False)
-    
+
     def update_visibility(self):
         mode = user_settings.interface.bar.modules.recording_indicator
-        
+
         if mode == "never":
             self.container.set_visible(False)
             self.timer_box.set_visible(False)

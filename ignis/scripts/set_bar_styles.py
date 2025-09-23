@@ -1,10 +1,6 @@
-import os
-from ignis import widgets, utils
 from ignis.window_manager import WindowManager
 from user_settings import user_settings
-from .send_notification import send_notification
 from modules.corners import Corners
-from .wallpaper import Wallpaper
 
 def rebuild_corners():
     Corners.destroy_all()
