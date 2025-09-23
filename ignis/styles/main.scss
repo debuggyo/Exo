@@ -10,6 +10,15 @@
 @use "m3.scss";
 @use "previews.scss";
 
+* {
+    outline: unset;
+    border: unset;
+    background: unset;
+    box-shadow: unset;
+    color: unset;
+    border-radius: unset;
+}
+
 *:focus {
     outline-color: colors.$secondary;
 }

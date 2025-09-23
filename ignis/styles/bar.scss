@@ -10,7 +10,7 @@
 }
 
 .bar {
-    background-color: colors.$surface;
+    background: colors.$surface;
     color: colors.$on_background;
 
     &.floating {
@@ -49,11 +49,11 @@
     }
 
     &.separated {
-        background-color: transparent;
+        background: transparent;
         .left-widgets,
         .center-widgets,
         .right-widgets {
-            background-color: colors.$background;
+            background: colors.$background;
         }
 
         &.top {
@@ -124,13 +124,13 @@
         .right-widgets {
             & > box,
             & > button:not(.active) {
-                background-color: transparent;
+                background: transparent;
                 border-radius: 20px;
             }
             padding: 2px 5px;
         }
         .system-info-tray:hover {
-            background-color: colors.$primary_container;
+            background: colors.$primary_container;
             color: colors.$on_primary_container;
         }
     }
@@ -140,13 +140,13 @@
         .right-widgets {
             & > box,
             & > button {
-                background-color: transparent;
+                background: transparent;
                 border-radius: 20px;
             }
             padding: 0px 5px;
         }
         .system-info-tray:hover {
-            background-color: colors.$primary_container;
+            background: colors.$primary_container;
             color: colors.$on_primary_container;
         }
     }
@@ -159,7 +159,7 @@
     & > box,
     & > button {
         border-radius: 5px;
-        background-color: colors.$surface_container;
+        background: colors.$surface_container;
 
         &:first-child {
             border-top-left-radius: 20px;
@@ -172,7 +172,7 @@
         }
 
         button {
-            background-color: transparent;
+            background: transparent;
         }
     }
 }
@@ -211,14 +211,14 @@
         min-width: 25px;
         min-height: 25px;
         border-radius: 20px;
-        background-color: transparent;
+        background: transparent;
 
         &:hover {
-            background-color: colors.$surface_container_highest;
+            background: colors.$surface_container_highest;
         }
 
         &.active {
-            background-color: colors.$primary;
+            background: colors.$primary;
             color: colors.$on_primary;
             padding: 0px 10px;
             font-weight: 700;
@@ -232,11 +232,11 @@
             padding: 0px 10px;
 
             &:hover {
-                background-color: colors.$surface_container_highest;
+                background: colors.$surface_container_highest;
             }
 
             &.active {
-                background-color: colors.$primary;
+                background: colors.$primary;
                 color: colors.$on_primary;
                 border-radius: 20px;
             }
@@ -251,13 +251,13 @@
             min-width: 6px;
             min-height: 6px;
             color: colors.$on_background;
-            background-color: rgba(colors.$on_background, 0.5);
+            background: rgba(colors.$on_background, 0.5);
             border-radius: 2rem;
 
             &.active {
                 min-height: 10px;
                 min-width: 20px;
-                background-color: colors.$on_background;
+                background: colors.$on_background;
             }
         }
     }
@@ -300,7 +300,7 @@
     .overlay-bg {
         margin: 0px;
         border-radius: 20px;
-        background-color: rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 0.5);
         opacity: 0;
         transition: 100ms;
     }
@@ -361,12 +361,12 @@
     font-weight: 400;
 
     &.recording-active {
-        background-color: colors.$error_container;
+        background: colors.$error_container;
         color: colors.$on_error_container;
     }
 
     &.paused {
-        background-color: colors.$tertiary_container;
+        background: colors.$tertiary_container;
         color: colors.$on_tertiary_container;
     }
 
@@ -377,7 +377,7 @@
     }
 
     * {
-        background-color: transparent;
+        background: transparent;
     }
 }
 
@@ -390,12 +390,12 @@
 .battery-widget {
     .battery-box {
         border-radius: 20px;
-        background-color: rgba(colors.$on_surface, 0.6);
+        background: rgba(colors.$on_surface, 0.6);
         color: colors.$surface;
         font-weight: 700;
         font-size: 8.5pt;
         .battery-fill {
-            background-color: colors.$on_surface;
+            background: colors.$on_surface;
         }
         .battery-status {
             font-size: 10pt;
@@ -404,19 +404,19 @@
     }
     &.low {
         .battery-box {
-            background-color: rgba(colors.$error, 0.7);
+            background: rgba(colors.$error, 0.7);
             color: colors.$on_error;
             .battery-fill {
-                background-color: colors.$error;
+                background: colors.$error;
             }
         }
     }
     &.charging {
         .battery-box {
-            background-color: rgba(lightgreen, 0.6);
+            background: rgba(lightgreen, 0.6);
             color: colors.$surface;
             .battery-fill {
-                background-color: lightgreen;
+                background: lightgreen;
             }
             .battery-status {
                 font-variation-settings: "FILL" 1;
@@ -437,7 +437,7 @@
     }
 
     &:hover {
-        background-color: colors.$primary_container;
+        background: colors.$primary_container;
         color: colors.$on_primary_container;
     }
 
@@ -516,14 +516,14 @@
             min-height: 2px;
             transform: skewY(-20deg);
             margin: 0px 5px;
-            background-color: rgba(colors.$on_surface, 0.3);
+            background: rgba(colors.$on_surface, 0.3);
         }
     }
 
     .quickcenter-button {
         padding: 5px 0px;
         &:hover {
-            background-color: colors.$primary_container;
+            background: colors.$primary_container;
             color: colors.$on_primary_container;
         }
     }
@@ -541,11 +541,11 @@
     }
 
     &.separated {
-        background-color: transparent;
+        background: transparent;
         .left-widgets,
         .center-widgets,
         .right-widgets {
-            background-color: colors.$background;
+            background: colors.$background;
         }
 
         &.left {

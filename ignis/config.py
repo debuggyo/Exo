@@ -18,18 +18,21 @@ from user_settings import user_settings
 Wallpaper.generatePreviews()
 
 css_manager = CssManager.get_default()
+css_manager.widgets_style_priority = "user"
 css_manager.apply_css(
     CssInfoPath(
         name="main",
         path=os.path.expanduser("~/.config/ignis/styles/main.scss"),
-        compiler_function=lambda path: utils.sass_compile(path=path)
+        compiler_function=lambda path: utils.sass_compile(path=path),
+        priority="user",
     )
 )
 css_manager.apply_css(
     CssInfoPath(
         name="colors",
         path=os.path.expanduser("~/.config/ignis/colors.scss"),
-        compiler_function=lambda path: utils.sass_compile(path=path)
+        compiler_function=lambda path: utils.sass_compile(path=path),
+        priority="user",
     )
 )
 
