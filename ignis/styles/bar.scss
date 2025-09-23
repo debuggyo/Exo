@@ -273,7 +273,8 @@
         margin-bottom: -2px;
     }
 
-    .date {
+    .date,
+    .month {
         font-weight: 400;
         font-size: 8pt;
         opacity: 0.8;
@@ -501,8 +502,21 @@
     .timedate {
         padding: 5px 0px;
         .date {
-            opacity: 1;
-            font-size: 10pt;
+            font-size: 8pt;
+            margin-left: -5px;
+        }
+        .month {
+            font-size: 8pt;
+            margin-right: -5px;
+        }
+        .separator {
+            padding: 0px;
+        }
+        separator {
+            min-height: 2px;
+            transform: skewY(-20deg);
+            margin: 0px 5px;
+            background-color: rgba(colors.$on_surface, 0.3);
         }
     }
 
