@@ -60,4 +60,4 @@ Launcher()
 PowerMenu()
 M3Test()
 
-NotificationPopup(1)
+NotificationPopup(0)
