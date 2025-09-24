@@ -513,19 +513,20 @@ popover {
             background-color: transparent;
             & > label {
                 color: colors.$on_surface_variant;
-                padding: 5px;
             }
-            button {
+            modelbutton {
                 background-color: transparent;
                 border-radius: 10px;
                 min-width: 100px;
+                transition: 100ms;
                 &:hover {
                     background-color: colors.$surface_container_highest;
                 }
-                label {
-                    font-weight: 400;
-                }
             }
+        }
+        label {
+            font-weight: 400;
+            color: colors.$on_surface;
         }
     }
     arrow {
