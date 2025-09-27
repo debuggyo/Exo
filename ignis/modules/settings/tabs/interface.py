@@ -1,4 +1,5 @@
 
+from warnings import showwarning
 from ignis import widgets
 from modules.m3components import Button
 from scripts import BarStyles, DockStyles, send_notification
@@ -216,6 +217,8 @@ class NotificationsCategory(widgets.Box):
 class ExtraBarCategory(widgets.Box):
     media_widget = user_settings.interface.bar.modules.media_widget
     military_time = user_settings.interface.bar.modules.military_time
+    show_date = user_settings.interface.bar.modules.show_date
+    day_month_swapped = user_settings.interface.bar.modules.day_month_swapped
 
     def __init__(self):
         super().__init__(
@@ -231,10 +234,22 @@ class ExtraBarCategory(widgets.Box):
                     on_change=lambda x, active: BarStyles.setMediaWidget(active)
                 ),
                 SwitchRow(
-                    label="Use 24 hour time.",
+                    label="Use 24 hour time",
                     description="Toggle between 12-hour (AM/PM) and 24-hour time formats.",
                     active=self.military_time,
                     on_change=lambda x, active: BarStyles.setMilitaryTime(active)
+                ),
+                SwitchRow(
+                    label="Show the date",
+                    description="Toggle the visibility of the date in the bar.",
+                    active=self.show_date,
+                    on_change=lambda x, active: BarStyles.setDateVisibility(active)
+                ),
+                SwitchRow(
+                    label="Swap the day and month",
+                    description="Use the American date format.",
+                    active=self.day_month_swapped,
+                    on_change=lambda x, active: BarStyles.setDayMonthSwapped(active)
                 ),
                 SettingsRow(
                     title="Recording Indicator",

@@ -275,3 +275,13 @@ class BarStyles:
     def setMilitaryTime(enabled: bool):
         user_settings.interface.bar.modules.set_military_time(enabled)
         BarStyles._update_all_layouts()
+
+    @staticmethod
+    def setDateVisibility(enabled: bool):
+        user_settings.interface.bar.modules.set_show_date(enabled)
+        BarStyles._update_all_layouts()
+
+    @staticmethod
+    def setDayMonthSwapped(enabled: bool):
+        user_settings.interface.bar.modules.set_day_month_swapped(enabled)
+        BarStyles._update_all_layouts()

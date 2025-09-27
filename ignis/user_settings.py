@@ -31,6 +31,8 @@ class UserSettings(OptionsManager):
 
             class Modules(OptionsGroup):
                 media_widget: bool = True
+                show_date: bool = True
+                day_month_swapped: bool = False
                 military_time: bool = False
                 recording_indicator: str = "recording"
                 workspaces_style: str = "numbers"
