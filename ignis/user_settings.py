@@ -3,8 +3,10 @@ from ignis import utils
 from ignis.app import IgnisApp
 from ignis.options_manager import OptionsGroup, OptionsManager, TrackedList
 from ignis.window_manager import WindowManager
+
 window_manager = WindowManager.get_default()
 app = IgnisApp.get_initialized()
+
 
 class UserSettings(OptionsManager):
     def __init__(self):
@@ -37,6 +39,25 @@ class UserSettings(OptionsManager):
                 recording_indicator: str = "recording"
                 workspaces_style: str = "numbers"
 
+                class Locations(OptionsGroup):
+                    window_info: int = 0
+                    media: int = 0
+                    workspaces: int = 1
+                    recording_indicator: int = 2
+                    systeminfotray: int = 2
+                    clock: int = 2
+
+                class Visibility(OptionsGroup):
+                    window_info: bool = True
+                    media: bool = True
+                    workspaces: bool = True
+                    recording_indicator: bool = True
+                    systeminfotray: bool = True
+                    clock: bool = True
+
+                location = Locations()
+                visibility = Visibility()
+
             modules = Modules()
 
         class Dock(OptionsGroup):
@@ -62,6 +83,9 @@ class UserSettings(OptionsManager):
         notifications = Notifications()
         launcher = Launcher()
         misc = Misc()
+
     appearance = Appearance()
     interface = Interface()
+
+
 user_settings = UserSettings()

@@ -167,4 +167,13 @@
         border-bottom-left-radius: 16px;
         border-bottom-right-radius: 16px;
     }
+
+    &.module-options {
+        separator {
+            margin: 5px 0.5rem;
+            background-color: colors.$surface_container_highest;
+            min-width: 2px;
+            border-radius: 20px;
+        }
+    }
 }

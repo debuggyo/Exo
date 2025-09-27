@@ -1,26 +1,36 @@
 from ignis import widgets
 from modules.m3components import Button
 
+
 class CategoryLabel(widgets.Label):
     def __init__(self, title):
         super().__init__(
             css_classes=["settings-category-label"],
             label=title,
             justify="left",
-            halign="start"
+            halign="start",
         )
 
-def make_toggle_buttons(items, get_value, set_value, on_any_click=None):
+
+def make_toggle_buttons(items, get_value, set_value, on_any_click=None, widget=None):
     buttons = []
 
     def update_active():
         for btn, value in buttons:
-            if get_value() == value:
-                btn.add_css_class("active")
-                btn.add_css_class("filled")
-            else:
-                btn.remove_css_class("active")
-                btn.remove_css_class("filled")
+            if widget:  # if widget exists
+                if get_value() == value and widget:
+                    btn.add_css_class("active")
+                    btn.add_css_class("filled")
+                else:
+                    btn.remove_css_class("active")
+                    btn.remove_css_class("filled")
+            else:  # otherwise, behave as before
+                if get_value() == value:
+                    btn.add_css_class("active")
+                    btn.add_css_class("filled")
+                else:
+                    btn.remove_css_class("active")
+                    btn.remove_css_class("filled")
 
     for item in items:
         if len(item) == 3:
@@ -29,8 +39,11 @@ def make_toggle_buttons(items, get_value, set_value, on_any_click=None):
             label, value = item
             icon = None
 
-        def click_handler(_, v=value, btn=None):
-            set_value(v)
+        def click_handler(_, v=value, w=widget, btn=None):
+            if widget:
+                set_value(widget, v)
+            else:
+                set_value(v)
             update_active()
             if on_any_click:
                 on_any_click()
@@ -41,26 +54,56 @@ def make_toggle_buttons(items, get_value, set_value, on_any_click=None):
             on_click=click_handler,
             shape="square",
             hexpand=True,
-            halign="fill"
+            halign="fill",
+            size="xs",
         )
         buttons.append((btn, value))
 
     update_active()
-    return Button.connected_group([b for b, _ in buttons], homogeneous=False, halign="start", hexpand=False)
+    return Button.connected_group(
+        [b for b, _ in buttons],
+        homogeneous=False,
+        halign="start",
+        hexpand=False,
+    )
+
 
 class SettingsRow(widgets.Box):
-    def __init__(self, icon: str = None, title: str = None, description: str = None, child: list = None, vertical: bool = True, css_classes: list = [], **kwargs):
+    def __init__(
+        self,
+        icon: str = None,
+        title: str = None,
+        description: str = None,
+        child: list = None,
+        vertical: bool = False,
+        css_classes: list = [],
+        **kwargs,
+    ):
         header = []
         if icon:
-            header.append(widgets.Label(label=icon, css_classes=["settings-row-icon"], halign="start"))
+            header.append(
+                widgets.Label(
+                    label=icon, css_classes=["settings-row-icon"], halign="start"
+                )
+            )
         if title:
-            header.append(widgets.Label(label=title, css_classes=["settings-row-title"], halign="start"))
+            header.append(
+                widgets.Label(
+                    label=title, css_classes=["settings-row-title"], halign="start"
+                )
+            )
         if description:
-            header.append( widgets.Label(label=description, css_classes=["settings-row-description"], halign="start") )
+            header.append(
+                widgets.Label(
+                    label=description,
+                    css_classes=["settings-row-description"],
+                    halign="start",
+                )
+            )
 
         children = child or []
 
-        classes=["settings-row"]
+        classes = ["settings-row"]
         classes.extend(css_classes)
 
         super().__init__(
@@ -80,8 +123,9 @@ class SettingsRow(widgets.Box):
                 ),
                 *children,
             ],
-            **kwargs
+            **kwargs,
         )
+
 
 def SwitchRow(label: str, active, on_change, **kwargs):
     switch = widgets.Switch(
@@ -94,10 +138,8 @@ def SwitchRow(label: str, active, on_change, **kwargs):
         title=label,
         vertical=False,
         css_classes=["switch-row"],
-        child=[
-            switch
-        ],
-        **kwargs
+        child=[switch],
+        **kwargs,
     )
 
     row_content.remove_css_class("settings-row")
@@ -112,5 +154,5 @@ def SwitchRow(label: str, active, on_change, **kwargs):
         on_click=on_button_click,
         hexpand=True,
         halign="fill",
-        css_classes=["settings-row", "row-button"]
+        css_classes=["settings-row", "row-button"],
     )

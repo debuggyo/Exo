@@ -19,7 +19,7 @@ class WallColorCategory(widgets.Box):
             spacing=5,
             child=[
                 CategoryLabel("Wallpaper & Colors"),
-            ]
+            ],
         )
 
         self.wallpaper_picture = widgets.Picture(
@@ -29,11 +29,12 @@ class WallColorCategory(widgets.Box):
             hexpand=False,
             content_fit="cover",
             css_classes=["wallpaper-preview"],
-            image=user_settings.appearance.wallcolors.bind("wallpaper_path")
+            image=user_settings.appearance.wallcolors.bind("wallpaper_path"),
         )
 
         self.wallpaper_filename_label = widgets.Label(
-            label=os.path.basename(user_settings.appearance.wallcolors.wallpaper_path) or "Click to set wallpaper",
+            label=os.path.basename(user_settings.appearance.wallcolors.wallpaper_path)
+            or "Click to set wallpaper",
             halign="start",
             valign="end",
             margin_start=10,
@@ -46,19 +47,24 @@ class WallColorCategory(widgets.Box):
             self._set_and_update_wallpaper(path)
 
         file_chooser_button = widgets.FileChooserButton(
-            label=widgets.Label(label=''),
+            label=widgets.Label(label=""),
             css_classes=["wallpaper-button-overlay"],
             dialog=widgets.FileDialog(
                 on_file_set=on_file_set_handler,
                 initial_path=user_settings.appearance.wallcolors.wallpaper_path,
                 filters=[
                     widgets.FileFilter(
-                        mime_types=["image/jpeg", "image/png", "image/webp", "image/gif"],
+                        mime_types=[
+                            "image/jpeg",
+                            "image/png",
+                            "image/webp",
+                            "image/gif",
+                        ],
                         default=True,
                         name="Images (PNG, JPG, WebP, GIF)",
                     )
-                ]
-            )
+                ],
+            ),
         )
 
         wallpaper_overlay = widgets.Overlay(
@@ -69,13 +75,19 @@ class WallColorCategory(widgets.Box):
         wallpaper_overlay.add_overlay(file_chooser_button)
         wallpaper_overlay.add_overlay(self.wallpaper_filename_label)
 
-        self.palettes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot"]
-
+        self.palettes = [
+            "content",
+            "expressive",
+            "fidelity",
+            "fruit-salad",
+            "monochrome",
+            "neutral",
+            "rainbow",
+            "tonal-spot",
+        ]
 
         palette_selector_row = widgets.Grid(
-            column_spacing=5,
-            row_spacing=5,
-            css_classes=["palette-selector-row"]
+            column_spacing=5, row_spacing=5, css_classes=["palette-selector-row"]
         )
 
         self.palette_buttons = []
@@ -98,15 +110,29 @@ class WallColorCategory(widgets.Box):
                 vexpand=False,
                 tooltip_text=palette_name,
                 child=[
-                    widgets.Box(css_classes=["primary"], height_request=25, width_request=50, hexpand=False, halign="start"),
+                    widgets.Box(
+                        css_classes=["primary"],
+                        height_request=25,
+                        width_request=50,
+                        hexpand=False,
+                        halign="start",
+                    ),
                     widgets.Box(
                         vertical=False,
                         child=[
-                            widgets.Box(css_classes=["secondary"], height_request=25, width_request=25),
-                            widgets.Box(css_classes=["tertiary"], height_request=25, width_request=25),
-                        ]
-                    )
-                ]
+                            widgets.Box(
+                                css_classes=["secondary"],
+                                height_request=25,
+                                width_request=25,
+                            ),
+                            widgets.Box(
+                                css_classes=["tertiary"],
+                                height_request=25,
+                                width_request=25,
+                            ),
+                        ],
+                    ),
+                ],
             )
 
             btn = widgets.Button(
@@ -114,7 +140,7 @@ class WallColorCategory(widgets.Box):
                 css_classes=["palette-preview-btn"],
                 hexpand=True,
                 halign="fill",
-                child=preview
+                child=preview,
             )
             btn.palette_name = palette_name
             preview.set_overflow(Gtk.Overflow.HIDDEN)
@@ -130,7 +156,7 @@ class WallColorCategory(widgets.Box):
             spacing=10,
             vexpand=True,
             valign="fill",
-            css_classes=["theme-selector-row"]
+            css_classes=["theme-selector-row"],
         )
 
         self.theme_buttons = []
@@ -178,11 +204,13 @@ class WallColorCategory(widgets.Box):
                                             vexpand=True,
                                             spacing=2,
                                             child=[
-                                                widgets.Label(label=icon, css_classes=["icon"]),
-                                                widgets.Label(label=label)
-                                            ]
+                                                widgets.Label(
+                                                    label=icon, css_classes=["icon"]
+                                                ),
+                                                widgets.Label(label=label),
+                                            ],
                                         )
-                                    ]
+                                    ],
                                 ),
                                 widgets.Box(
                                     vertical=False,
@@ -205,13 +233,13 @@ class WallColorCategory(widgets.Box):
                                             width_request=30,
                                             height_request=30,
                                         ),
-                                    ]
-                                )
-                            ]
+                                    ],
+                                ),
+                            ],
                         ),
-                    ]
+                    ],
                 ),
-                css_classes=["theme-preview-btn"]
+                css_classes=["theme-preview-btn"],
             )
             btn.is_dark = is_dark
             btn.set_overflow(Gtk.Overflow.HIDDEN)
@@ -239,10 +267,7 @@ class WallColorCategory(widgets.Box):
         self.thumbnail_overlays = []
 
         quick_select_container = widgets.Box(
-            vertical=True,
-            spacing=10,
-            vexpand=True,
-            valign="fill"
+            vertical=True, spacing=10, vexpand=True, valign="fill"
         )
 
         folder_chooser_button = widgets.FileChooserButton(
@@ -252,7 +277,7 @@ class WallColorCategory(widgets.Box):
                 select_folder=True,
                 initial_path=user_settings.appearance.wallcolors.quickselect_path,
                 on_file_set=self._on_quickselect_folder_selected,
-            )
+            ),
         )
         quick_select_container.append(folder_chooser_button)
 
@@ -273,11 +298,14 @@ class WallColorCategory(widgets.Box):
         loader_thread.daemon = True
         loader_thread.start()
 
-        self.append(SettingsRow(
-            title="Quick Select",
-            description="Browse local wallpapers for a quick change.",
-            child=[quick_select_container]
-        ))
+        self.append(
+            SettingsRow(
+                title="Quick Select",
+                description="Browse local wallpapers for a quick change.",
+                child=[quick_select_container],
+                vertical=True,
+            )
+        )
 
     def _update_palette_selection(self):
         selected_palette = user_settings.appearance.wallcolors.color_scheme
@@ -320,12 +348,14 @@ class WallColorCategory(widgets.Box):
             GLib.idle_add(self._replace_gallery_content, None)
             return
 
-        supported_extensions = ('.png', '.jpg', '.jpeg', '.gif')
+        supported_extensions = (".png", ".jpg", ".jpeg", ".gif")
         image_files = []
         try:
             with os.scandir(wallpaper_dir) as entries:
                 for entry in entries:
-                    if entry.is_file() and entry.name.lower().endswith(supported_extensions):
+                    if entry.is_file() and entry.name.lower().endswith(
+                        supported_extensions
+                    ):
                         image_files.append(entry.path)
         except Exception:
             GLib.idle_add(self._replace_gallery_content, None)
@@ -348,9 +378,11 @@ class WallColorCategory(widgets.Box):
             current_path = user_settings.appearance.wallcolors.wallpaper_path
 
             for idx, file_path in enumerate(image_files):
-                is_selected = (file_path == current_path)
+                is_selected = file_path == current_path
                 btn = widgets.Button(
-                    on_click=lambda btn, path=file_path: self._on_thumbnail_clicked(path),
+                    on_click=lambda btn, path=file_path: self._on_thumbnail_clicked(
+                        path
+                    ),
                     child=widgets.Picture(
                         image=file_path,
                         content_fit="cover",
@@ -358,11 +390,13 @@ class WallColorCategory(widgets.Box):
                         width=196,
                         hexpand=True,
                         halign="fill",
-                        css_classes=["wallpaper-thumbnail-image"] + (["selected"] if is_selected else [])
+                        css_classes=["wallpaper-thumbnail-image"]
+                        + (["selected"] if is_selected else []),
                     ),
                     hexpand=True,
                     halign="fill",
-                    css_classes=["wallpaper-thumbnail"] + (["selected"] if is_selected else [])
+                    css_classes=["wallpaper-thumbnail"]
+                    + (["selected"] if is_selected else []),
                 )
                 btn.wallpaper_path = file_path
                 gallery_grid.attach(btn, idx % columns, idx // columns, 1, 1)
@@ -373,7 +407,9 @@ class WallColorCategory(widgets.Box):
                 height_request=300,
             )
             gallery_scroll.set_child(gallery_grid)
-            GLib.idle_add(self._replace_gallery_content, gallery_scroll, temp_thumbnails)
+            GLib.idle_add(
+                self._replace_gallery_content, gallery_scroll, temp_thumbnails
+            )
 
         threading.Thread(target=build_gallery, daemon=True).start()
 
@@ -386,7 +422,9 @@ class WallColorCategory(widgets.Box):
 
     def _replace_gallery_content(self, new_child, thumbnail_buttons=None):
         while self.gallery_content_container.get_last_child():
-            self.gallery_content_container.remove(self.gallery_content_container.get_last_child())
+            self.gallery_content_container.remove(
+                self.gallery_content_container.get_last_child()
+            )
 
         if new_child:
             self.gallery_content_container.append(new_child)
@@ -394,12 +432,21 @@ class WallColorCategory(widgets.Box):
                 self.thumbnail_overlays = thumbnail_buttons
         else:
             self.gallery_content_container.append(
-                widgets.Label(label="No wallpapers found in the directory.", css_classes=["message"])
+                widgets.Label(
+                    label="No wallpapers found in the directory.",
+                    css_classes=["message"],
+                )
             )
 
 
 class AppearanceTab(widgets.Box):
-
     def __init__(self):
-        super().__init__(vertical=True, spacing=20, css_classes=["settings-body"], hexpand=False, halign="center", width_request=800)
+        super().__init__(
+            vertical=True,
+            spacing=20,
+            css_classes=["settings-body"],
+            hexpand=False,
+            halign="center",
+            width_request=800,
+        )
         self.append(WallColorCategory())

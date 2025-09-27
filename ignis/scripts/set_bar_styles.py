@@ -2,10 +2,15 @@ from ignis.window_manager import WindowManager
 from user_settings import user_settings
 from modules.corners import Corners
 
+
 def rebuild_corners():
     Corners.destroy_all()
-    if user_settings.interface.misc.screen_corners or user_settings.interface.misc.shell_corners:
+    if (
+        user_settings.interface.misc.screen_corners
+        or user_settings.interface.misc.shell_corners
+    ):
         Corners.build()
+
 
 class BarStyles:
     bar_instance = None
@@ -32,9 +37,21 @@ class BarStyles:
         compact_mode = user_settings.interface.bar.density
 
         all_possible_classes = {
-            "hug", "extrapadding", "round", "floating", "full",
-            "separated", "compact", "compact-plus", "ultracompact",
-            "vertical", "top", "bottom", "left", "right", "horizontal"
+            "hug",
+            "extrapadding",
+            "round",
+            "floating",
+            "full",
+            "separated",
+            "compact",
+            "compact-plus",
+            "ultracompact",
+            "vertical",
+            "top",
+            "bottom",
+            "left",
+            "right",
+            "horizontal",
         }
 
         for css_class in all_possible_classes:
@@ -77,6 +94,7 @@ class BarStyles:
             BarStyles.bar_instance.media.update_visibility()
             BarStyles.bar_instance.recording_indicator.update_layout()
             BarStyles.bar_instance.systeminfotray.update_layout()
+            BarStyles.bar_instance.clock.update_layout()
 
     @staticmethod
     def _update_quick_center():
@@ -114,7 +132,9 @@ class BarStyles:
         win = bar.get_window()
 
         floating = user_settings.interface.bar.floating
-        win.margin_top, win.margin_left, win.margin_right, win.margin_bottom = BarStyles._compute_margins(side, floating)
+        win.margin_top, win.margin_left, win.margin_right, win.margin_bottom = (
+            BarStyles._compute_margins(side, floating)
+        )
 
         width = 40
         height = 40
@@ -133,7 +153,11 @@ class BarStyles:
         win.set_height_request(height if not vertical else -1)
 
         centered = user_settings.interface.bar.centered
-        anchors = [side] if centered else (["top", "bottom", side] if vertical else ["left", "right", side])
+        anchors = (
+            [side]
+            if centered
+            else (["top", "bottom", side] if vertical else ["left", "right", side])
+        )
         win.anchor = None
         win.anchor = anchors
 
@@ -147,9 +171,12 @@ class BarStyles:
         center_box.halign = "fill"
         center_box.valign = "fill"
 
-        if start_box: start_box.vertical = vertical
-        if center_box_inner: center_box_inner.vertical = vertical
-        if end_box: end_box.vertical = vertical
+        if start_box:
+            start_box.vertical = vertical
+        if center_box_inner:
+            center_box_inner.vertical = vertical
+        if end_box:
+            end_box.vertical = vertical
 
         if vertical:
             if start_box:
@@ -285,3 +312,15 @@ class BarStyles:
     def setDayMonthSwapped(enabled: bool):
         user_settings.interface.bar.modules.set_day_month_swapped(enabled)
         BarStyles._update_all_layouts()
+
+    @staticmethod
+    def setWidgetLocation(widget: str, location: int):
+        getattr(user_settings.interface.bar.modules.location, f"set_{widget}")(location)
+        BarStyles.bar_instance.update_layout()
+
+    @staticmethod
+    def setWidgetVisibility(widget: str, visibility: bool):
+        getattr(user_settings.interface.bar.modules.visibility, f"set_{widget}")(
+            visibility
+        )
+        BarStyles.bar_instance.update_layout()
