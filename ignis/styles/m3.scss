@@ -11,6 +11,10 @@ $square-radius: 12px;
     background-color: colors.$background;
 }
 
+.m3-icon {
+    font-family: "Material Symbols Outlined";
+}
+
 .m3-button {
     /* Base */
     transition-timing-function: cubic-bezier(0.3, 0, 0, 1);

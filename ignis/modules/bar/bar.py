@@ -1,6 +1,14 @@
 from ignis import widgets
 from user_settings import user_settings
-from .widgets import WindowInfo, Workspaces, Media, SystemInfoTray, Clock
+from .widgets import (
+    WindowInfo,
+    Workspaces,
+    Media,
+    SystemInfoTray,
+    Clock,
+    Tasks,
+    Launcher,
+)
 from ignis.css_manager import CssManager
 from ignis.window_manager import WindowManager
 from scripts import BarStyles
@@ -21,6 +29,8 @@ class Bar:
         self.recording_indicator = RecordingIndicator()
         self.systeminfotray = SystemInfoTray()
         self.clock = Clock()
+        self.tasks = Tasks()
+        self.launcher = Launcher()
         set_indicator(self.recording_indicator)
 
         self.media_widget = self.media.widget()
@@ -29,6 +39,8 @@ class Bar:
         self.recording_indicator_widget = self.recording_indicator.widget()
         self.systeminfotray_widget = self.systeminfotray.widget()
         self.clock_widget = self.clock.widget()
+        self.tasks_widget = self.tasks.widget()
+        self.launcher_widget = self.launcher.widget()
 
     def build(self):
         side = user_settings.interface.bar.side
@@ -106,6 +118,10 @@ class Bar:
         visibility_setting = user_settings.interface.bar.modules.visibility
 
         widgets = {
+            "launcher": {
+                "name": "launcher",
+                "widget": self.launcher_widget,
+            },
             "window_info": {
                 "name": "window_info",
                 "widget": self.window_info_widget,
@@ -117,6 +133,10 @@ class Bar:
             "workspaces": {
                 "name": "workspaces",
                 "widget": self.workspaces_widget,
+            },
+            "tasks": {
+                "name": "tasks",
+                "widget": self.tasks_widget,
             },
             "recording_indicator": {
                 "name": "recording_indicator",

@@ -40,9 +40,11 @@ class UserSettings(OptionsManager):
                 workspaces_style: str = "numbers"
 
                 class Locations(OptionsGroup):
+                    launcher: int = 0
                     window_info: int = 0
                     media: int = 0
                     workspaces: int = 1
+                    tasks: int = 1
                     recording_indicator: int = 2
                     systeminfotray: int = 2
                     clock: int = 2
@@ -54,11 +56,33 @@ class UserSettings(OptionsManager):
                     recording_indicator: bool = True
                     systeminfotray: bool = True
                     clock: bool = True
+                    tasks: bool = False
+                    launcher: bool = True
+
+                class BarID(OptionsGroup):
+                    launcher: int = 0
+                    window_info: int = 0
+                    media: int = 0
+                    workspaces: int = 0
+                    tasks: int = 0
+                    recording_indicator: int = 0
+                    systeminfotray: int = 0
+                    clock: int = 1
 
                 location = Locations()
                 visibility = Visibility()
+                bar_id = BarID()
 
             modules = Modules()
+
+        class Bar2(OptionsGroup):
+            enabled: bool = True
+            side: str = "top"
+            vertical: bool = False
+            density: int = 0
+            floating: bool = False
+            separation: bool = False
+            centered: bool = False
 
         class Dock(OptionsGroup):
             enabled: bool = False
@@ -79,6 +103,7 @@ class UserSettings(OptionsManager):
             screen_corners: bool = True
 
         bar = Bar()
+        bar2 = Bar2()
         dock = Dock()
         notifications = Notifications()
         launcher = Launcher()

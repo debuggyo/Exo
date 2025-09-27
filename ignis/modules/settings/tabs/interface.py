@@ -1,7 +1,7 @@
 from warnings import showwarning
 from ignis import widgets
 from modules.m3components import Button
-from scripts import BarStyles, DockStyles, send_notification
+from scripts import BarStyles, send_notification
 from user_settings import user_settings
 from ..widgets import CategoryLabel, make_toggle_buttons, SwitchRow, SettingsRow
 from ignis.app import IgnisApp
@@ -106,100 +106,6 @@ class BarCategory(widgets.Box):
         )
 
 
-class DockCategory(widgets.Box):
-    def __init__(self):
-        super().__init__(
-            css_classes=["settings-category"],
-            vertical=True,
-            spacing=5,
-        )
-
-        self.append(CategoryLabel("Dock"))
-
-        self._enable_switch = SwitchRow(
-            label="Enable",
-            description="Enable a Dock with your pinned apps.",
-            active=user_settings.interface.dock.enabled,
-            on_change=lambda x, active: self._on_enable_change(active),
-        )
-        self.append(self._enable_switch)
-
-        self._settings_box = widgets.Box(
-            css_classes=["dock-settings-container"],
-            vertical=True,
-            spacing=5,
-        )
-
-        self._settings_box.append(
-            SettingsRow(
-                title="Note",
-                description="Some configurations might look off when shell corners are enabled.",
-            )
-        )
-
-        self._settings_box.append(
-            SettingsRow(
-                title="Position",
-                description="Pick a side for the dock to be located.",
-                child=[
-                    make_toggle_buttons(
-                        [
-                            ("Top", "top", "align_vertical_top"),
-                            ("Bottom", "bottom", "align_vertical_bottom"),
-                            ("Left", "left", "align_horizontal_left"),
-                            ("Right", "right", "align_horizontal_right"),
-                        ],
-                        lambda: user_settings.interface.dock.side,
-                        DockStyles.setSide,
-                        on_any_click=None,
-                    )
-                ],
-            )
-        )
-
-        self._settings_box.append(
-            SettingsRow(
-                title="Size",
-                description="Set a size for your dock icons.",
-                vertical=False,
-                child=[
-                    widgets.SpinButton(
-                        min=16,
-                        max=128,
-                        step=1,
-                        value=user_settings.interface.dock.size,
-                        on_change=lambda x, value: DockStyles.setSize(value),
-                    )
-                ],
-            )
-        )
-
-        self._settings_box.append(
-            SwitchRow(
-                label="Floating Dock",
-                description="Make the dock float away from the edges of the screen.",
-                active=user_settings.interface.dock.floating,
-                on_change=lambda x, active: DockStyles.setFloating(active),
-            )
-        )
-
-        self._settings_box.append(
-            SwitchRow(
-                label="Extend to Edges",
-                description="Make the dock span the full width of the screen.",
-                active=(not user_settings.interface.dock.centered),
-                on_change=lambda x, active: DockStyles.setCentered(not active),
-            )
-        )
-
-        self.append(self._settings_box)
-        self._settings_box.set_visible(user_settings.interface.dock.enabled)
-
-    def _on_enable_change(self, active):
-        DockStyles.setEnabled(active)
-        self._settings_box.set_visible(active)
-
-
 class NotificationsCategory(widgets.Box):
     def __init__(self):
         super().__init__(
@@ -251,12 +157,12 @@ class NotificationsCategory(widgets.Box):
 
 
 class BarModuleSettings(SettingsRow):
-    def __init__(self, name: str, widget_name: str):
+    def __init__(self, name: str, widget_name: str, description: str):
         self._widget_name = widget_name
 
         super().__init__(
             title=f"{name} Widget",
-            description=f"Configure the location and visibility of the {name} widget.",
+            description=description,
             css_classes=["module-options"],
             child=[
                 widgets.Box(
@@ -308,22 +214,54 @@ class BarModulesCategory(widgets.Box):
         )
 
         modules = {
-            "window_info": {"name": "Window Info", "widget": "window_info"},
-            "media": {"name": "Media", "widget": "media"},
-            "workspaces": {"name": "Workspaces", "widget": "workspaces"},
+            "launcher": {
+                "name": "Launcher",
+                "widget": "launcher",
+                "description": "Button to open the Launcher.",
+            },
+            "window_info": {
+                "name": "Window Info",
+                "widget": "window_info",
+                "description": "Shows information about the active window.",
+            },
+            "media": {
+                "name": "Media",
+                "widget": "media",
+                "description": "Shows the currently playing media with controls.",
+            },
+            "workspaces": {
+                "name": "Workspaces",
+                "widget": "workspaces",
+                "description": "Shows a list of workspaces.",
+            },
+            "tasks": {
+                "name": "Tasks",
+                "widget": "tasks",
+                "description": "Shows pinned and currently running applications.",
+            },
             "recording_indicator": {
                 "name": "Recording Indicator",
                 "widget": "recording_indicator",
+                "description": "Shows the current recording status.",
             },
-            "systeminfotray": {"name": "System Tray", "widget": "systeminfotray"},
-            "clock": {"name": "Clock", "widget": "clock"},
+            "systeminfotray": {
+                "name": "System Tray",
+                "widget": "systeminfotray",
+                "description": "Shows system tray icons.",
+            },
+            "clock": {
+                "name": "Clock",
+                "widget": "clock",
+                "description": "Shows the current time and date.",
+            },
         }
 
         for module in modules.values():
             name = module["name"]
             widget_name = module["widget"]
+            description = module["description"]
 
-            self.append(BarModuleSettings(name, widget_name))
+            self.append(BarModuleSettings(name, widget_name, description))
 
 
 class ExtraBarCategory(widgets.Box):
@@ -417,7 +355,6 @@ class InterfaceTab(widgets.Box):
         self.append(BarCategory())
         self.append(BarModulesCategory())
         self.append(ExtraBarCategory())
-        self.append(DockCategory())
         self.append(NotificationsCategory())
         self.append(MiscCategory())
         self.hexpand = True

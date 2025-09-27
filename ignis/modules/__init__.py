@@ -5,7 +5,6 @@ from .launcher import Launcher
 from .powermenu import PowerMenu
 from .notifications import ExoNotification, NotificationPopup
 from .quickcenter import QuickCenter
-from .dock import Dock
 from .m3test import M3Test
 
 # Material Components
@@ -20,10 +19,7 @@ __all__ = [
     "ExoNotification",
     "NotificationPopup",
     "QuickCenter",
-    "Dock",
-
     "M3Test",
-
     # Material Components
-    "Button"
+    "Button",
 ]

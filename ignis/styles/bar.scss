@@ -133,7 +133,8 @@
             }
             padding: 2px 5px;
         }
-        .system-info-tray:hover {
+        .system-info-tray:hover,
+        .launcher-button:hover {
             background: colors.$primary_container;
             color: colors.$on_primary_container;
         }
@@ -149,7 +150,8 @@
             }
             padding: 0px 5px;
         }
-        .system-info-tray:hover {
+        .system-info-tray:hover,
+        .launcher-button:hover {
             background: colors.$primary_container;
             color: colors.$on_primary_container;
         }
@@ -448,6 +450,15 @@
     transition: 200ms;
 }
 
+.launcher-button {
+    font-size: 12pt;
+    &:hover {
+        background: colors.$primary_container;
+        color: colors.$on_primary_container;
+    }
+    padding: 0px 10px;
+}
+
 // Vertical Bar
 .vertical {
     .left-widgets,
@@ -534,6 +545,10 @@
 
     .system-info-tray {
         padding: 10px 0px;
+    }
+
+    .launcher-button {
+        padding: 5px 0px;
     }
 
     &.separated {
