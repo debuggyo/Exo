@@ -23,57 +23,56 @@ class UserSettings(OptionsManager):
         wallcolors = WallpaperColors()
 
     class Interface(OptionsGroup):
-        class Bar(OptionsGroup):
-            side: str = "top"
-            vertical: bool = False
-            density: int = 0
-            floating: bool = False
-            separation: bool = False
-            centered: bool = False
+        class Modules(OptionsGroup):
+            class Locations(OptionsGroup):
+                launcher: int = 0
+                window_info: int = 0
+                media: int = 0
+                workspaces: int = 1
+                tasks: int = 1
+                recording_indicator: int = 2
+                systeminfotray: int = 2
+                clock: int = 2
 
-            class Modules(OptionsGroup):
-                media_widget: bool = True
+            class Visibility(OptionsGroup):
+                window_info: bool = True
+                media: bool = True
+                workspaces: bool = True
+                recording_indicator: bool = True
+                systeminfotray: bool = True
+                clock: bool = True
+                tasks: bool = False
+                launcher: bool = True
+
+            class BarID(OptionsGroup):
+                launcher: int = 1
+                window_info: int = 0
+                media: int = 0
+                workspaces: int = 0
+                tasks: int = 1
+                recording_indicator: int = 0
+                systeminfotray: int = 0
+                clock: int = 1
+
+            class ModuleOptions(OptionsGroup):
                 show_date: bool = True
                 day_month_swapped: bool = False
                 military_time: bool = False
                 recording_indicator: str = "recording"
                 workspaces_style: str = "numbers"
 
-                class Locations(OptionsGroup):
-                    launcher: int = 0
-                    window_info: int = 0
-                    media: int = 0
-                    workspaces: int = 1
-                    tasks: int = 1
-                    recording_indicator: int = 2
-                    systeminfotray: int = 2
-                    clock: int = 2
+            location = Locations()
+            visibility = Visibility()
+            bar_id = BarID()
+            options = ModuleOptions()
 
-                class Visibility(OptionsGroup):
-                    window_info: bool = True
-                    media: bool = True
-                    workspaces: bool = True
-                    recording_indicator: bool = True
-                    systeminfotray: bool = True
-                    clock: bool = True
-                    tasks: bool = False
-                    launcher: bool = True
-
-                class BarID(OptionsGroup):
-                    launcher: int = 0
-                    window_info: int = 0
-                    media: int = 0
-                    workspaces: int = 0
-                    tasks: int = 0
-                    recording_indicator: int = 0
-                    systeminfotray: int = 0
-                    clock: int = 1
-
-                location = Locations()
-                visibility = Visibility()
-                bar_id = BarID()
-
-            modules = Modules()
+        class Bar(OptionsGroup):
+            side: str = "bottom"
+            vertical: bool = False
+            density: int = 0
+            floating: bool = False
+            separation: bool = False
+            centered: bool = False
 
         class Bar2(OptionsGroup):
             enabled: bool = True
@@ -83,14 +82,6 @@ class UserSettings(OptionsManager):
             floating: bool = False
             separation: bool = False
             centered: bool = False
-
-        class Dock(OptionsGroup):
-            enabled: bool = False
-            side: str = "bottom"
-            vertical: bool = False
-            floating: bool = True
-            centered: bool = True
-            size: int = 24
 
         class Notifications(OptionsGroup):
             anchor: list = ["top", "right"]
@@ -102,9 +93,9 @@ class UserSettings(OptionsManager):
             shell_corners: bool = True
             screen_corners: bool = True
 
+        modules = Modules()
         bar = Bar()
         bar2 = Bar2()
-        dock = Dock()
         notifications = Notifications()
         launcher = Launcher()
         misc = Misc()

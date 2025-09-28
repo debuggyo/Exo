@@ -4,6 +4,7 @@ from ignis.services.upower import UPowerService
 from gi.repository import Gtk
 from user_settings import user_settings
 
+
 class Battery:
     def __init__(self):
         self.upowerservice = UPowerService.get_default()
@@ -14,7 +15,9 @@ class Battery:
         self.battery_status = widgets.Label(css_classes=["battery-status"])
         self.battery_fill = widgets.Box(css_classes=["battery-fill"])
 
-        self.text_container = widgets.Box(spacing=2, halign="center", valign="center", homogeneous=False)
+        self.text_container = widgets.Box(
+            spacing=2, halign="center", valign="center", homogeneous=False
+        )
         self.text_container.append(self.battery_status)
         self.text_container.append(self.battery_percent)
 
@@ -23,7 +26,7 @@ class Battery:
             overlays=[self.text_container],
             css_classes=["battery-box"],
             halign="center",
-            valign="center"
+            valign="center",
         )
         self.battery_box.set_overflow(Gtk.Overflow.HIDDEN)
 
@@ -56,7 +59,12 @@ class Battery:
             self._update_ui()
 
     def update_layout(self):
-        is_vertical = user_settings.interface.bar.vertical
+        bar = (
+            user_settings.interface.bar
+            if user_settings.interface.modules.bar_id.systeminfotray == 0
+            else user_settings.interface.bar2
+        )
+        is_vertical = bar.vertical
         self.container.set_vertical(is_vertical)
         self.text_container.set_vertical(is_vertical)
 

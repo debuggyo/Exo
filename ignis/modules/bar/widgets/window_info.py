@@ -3,28 +3,39 @@ from ignis.services.niri import NiriService
 from ignis.services.hyprland import HyprlandService
 from user_settings import user_settings
 
+
 class WindowInfo:
     def __init__(self):
         self.niri = NiriService.get_default()
         self.hyprland = HyprlandService.get_default()
 
         self.icon = widgets.Icon(pixel_size=16)
-        self.title_label = widgets.Label(css_classes=["title"], halign="start", ellipsize="end", max_width_chars=52, hexpand=True)
-        self.appid_label = widgets.Label(css_classes=["app_id"], halign="start", ellipsize="end", hexpand=True)
+        self.title_label = widgets.Label(
+            css_classes=["title"],
+            halign="start",
+            ellipsize="end",
+            max_width_chars=52,
+            hexpand=True,
+        )
+        self.appid_label = widgets.Label(
+            css_classes=["app_id"], halign="start", ellipsize="end", hexpand=True
+        )
         self.title = None
         self.app_id = None
 
-        self.label_box = widgets.Box(vertical=True, valign="center", hexpand=True, child=[self.title_label, self.appid_label])
+        self.label_box = widgets.Box(
+            vertical=True,
+            valign="center",
+            hexpand=True,
+            child=[self.title_label, self.appid_label],
+        )
 
         self.main_box = widgets.Box(
             vertical=False,
             spacing=8,
             vexpand=True,
             css_classes=["winfo"],
-            child=[
-                self.icon,
-                self.label_box
-            ]
+            child=[self.icon, self.label_box],
         )
 
         self.update_layout()
@@ -54,8 +65,13 @@ class WindowInfo:
         self.icon.set_visible(True)
 
     def update_layout(self):
-        is_vertical = user_settings.interface.bar.vertical
-        is_centered = user_settings.interface.bar.centered
+        bar = (
+            user_settings.interface.bar
+            if user_settings.interface.modules.bar_id.window_info == 0
+            else user_settings.interface.bar2
+        )
+        is_vertical = bar.vertical
+        is_centered = bar.centered
 
         if is_vertical:
             self.main_box.set_halign("fill")
@@ -81,11 +97,11 @@ class WindowInfo:
                 self.main_box.set_width_request(-1)
                 self.main_box.set_hexpand(True)
 
-            if user_settings.interface.bar.density == 0:
+            if bar.density == 0:
                 self.title_label.set_visible(True)
                 self.appid_label.set_visible(True)
                 self.main_box.set_tooltip_text(None)
-            elif user_settings.interface.bar.density >= 1:
+            elif bar.density >= 1:
                 self.title_label.set_visible(True)
                 self.appid_label.set_visible(False)
                 self.main_box.set_tooltip_text(self.app_id)

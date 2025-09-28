@@ -71,7 +71,12 @@ class Tray(widgets.Box):
             )
 
     def update_layout(self):
-        is_vertical = user_settings.interface.bar.vertical
+        bar = (
+            user_settings.interface.bar
+            if user_settings.interface.modules.bar_id.systeminfotray == 0
+            else user_settings.interface.bar2
+        )
+        is_vertical = bar.vertical
 
         self.container.set_vertical(is_vertical)
 
@@ -171,7 +176,12 @@ class SystemInfoTray:
         self.audio_service.speaker.volume = new_volume
 
     def update_layout(self):
-        is_vertical = user_settings.interface.bar.vertical
+        bar = (
+            user_settings.interface.bar
+            if user_settings.interface.modules.bar_id.systeminfotray == 0
+            else user_settings.interface.bar2
+        )
+        is_vertical = bar.vertical
         button_content = self.button.get_child()
 
         if is_vertical:

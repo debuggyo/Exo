@@ -459,6 +459,76 @@
     padding: 0px 10px;
 }
 
+.tasks {
+    padding: 0px 5px;
+    .app-button {
+        padding: 3px 6px;
+        border-radius: 50rem;
+        background-color: transparent;
+        color: colors.$on_surface;
+        transition: 200ms cubic-bezier(0.19, 1, 0.22, 1);
+
+        &.open-app {
+            /* background-color: colors.$surface_container; */
+        }
+
+        .app-indicator {
+            background-color: colors.$on_surface;
+            border-radius: 50rem;
+            transition: 200ms cubic-bezier(0.19, 1, 0.22, 1);
+            transition-property: padding;
+
+            &.top {
+                margin-top: -5px;
+                margin-bottom: 8px;
+                min-width: 5px;
+                min-height: 2px;
+            }
+            &.bottom {
+                margin-top: 8px;
+                margin-bottom: -5px;
+                min-width: 5px;
+                min-height: 2px;
+            }
+            &.left {
+                margin-left: -5px;
+                margin-right: 8px;
+                min-height: 5px;
+                min-width: 2px;
+            }
+            &.right {
+                margin-right: -5px;
+                margin-left: 8px;
+                min-height: 5px;
+                min-width: 2px;
+            }
+        }
+
+        &:hover {
+            background-color: colors.$surface_container_highest;
+        }
+
+        &.active-app {
+            /* background-color: colors.$secondary_container; */
+            .app-indicator {
+                background-color: colors.$secondary;
+                &.top,
+                &.bottom {
+                    padding: 0px 8px;
+                }
+                &.left,
+                &.right {
+                    padding: 8px 0px;
+                }
+            }
+        }
+
+        .icon {
+            background-color: transparent;
+        }
+    }
+}
+
 // Vertical Bar
 .vertical {
     .left-widgets,
@@ -549,6 +619,13 @@
 
     .launcher-button {
         padding: 5px 0px;
+    }
+
+    .tasks {
+        padding: 5px 0px;
+        .app-button {
+            padding: 3px 0px;
+        }
     }
 
     &.separated {

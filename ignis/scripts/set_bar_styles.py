@@ -16,6 +16,18 @@ class BarStyles:
     bar_instance = None
     _rounded_corners_row = None
 
+    @staticmethod
+    def _get_bar_settings(bar_id: int):
+        if bar_id == 0:
+            return user_settings.interface.bar
+        elif bar_id == 1:
+            return user_settings.interface.bar2
+        return user_settings.interface.bar
+
+    @staticmethod
+    def _get_misc_settings():
+        return user_settings.interface.misc
+
     @classmethod
     def set_bar_instance(cls, bar):
         cls.bar_instance = bar
@@ -25,16 +37,18 @@ class BarStyles:
         cls._rounded_corners_row = row_instance
 
     @staticmethod
-    def _apply_css(window):
+    def _apply_css(window, bar_id: int = 0):
         if not window:
             return
 
-        side = user_settings.interface.bar.side
-        vertical = user_settings.interface.bar.vertical
-        separation = user_settings.interface.bar.separation
-        floating = user_settings.interface.bar.floating
-        centered = user_settings.interface.bar.centered
-        compact_mode = user_settings.interface.bar.density
+        bar_settings = BarStyles._get_bar_settings(bar_id)
+
+        side = bar_settings.side
+        vertical = bar_settings.vertical
+        separation = bar_settings.separation
+        floating = bar_settings.floating
+        centered = bar_settings.centered
+        compact_mode = bar_settings.density
 
         all_possible_classes = {
             "hug",
@@ -88,13 +102,13 @@ class BarStyles:
     @staticmethod
     def _update_all_layouts():
         if BarStyles.bar_instance:
-            BarStyles.bar_instance.window_info.update_layout()
+            BarStyles.bar_instance.update_layout()
+            BarStyles.bar_instance.clock.update_layout()
             BarStyles.bar_instance.media.update_layout()
-            BarStyles.bar_instance.workspaces.update_layout()
-            BarStyles.bar_instance.media.update_visibility()
             BarStyles.bar_instance.recording_indicator.update_layout()
             BarStyles.bar_instance.systeminfotray.update_layout()
-            BarStyles.bar_instance.clock.update_layout()
+            BarStyles.bar_instance.window_info.update_layout()
+            BarStyles.bar_instance.workspaces.update_layout()
 
     @staticmethod
     def _update_quick_center():
@@ -104,7 +118,9 @@ class BarStyles:
             quick_center_window.update_side()
 
     @staticmethod
-    def _compute_margins(side: str, floating: bool):
+    def _compute_margins(side: str, bar_id: int = 0):
+        bar_settings = BarStyles._get_bar_settings(bar_id)
+        floating = bar_settings.floating
         if not floating:
             return 0, 0, 0, 0
 
@@ -120,25 +136,26 @@ class BarStyles:
         return top, left, right, bottom
 
     @staticmethod
-    def setSide(side: str):
-        user_settings.interface.bar.set_side(side)
+    def setSide(side: str, bar_id: int = 0):
+        bar_settings = BarStyles._get_bar_settings(bar_id)
+        bar_settings.set_side(side)
         vertical = side in ("left", "right")
-        user_settings.interface.bar.set_vertical(vertical)
+        bar_settings.set_vertical(vertical)
 
         bar = BarStyles.bar_instance
-        if not bar or not bar.get_window():
+        if not bar or not bar.get_window(bar_id):
             return
 
-        win = bar.get_window()
+        win = bar.get_window(bar_id)
 
-        floating = user_settings.interface.bar.floating
+        floating = bar_settings.floating
         win.margin_top, win.margin_left, win.margin_right, win.margin_bottom = (
-            BarStyles._compute_margins(side, floating)
+            BarStyles._compute_margins(side, bar_id)
         )
 
         width = 40
         height = 40
-        compact_mode = user_settings.interface.bar.density
+        compact_mode = bar_settings.density
         if compact_mode == 1:
             width = 35
             height = 35
@@ -152,7 +169,7 @@ class BarStyles:
         win.set_width_request(width if vertical else -1)
         win.set_height_request(height if not vertical else -1)
 
-        centered = user_settings.interface.bar.centered
+        centered = bar_settings.centered
         anchors = (
             [side]
             if centered
@@ -214,16 +231,17 @@ class BarStyles:
         BarStyles._update_all_layouts()
         rebuild_corners()
 
-        BarStyles._apply_css(win)
+        BarStyles._apply_css(win, bar_id)
 
         BarStyles._update_quick_center()
 
     @staticmethod
-    def setCompact(mode: int):
-        user_settings.interface.bar.set_density(mode)
+    def setCompact(mode: int, bar_id: int = 0):
+        bar_settings = BarStyles._get_bar_settings(bar_id)
+        bar_settings.set_density(mode)
         if BarStyles.bar_instance:
-            win = BarStyles.bar_instance.get_window()
-            BarStyles._apply_css(win)
+            win = BarStyles.bar_instance.get_window(bar_id)
+            BarStyles._apply_css(win, bar_id)
 
             height = 40
             width = 40
@@ -238,7 +256,7 @@ class BarStyles:
                 width = 25
 
             if win:
-                if user_settings.interface.bar.vertical:
+                if bar_settings.vertical:
                     win.set_width_request(width)
                 else:
                     win.set_height_request(height)
@@ -247,80 +265,86 @@ class BarStyles:
         BarStyles._update_all_layouts()
 
     @staticmethod
-    def setMediaWidget(enabled: bool):
-        user_settings.interface.bar.modules.set_media_widget(enabled)
-        if BarStyles.bar_instance:
-            BarStyles.bar_instance.media.update_visibility()
+    def setRecordingIndicator(mode: str, bar_id: int = 0):
+        user_settings.interface.modules.options.set_recording_indicator(mode)
 
     @staticmethod
-    def setRecordingIndicator(mode: str):
-        user_settings.interface.bar.modules.set_recording_indicator(mode)
-        if BarStyles.bar_instance and BarStyles.bar_instance.recording_indicator:
-            BarStyles.bar_instance.recording_indicator.update_visibility()
-
-    @staticmethod
-    def setWorkspacesStyle(style: str):
-        user_settings.interface.bar.modules.set_workspaces_style(style)
+    def setWorkspacesStyle(style: str, bar_id: int = 0):
+        user_settings.interface.modules.options.set_workspaces_style(style)
         if BarStyles.bar_instance and BarStyles.bar_instance.workspaces:
             BarStyles.bar_instance.workspaces.update_workspaces()
             BarStyles.bar_instance.workspaces.update_layout()
 
     @staticmethod
-    def setSeparation(enabled: bool):
-        user_settings.interface.bar.set_separation(enabled)
+    def setSeparation(enabled: bool, bar_id: int = 0):
+        BarStyles._get_bar_settings(bar_id).set_separation(enabled)
         if BarStyles.bar_instance:
-            BarStyles._apply_css(BarStyles.bar_instance.get_window())
+            BarStyles._apply_css(BarStyles.bar_instance.get_window(bar_id), bar_id)
 
     @staticmethod
-    def setFloating(enabled: bool):
-        user_settings.interface.bar.set_floating(enabled)
+    def setFloating(enabled: bool, bar_id: int = 0):
+        bar_settings = BarStyles._get_bar_settings(bar_id)
+        bar_settings.set_floating(enabled)
         if BarStyles.bar_instance:
-            BarStyles._apply_css(BarStyles.bar_instance.get_window())
-        BarStyles.setSide(user_settings.interface.bar.side)
+            BarStyles._apply_css(BarStyles.bar_instance.get_window(bar_id), bar_id)
+        BarStyles.setSide(bar_settings.side, bar_id)
         rebuild_corners()
         BarStyles._update_all_layouts()
 
     @staticmethod
     def setShellCorners(enabled: bool):
-        user_settings.interface.misc.set_shell_corners(enabled)
+        # shell_corners is a global setting, so bar_id is not relevant here.
+        BarStyles._get_misc_settings().set_shell_corners(enabled)
         rebuild_corners()
+
+    @staticmethod
+    def setBarCenter(enabled: bool, bar_id: int = 0):
+        # setBarCenter should control if the specific bar is centered.
+        bar_settings = BarStyles._get_bar_settings(bar_id)
+        bar_settings.set_centered(enabled)
+        # Re-apply side settings to update anchors based on the new centered state.
+        BarStyles.setSide(bar_settings.side, bar_id)
+        rebuild_corners()
+        if BarStyles.bar_instance:
+            BarStyles._apply_css(BarStyles.bar_instance.get_window(bar_id), bar_id)
 
     @staticmethod
     def setScreenCorners(enabled: bool):
-        user_settings.interface.misc.set_screen_corners(enabled)
+        # screen_corners is a global setting, so bar_id is not relevant here.
+        misc_settings = BarStyles._get_misc_settings()
+        misc_settings.set_screen_corners(enabled)
         rebuild_corners()
-
-    @staticmethod
-    def setBarCenter(enabled: bool):
-        user_settings.interface.bar.set_centered(enabled)
-        BarStyles.setSide(user_settings.interface.bar.side)
-        rebuild_corners()
-        if BarStyles.bar_instance:
-            BarStyles._apply_css(BarStyles.bar_instance.get_window())
+        # No bar-specific CSS application is needed here, as it's a global screen setting.
 
     @staticmethod
     def setMilitaryTime(enabled: bool):
-        user_settings.interface.bar.modules.set_military_time(enabled)
+        user_settings.interface.modules.options.set_military_time(enabled)
         BarStyles._update_all_layouts()
 
     @staticmethod
     def setDateVisibility(enabled: bool):
-        user_settings.interface.bar.modules.set_show_date(enabled)
+        user_settings.interface.modules.options.set_show_date(enabled)
         BarStyles._update_all_layouts()
 
     @staticmethod
     def setDayMonthSwapped(enabled: bool):
-        user_settings.interface.bar.modules.set_day_month_swapped(enabled)
+        user_settings.interface.modules.options.set_day_month_swapped(enabled)
         BarStyles._update_all_layouts()
 
     @staticmethod
     def setWidgetLocation(widget: str, location: int):
-        getattr(user_settings.interface.bar.modules.location, f"set_{widget}")(location)
+        getattr(user_settings.interface.modules.location, f"set_{widget}")(location)
         BarStyles.bar_instance.update_layout()
+        BarStyles._update_all_layouts()
 
     @staticmethod
     def setWidgetVisibility(widget: str, visibility: bool):
-        getattr(user_settings.interface.bar.modules.visibility, f"set_{widget}")(
-            visibility
-        )
+        getattr(user_settings.interface.modules.visibility, f"set_{widget}")(visibility)
         BarStyles.bar_instance.update_layout()
+        BarStyles._update_all_layouts()
+
+    @staticmethod
+    def setWidgetBarID(widget: str, bar_id: int = 0):
+        getattr(user_settings.interface.modules.bar_id, f"set_{widget}")(bar_id)
+        BarStyles.bar_instance.update_layout()
+        BarStyles._update_all_layouts()

@@ -12,7 +12,9 @@ class CategoryLabel(widgets.Label):
         )
 
 
-def make_toggle_buttons(items, get_value, set_value, on_any_click=None, widget=None):
+def make_toggle_buttons(
+    items, get_value, set_value, on_any_click=None, widget=None, bar_id=None
+):
     buttons = []
 
     def update_active():
@@ -39,8 +41,10 @@ def make_toggle_buttons(items, get_value, set_value, on_any_click=None, widget=N
             label, value = item
             icon = None
 
-        def click_handler(_, v=value, w=widget, btn=None):
-            if widget:
+        def click_handler(_, v=value, btn=None):
+            if bar_id:
+                set_value(v, bar_id)
+            elif widget:
                 set_value(widget, v)
             else:
                 set_value(v)

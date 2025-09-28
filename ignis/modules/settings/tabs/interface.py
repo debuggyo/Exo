@@ -60,25 +60,6 @@ class BarCategory(widgets.Box):
         )
 
         self.append(
-            SettingsRow(
-                title="Workspace Indicator Style",
-                description="Pick between 3 different Workspace Indicator styles.",
-                child=[
-                    make_toggle_buttons(
-                        [
-                            ("Icons", "windows", "photo"),
-                            ("Numbers", "numbers", "counter_1"),
-                            ("Dots", "dots", "more_horiz"),
-                        ],
-                        lambda: user_settings.interface.bar.modules.workspaces_style,
-                        BarStyles.setWorkspacesStyle,
-                        on_any_click=None,
-                    )
-                ],
-            )
-        )
-
-        self.append(
             SwitchRow(
                 label="Floating Bar",
                 description="Make the bar float away from the edges of the screen.",
@@ -102,6 +83,92 @@ class BarCategory(widgets.Box):
                 description="Make the bar span the full width of the screen.",
                 active=(not user_settings.interface.bar.centered),
                 on_change=lambda x, active: BarStyles.setBarCenter(not active),
+            )
+        )
+
+
+class Bar2Category(widgets.Box):
+    def __init__(self):
+        super().__init__(
+            css_classes=["settings-category"],
+            vertical=True,
+            spacing=5,
+        )
+
+        self.append(CategoryLabel("Second Bar"))
+
+        self.append(
+            SettingsRow(
+                description="The second bar will be automatically enabled if any modules are located in it.\nIt will automatically be disabled if there are no modules located in it.\nNote: If any disabled modules are located in the second bar, it will still be enabled.",
+            )
+        )
+
+        self.append(
+            SettingsRow(
+                title="Position",
+                description="Pick a side for the bar to be located.",
+                child=[
+                    make_toggle_buttons(
+                        [
+                            ("Top", "top", "align_vertical_top"),
+                            ("Bottom", "bottom", "align_vertical_bottom"),
+                            ("Left", "left", "align_horizontal_left"),
+                            ("Right", "right", "align_horizontal_right"),
+                        ],
+                        lambda: user_settings.interface.bar2.side,
+                        BarStyles.setSide,
+                        on_any_click=None,
+                        bar_id=1,
+                    )
+                ],
+            )
+        )
+
+        self.append(
+            SettingsRow(
+                title="Density",
+                description="Pick between 4 different density options.",
+                child=[
+                    make_toggle_buttons(
+                        [
+                            ("Cozy", 0, "density_large"),
+                            ("Comfortable", 1, "density_medium"),
+                            ("Compact", 2, "density_small"),
+                            ("Condensed", 3, "list"),
+                        ],
+                        lambda: user_settings.interface.bar2.density,
+                        BarStyles.setCompact,
+                        on_any_click=None,
+                        bar_id=1,
+                    )
+                ],
+            )
+        )
+
+        self.append(
+            SwitchRow(
+                label="Floating Bar",
+                description="Make the bar float away from the edges of the screen.",
+                active=user_settings.interface.bar2.floating,
+                on_change=lambda x, active: BarStyles.setFloating(active, 1),
+            )
+        )
+
+        self.append(
+            SwitchRow(
+                label="Separated Islands",
+                description="Seperate the bar into 3 separate 'islands'.",
+                active=user_settings.interface.bar2.separation,
+                on_change=lambda x, active: BarStyles.setSeparation(active, 1),
+            )
+        )
+
+        self.append(
+            SwitchRow(
+                label="Extend to Edges",
+                description="Make the bar span the full width of the screen.",
+                active=(not user_settings.interface.bar2.centered),
+                on_change=lambda x, active: BarStyles.setBarCenter(not active, 1),
             )
         )
 
@@ -170,12 +237,31 @@ class BarModuleSettings(SettingsRow):
                     child=[
                         make_toggle_buttons(
                             [
+                                (None, 0, "timer_1"),
+                                (None, 1, "timer_2"),
+                            ],
+                            lambda: getattr(
+                                user_settings.interface.modules.bar_id,
+                                self._widget_name,
+                            ),
+                            self._set_widget_bar_id,
+                            on_any_click=None,
+                            widget=self._widget_name,
+                        ),
+                    ],
+                ),
+                widgets.Separator(),
+                widgets.Box(
+                    vertical=False,
+                    child=[
+                        make_toggle_buttons(
+                            [
                                 ("Start", 0),
                                 ("Center", 1),
                                 ("End", 2),
                             ],
                             lambda: getattr(
-                                user_settings.interface.bar.modules.location,
+                                user_settings.interface.modules.location,
                                 self._widget_name,
                             ),
                             self._set_widget_location,
@@ -187,7 +273,7 @@ class BarModuleSettings(SettingsRow):
                 widgets.Separator(),
                 widgets.Switch(
                     active=getattr(
-                        user_settings.interface.bar.modules.visibility,
+                        user_settings.interface.modules.visibility,
                         self._widget_name,
                     ),
                     on_change=self._set_widget_visibility,
@@ -200,6 +286,9 @@ class BarModuleSettings(SettingsRow):
 
     def _set_widget_visibility(self, _, active: bool):
         BarStyles.setWidgetVisibility(self._widget_name, active)
+
+    def _set_widget_bar_id(self, _, value):
+        BarStyles.setWidgetBarID(self._widget_name, value)
 
 
 class BarModulesCategory(widgets.Box):
@@ -265,10 +354,9 @@ class BarModulesCategory(widgets.Box):
 
 
 class ExtraBarCategory(widgets.Box):
-    media_widget = user_settings.interface.bar.modules.media_widget
-    military_time = user_settings.interface.bar.modules.military_time
-    show_date = user_settings.interface.bar.modules.show_date
-    day_month_swapped = user_settings.interface.bar.modules.day_month_swapped
+    military_time = user_settings.interface.modules.options.military_time
+    show_date = user_settings.interface.modules.options.show_date
+    day_month_swapped = user_settings.interface.modules.options.day_month_swapped
 
     def __init__(self):
         super().__init__(
@@ -277,6 +365,22 @@ class ExtraBarCategory(widgets.Box):
             spacing=5,
             child=[
                 CategoryLabel("Extra Module Options"),
+                SettingsRow(
+                    title="Workspace Indicator Style",
+                    description="Pick between 3 different Workspace Indicator styles.",
+                    child=[
+                        make_toggle_buttons(
+                            [
+                                ("Icons", "windows", "photo"),
+                                ("Numbers", "numbers", "counter_1"),
+                                ("Dots", "dots", "more_horiz"),
+                            ],
+                            lambda: user_settings.interface.modules.options.workspaces_style,
+                            BarStyles.setWorkspacesStyle,
+                            on_any_click=None,
+                        )
+                    ],
+                ),
                 SwitchRow(
                     label="Use 24 hour time",
                     description="Toggle between 12-hour (AM/PM) and 24-hour time formats.",
@@ -304,7 +408,7 @@ class ExtraBarCategory(widgets.Box):
                                 ("Always", "always", "visibility"),
                                 ("When Recording", "recording", "screen_record"),
                             ],
-                            lambda: user_settings.interface.bar.modules.recording_indicator,
+                            lambda: user_settings.interface.modules.options.recording_indicator,
                             BarStyles.setRecordingIndicator,
                             on_any_click=None,
                         ),
@@ -316,8 +420,6 @@ class ExtraBarCategory(widgets.Box):
 
 class MiscCategory(widgets.Box):
     screen_corners = user_settings.interface.misc.screen_corners
-    media_widget = user_settings.interface.bar.modules.media_widget
-    military_time = user_settings.interface.bar.modules.military_time
 
     def __init__(self):
         super().__init__(
@@ -353,6 +455,7 @@ class InterfaceTab(widgets.Box):
             width_request=800,
         )
         self.append(BarCategory())
+        self.append(Bar2Category())
         self.append(BarModulesCategory())
         self.append(ExtraBarCategory())
         self.append(NotificationsCategory())

@@ -5,7 +5,6 @@ from user_settings import user_settings
 
 class Clock:
     def __init__(self):
-        self.settings = user_settings.interface.bar.modules
         self.container = widgets.Box(css_classes=["clock"], hexpand=True, vexpand=True)
         self.time_label = widgets.Label(css_classes=["time"], justify="center")
         self.separator = widgets.Label(
@@ -35,9 +34,15 @@ class Clock:
 
     def update_labels(self):
         now = datetime.datetime.now()
-        is_vertical = user_settings.interface.bar.vertical
-        day_month_swapped = user_settings.interface.bar.modules.day_month_swapped
-        military_time = user_settings.interface.bar.modules.military_time
+        settings = user_settings.interface.modules.options
+        bar = (
+            user_settings.interface.bar
+            if user_settings.interface.modules.bar_id.clock == 0
+            else user_settings.interface.bar2
+        )
+        is_vertical = bar.vertical
+        day_month_swapped = settings.day_month_swapped
+        military_time = settings.military_time
 
         if is_vertical:
             time_format = "%H%n%M" if military_time else "%I%n%M"
@@ -53,9 +58,19 @@ class Clock:
         self.month_label.set_label(now.strftime(month_format))
 
     def update_layout(self):
-        is_vertical = user_settings.interface.bar.vertical
-        compact_mode = user_settings.interface.bar.density
-        date_visible = user_settings.interface.bar.modules.show_date
+        settings = user_settings.interface.modules.options
+        bar = (
+            user_settings.interface.bar
+            if user_settings.interface.modules.bar_id.clock == 0
+            else user_settings.interface.bar2
+        )
+        is_vertical = (
+            user_settings.interface.bar.vertical
+            if user_settings.interface.modules.bar_id.clock == 0
+            else user_settings.interface.bar2.vertical
+        )
+        compact_mode = bar.density
+        date_visible = settings.show_date
 
         self.container.set_halign("fill")
         self.container.set_valign("fill")

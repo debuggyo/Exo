@@ -12,6 +12,7 @@ elif HyprlandService.get_default().is_available:
 
 APPLICATIONS = ApplicationsService.get_default()
 
+
 def get_active_workspace():
     if not SERVICE:
         return None
@@ -24,9 +25,15 @@ def get_active_workspace():
         return SERVICE.active_workspace
     return None
 
+
 class WorkspaceButton(widgets.Button):
     def __init__(self, workspace) -> None:
-        style = user_settings.interface.bar.modules.workspaces_style
+        bar = (
+            user_settings.interface.bar
+            if user_settings.interface.modules.bar_id.workspaces == 0
+            else user_settings.interface.bar2
+        )
+        style = user_settings.interface.modules.options.workspaces_style
 
         if isinstance(workspace, NiriWorkspace):
             label_text = str(workspace.idx)
@@ -44,10 +51,7 @@ class WorkspaceButton(widgets.Button):
             children.append(self._icons_box)
 
         self._main_content_box = widgets.Box(
-            halign="center",
-            valign="center",
-            spacing=4,
-            child=children
+            halign="center", valign="center", spacing=4, child=children
         )
 
         super().__init__(
@@ -111,18 +115,19 @@ class WorkspaceButton(widgets.Button):
             if not icon_name:
                 icon_name = "application-x-executable-symbolic"
 
-            icon_widget = widgets.Icon(
-                icon_name=icon_name,
-                pixel_size=16
-            )
+            icon_widget = widgets.Icon(icon_name=icon_name, pixel_size=16)
             self._icons_box.append(icon_widget)
 
         self._main_content_box.queue_resize()
 
-
     def update_layout(self):
-        vertical = user_settings.interface.bar.vertical
-        style = user_settings.interface.bar.modules.workspaces_style
+        bar = (
+            user_settings.interface.bar
+            if user_settings.interface.modules.bar_id.workspaces == 0
+            else user_settings.interface.bar2
+        )
+        vertical = bar.vertical
+        style = user_settings.interface.modules.options.workspaces_style
 
         if self._icons_box:
             self._icons_box.set_vertical(vertical)
@@ -144,6 +149,7 @@ class WorkspaceButton(widgets.Button):
 
         if style == "dots":
             self._main_content_box.set_spacing(0)
+
 
 class Workspaces(widgets.EventBox):
     def __init__(self):
@@ -168,7 +174,12 @@ class Workspaces(widgets.EventBox):
         self.update_layout()
 
     def update_workspaces(self, *args):
-        style = user_settings.interface.bar.modules.workspaces_style
+        bar = (
+            user_settings.interface.bar
+            if user_settings.interface.modules.bar_id.workspaces == 0
+            else user_settings.interface.bar2
+        )
+        style = user_settings.interface.modules.options.workspaces_style
 
         self._workspace_box.remove_css_class("dots")
         self._workspace_box.remove_css_class("windows")
@@ -195,10 +206,13 @@ class Workspaces(widgets.EventBox):
             pass
 
     def update_layout(self):
-        vertical = user_settings.interface.bar.vertical
-
-        style = user_settings.interface.bar.modules.workspaces_style
-
+        bar = (
+            user_settings.interface.bar
+            if user_settings.interface.modules.bar_id.workspaces == 0
+            else user_settings.interface.bar2
+        )
+        vertical = bar.vertical
+        style = user_settings.interface.modules.options.workspaces_style
 
         if style == "windows":
             spacing = 2
@@ -220,8 +234,7 @@ class Workspaces(widgets.EventBox):
 
         if isinstance(SERVICE, NiriService):
             active_workspace_niri = next(
-                (ws for ws in SERVICE.workspaces if ws.is_active),
-                None
+                (ws for ws in SERVICE.workspaces if ws.is_active), None
             )
             if active_workspace_niri:
                 active_workspace_id = active_workspace_niri.idx
@@ -240,7 +253,6 @@ class Workspaces(widgets.EventBox):
         if active_workspace_id is not None:
             new_workspace_id = active_workspace_id + difference
             SERVICE.switch_to_workspace(new_workspace_id)
-
 
     def widget(self):
         return self

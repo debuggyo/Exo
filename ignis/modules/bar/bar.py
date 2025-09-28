@@ -22,7 +22,7 @@ window_manager = WindowManager.get_default()
 class Bar:
     def __init__(self, monitor: int = 0):
         self.monitor = monitor
-        self.__win = None
+        self.__wins = {}
         self.media = Media()
         self.window_info = WindowInfo()
         self.workspaces = Workspaces()
@@ -32,6 +32,13 @@ class Bar:
         self.tasks = Tasks()
         self.launcher = Launcher()
         set_indicator(self.recording_indicator)
+
+        self.left_widgets = None
+        self.center_widgets = None
+        self.right_widgets = None
+        self.left_widgets2 = None
+        self.center_widgets2 = None
+        self.right_widgets2 = None
 
         self.media_widget = self.media.widget()
         self.window_info_widget = self.window_info.widget()
@@ -88,9 +95,7 @@ class Bar:
             css_classes=["right-widgets"],
         )
 
-        self.update_layout()
-
-        self.__win = widgets.Window(
+        self.__wins[0] = widgets.Window(
             namespace="Bar",
             monitor=self.monitor,
             anchor=anchors,
@@ -106,16 +111,89 @@ class Bar:
             ),
         )
 
-        BarStyles.setFloating(user_settings.interface.bar.floating)
+        return self.__wins[0]
 
-        return self.__win
+    def build2(self):
+        side = user_settings.interface.bar2.side
+        vertical = user_settings.interface.bar2.vertical
+        compact_mode = user_settings.interface.bar2.density
+
+        height = 40
+        width = 40
+        if compact_mode == 1:
+            height = 35
+            width = 35
+        elif compact_mode == 2:
+            height = 30
+            width = 30
+        elif compact_mode == 3:
+            height = 25
+            width = 25
+
+        anchors = (
+            [side]
+            if user_settings.interface.bar2.centered
+            else (["top", "bottom", side] if vertical else ["left", "right", side])
+        )
+
+        if vertical:
+            size_request = {"width_request": width}
+        else:
+            size_request = {"height_request": height}
+
+        self.left_widgets2 = widgets.Box(
+            vertical=vertical,
+            spacing=2,
+            css_classes=["left-widgets"],
+        )
+
+        self.center_widgets2 = widgets.Box(
+            vertical=vertical,
+            spacing=2,
+            css_classes=["center-widgets"],
+        )
+
+        self.right_widgets2 = widgets.Box(
+            vertical=vertical,
+            spacing=2,
+            css_classes=["right-widgets"],
+        )
+
+        self.__wins[1] = widgets.Window(
+            namespace="Bar2",
+            monitor=self.monitor,
+            anchor=anchors,
+            css_classes=["bar"],
+            exclusivity="exclusive",
+            visible=user_settings.interface.bar2.enabled,
+            **size_request,
+            child=widgets.CenterBox(
+                vertical=vertical,
+                css_classes=["bar-widgets"],
+                start_widget=self.left_widgets2,
+                center_widget=self.center_widgets2,
+                end_widget=self.right_widgets2,
+            ),
+        )
+
+        self.update_layout()
+
+        return self.__wins[1]
 
     def update_layout(self):
-        self.left_widgets.set_child([])
-        self.center_widgets.set_child([])
-        self.right_widgets.set_child([])
-        location_setting = user_settings.interface.bar.modules.location
-        visibility_setting = user_settings.interface.bar.modules.visibility
+        for area in [
+            self.left_widgets,
+            self.center_widgets,
+            self.right_widgets,
+            self.left_widgets2,
+            self.center_widgets2,
+            self.right_widgets2,
+        ]:
+            area.set_child([])
+
+        location_setting = user_settings.interface.modules.location
+        visibility_setting = user_settings.interface.modules.visibility
+        bar_id_setting = user_settings.interface.modules.bar_id
 
         widgets = {
             "launcher": {
@@ -152,25 +230,58 @@ class Bar:
             },
         }
 
-        def location(location):
-            if location == 0:
-                return self.left_widgets
-            elif location == 1:
-                return self.center_widgets
-            elif location == 2:
-                return self.right_widgets
+        def location(location, bar_id):
+            if bar_id == 0:
+                if location == 0:
+                    return self.left_widgets
+                elif location == 1:
+                    return self.center_widgets
+                elif location == 2:
+                    return self.right_widgets
+                else:
+                    raise ValueError("Invalid location")
+            elif bar_id == 1:
+                if location == 0:
+                    return self.left_widgets2
+                elif location == 1:
+                    return self.center_widgets2
+                elif location == 2:
+                    return self.right_widgets2
+                else:
+                    raise ValueError("Invalid location")
             else:
-                raise ValueError("Invalid location")
+                raise ValueError("Invalid bar id")
 
         for widget in widgets.values():
-            location(getattr(location_setting, widget["name"])).append(widget["widget"])
+            a = getattr(location_setting, widget["name"])
+            b = getattr(bar_id_setting, widget["name"])
+
+            location(a, b).append(widget["widget"])
             widget["widget"].set_visible(getattr(visibility_setting, widget["name"]))
 
-        for area in [self.left_widgets, self.center_widgets, self.right_widgets]:
+        for area in [
+            self.left_widgets,
+            self.center_widgets,
+            self.right_widgets,
+            self.left_widgets2,
+            self.center_widgets2,
+            self.right_widgets2,
+        ]:
             if len(area.child) == 0:
                 area.add_css_class("empty")
             else:
                 area.remove_css_class("empty")
 
-    def get_window(self):
-        return self.__win
+        if (
+            len(self.left_widgets2.child) == 0
+            and len(self.center_widgets2.child) == 0
+            and len(self.right_widgets2.child) == 0
+        ):
+            user_settings.interface.bar2.set_enabled(False)
+            self.__wins[1].set_visible(False)
+        else:
+            user_settings.interface.bar2.set_enabled(True)
+            self.__wins[1].set_visible(True)
+
+    def get_window(self, bar_id: int):
+        return self.__wins.get(bar_id)
