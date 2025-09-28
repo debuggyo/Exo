@@ -1,6 +1,7 @@
 from ignis import widgets, utils
 from ignis.services.niri import NiriService
 from ignis.services.hyprland import HyprlandService
+from ignis.services.applications import ApplicationsService
 from user_settings import user_settings
 
 
@@ -8,6 +9,7 @@ class WindowInfo:
     def __init__(self):
         self.niri = NiriService.get_default()
         self.hyprland = HyprlandService.get_default()
+        self.applications = ApplicationsService.get_default()
 
         self.icon = widgets.Icon(pixel_size=16)
         self.title_label = widgets.Label(
@@ -41,6 +43,13 @@ class WindowInfo:
         self.update_layout()
         utils.Poll(100, lambda _: self.update())
 
+    def _is_same_app(self, id1: str, id2: str):
+        if not id1 or not id2:
+            return False
+        id1_lower = id1.lower()
+        id2_lower = id2.lower()
+        return id1_lower in id2_lower or id2_lower in id1_lower
+
     def update(self):
         FALLBACK_ICON = "application-x-executable-symbolic"
 
@@ -61,7 +70,18 @@ class WindowInfo:
         if icon_path:
             self.icon.set_image(icon_path)
         else:
-            self.icon.set_image(FALLBACK_ICON)
+            icon_path = FALLBACK_ICON
+            app_id = None
+            if self.niri.is_available:
+                app_id = self.niri.active_window.app_id
+            elif self.hyprland.is_available:
+                app_id = self.hyprland.active_window.class_name
+
+            if app_id:
+                for app in self.applications.apps:
+                    if self._is_same_app(app.id, app_id):
+                        icon_path = app.icon if app.icon else FALLBACK_ICON
+            self.icon.set_image(icon_path)
         self.icon.set_visible(True)
 
     def update_layout(self):

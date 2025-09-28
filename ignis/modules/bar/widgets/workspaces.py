@@ -86,6 +86,13 @@ class WorkspaceButton(widgets.Button):
             return SERVICE.get_windows_on_workspace(self.workspace.id)
         return []
 
+    def _is_same_app(self, id1: str, id2: str):
+        if not id1 or not id2:
+            return False
+        id1_lower = id1.lower()
+        id2_lower = id2.lower()
+        return id1_lower in id2_lower or id2_lower in id1_lower
+
     def _update_icons(self):
         if not self._icons_box:
             return
@@ -109,6 +116,18 @@ class WorkspaceButton(widgets.Button):
             icon_name = None
             if app_id:
                 icon_name = utils.get_app_icon_name(app_id)
+
+            if not icon_name:
+                app_id = None
+                if isinstance(SERVICE, NiriService):
+                    app_id = window.app_id
+                elif isinstance(SERVICE, HyprlandService):
+                    app_id = window.class_name
+
+                if app_id:
+                    for app in APPLICATIONS.apps:
+                        if self._is_same_app(app.id, app_id):
+                            icon_name = app.icon if app.icon else None
 
             if not icon_name:
                 icon_name = "application-x-executable-symbolic"
