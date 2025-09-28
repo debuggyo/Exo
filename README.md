@@ -129,23 +129,20 @@ If you don't use bar or screen corners, these don't matter and you can pick your
 I intend to make this automatic when I implement Niri/Hyprland configuration in the settings window.
 
 ## Screenshots/Videos
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/c60deecf-02e0-4288-a61d-de355cb12aba" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/c65f5bfb-c72d-4f36-bdef-b68613759f59" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/286a527a-bd9b-478b-bc1d-d852b7cdbf16" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/cccad6cd-8866-40b4-b90a-d36bde8d20c6" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/3a02e717-42de-4c5e-9aba-78d9840e5d5a" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/5e4b3080-8950-4e3c-9870-40439c58180c" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/8c12f006-3659-4c63-94c5-e262b854a22a" />
 
-<img width="1920" height="1080" alt="image"
-src="https://github.com/user-attachments/assets/8179e2f8-0eea-4a55-96f3-c4746fdca45c" />
-<img width="1920" height="1080" alt="image"
-src="https://github.com/user-attachments/assets/e54530fe-6d85-453b-a819-80f8ad8a2b45" />
-<img width="1920" height="1080" alt="image"
-src="https://github.com/user-attachments/assets/8a75f825-0b2e-40ed-842b-fe957e865b45" />
-<img width="1920" height="1080" alt="image"
-src="https://github.com/user-attachments/assets/3c95c7ae-eeb5-4fd2-b252-72f597b2cb9a" />
-<img width="1920" height="1080" alt="image"
-src="https://github.com/user-attachments/assets/765efbf1-e482-4a50-a994-8d091c6aacc1" />
-<img width="1920" height="1080" alt="image"
-src="https://github.com/user-attachments/assets/569bd446-dd8b-4cac-aa32-61df811adc68" />
 
 https://github.com/user-attachments/assets/c6b4ffcb-1be7-4a95-b03d-33bfe748756d
 
 https://github.com/user-attachments/assets/78e35d82-5fe9-4986-b545-80fc59bc4784
+
+
 
 ## Credits
 
