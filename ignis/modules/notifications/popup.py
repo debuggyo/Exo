@@ -6,6 +6,7 @@ from user_settings import user_settings
 
 notifications = NotificationService.get_default()
 
+
 class Popup(widgets.Box):
     def __init__(
         self, box: "PopupBox", window: "NotificationPopup", notification: Notification
@@ -20,9 +21,18 @@ class Popup(widgets.Box):
 
         widget = ExoNotification(notification)
         widget.css_classes = ["notification-popup"]
-        self._inner = widgets.Revealer(transition_type="crossfade", child=widget, hexpand=True, halign="fill")
-        self._outer = widgets.Revealer(transition_type=transition_type, child=self._inner, hexpand=True, halign="fill")
-        super().__init__(child=[self._outer], halign="fill", valign="fill", hexpand=True)
+        self._inner = widgets.Revealer(
+            transition_type="crossfade", child=widget, hexpand=True, halign="fill"
+        )
+        self._outer = widgets.Revealer(
+            transition_type=transition_type,
+            child=self._inner,
+            hexpand=True,
+            halign="fill",
+        )
+        super().__init__(
+            child=[self._outer], halign="fill", valign="fill", hexpand=True
+        )
 
         notification.connect("dismissed", lambda x: self.destroy())
 
@@ -58,7 +68,7 @@ class PopupBox(widgets.Box):
 
     def __on_notified(self, notification: Notification) -> None:
         self._window._update_window_properties()
-        
+
         self._window.visible = True
         popup = Popup(box=self, window=self._window, notification=notification)
         if user_settings.interface.bar.side == "top":
@@ -77,7 +87,7 @@ class NotificationPopup(widgets.Window):
             anchor=user_settings.interface.notifications.anchor,
             monitor=monitor,
             namespace=f"notification",
-            layer="top",
+            layer="overlay",
             child=PopupBox(window=self, monitor=monitor),
             visible=False,
             dynamic_input_region=True,
@@ -85,7 +95,7 @@ class NotificationPopup(widgets.Window):
             style="min-width: 29rem;",
         )
         self._update_window_properties()
-    
+
     def _update_window_properties(self):
         self.set_anchor(None)
         self.set_anchor(user_settings.interface.notifications.anchor)

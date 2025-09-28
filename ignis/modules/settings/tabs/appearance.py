@@ -18,7 +18,7 @@ class WallColorCategory(widgets.Box):
             vertical=True,
             spacing=5,
             child=[
-                CategoryLabel("Wallpaper & Colors"),
+                CategoryLabel("Appearance"),
             ],
         )
 
@@ -255,11 +255,21 @@ class WallColorCategory(widgets.Box):
         right_column.append(theme_selector_row)
         right_column.append(palette_selector_row)
 
-        top_section = widgets.Box(vertical=False, spacing=10)
+        top_section = widgets.Box(
+            vertical=False, spacing=10, valign="center", halign="center"
+        )
         top_section.append(wallpaper_overlay)
         top_section.append(right_column)
 
-        self.append(SettingsRow(child=[top_section]))
+        self.append(
+            SettingsRow(
+                title="Wallpaper & Colors",
+                description="Set your wallpaper and color scheme.",
+                vertical=True,
+                child=[top_section],
+                css_classes=["wallcolors-row"],
+            )
+        )
 
         self._update_palette_selection()
         self._update_theme_selection()
