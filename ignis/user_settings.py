@@ -45,14 +45,14 @@ class UserSettings(OptionsManager):
                 launcher: bool = True
 
             class BarID(OptionsGroup):
-                launcher: int = 1
+                launcher: int = 0
                 window_info: int = 0
                 media: int = 0
                 workspaces: int = 0
-                tasks: int = 1
+                tasks: int = 0
                 recording_indicator: int = 0
                 systeminfotray: int = 0
-                clock: int = 1
+                clock: int = 0
 
             class ModuleOptions(OptionsGroup):
                 show_date: bool = True
