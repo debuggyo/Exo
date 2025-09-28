@@ -21,6 +21,9 @@ class Corners:
             height_request=size,
             width_request=size,
             exclusivity=exclusivity,
+            dynamic_input_region=False,
+            input_width=0,
+            input_height=0,
             child=widgets.Corner(orientation="-".join(anchors)),
         )
         cls._windows.append(win)
