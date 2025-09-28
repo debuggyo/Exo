@@ -1,4 +1,4 @@
-from ignis import widgets
+from ignis import widgets, utils
 from ignis.services.niri import NiriService, NiriWorkspace, NiriWindow
 from ignis.services.hyprland import HyprlandService, HyprlandWindow
 from ignis.services.applications import ApplicationsService
@@ -108,9 +108,7 @@ class WorkspaceButton(widgets.Button):
 
             icon_name = None
             if app_id:
-                apps = APPLICATIONS.search(APPLICATIONS.apps, app_id)
-                if apps and apps[0].icon:
-                    icon_name = apps[0].icon
+                icon_name = utils.get_app_icon_name(app_id)
 
             if not icon_name:
                 icon_name = "application-x-executable-symbolic"
