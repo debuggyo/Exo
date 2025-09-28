@@ -1,5 +1,6 @@
 import gi
-gi.require_version('Gtk', '4.0')
+
+gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk
 from ignis.services.applications.application import Application
 from ignis import widgets
@@ -14,8 +15,15 @@ window_manager = WindowManager.get_default()
 
 GRID_COLUMNS = 5
 
+
 class AppItem(widgets.Button):
-    def __init__(self, application: Application, launcher_instance: 'Launcher', is_featured: bool = False, layout: str = "grid") -> None:
+    def __init__(
+        self,
+        application: Application,
+        launcher_instance: "Launcher",
+        is_featured: bool = False,
+        layout: str = "grid",
+    ) -> None:
         self._application = application
         self._launcher = launcher_instance
 
@@ -26,9 +34,31 @@ class AppItem(widgets.Button):
                 halign="start",
                 valign="center",
                 child=[
-                    widgets.Icon(image=application.icon, pixel_size=32, halign="center"),
-                    widgets.Label(label=application.name, halign="center", css_classes=["app-label"])
-                ]
+                    widgets.Icon(
+                        image=application.icon, pixel_size=32, halign="center"
+                    ),
+                    widgets.Box(
+                        vertical=True,
+                        halign="start",
+                        valign="center",
+                        child=[
+                            widgets.Label(
+                                label=application.name,
+                                halign="start",
+                                css_classes=["app-label"],
+                                ellipsize="end",
+                            ),
+                            widgets.Label(
+                                label=application.description,
+                                halign="start",
+                                css_classes=["app-description"],
+                                ellipsize="end",
+                            )
+                            if application.description
+                            else None,
+                        ],
+                    ),
+                ],
             )
         else:  # grid layout
             child_widget = widgets.Box(
@@ -37,9 +67,16 @@ class AppItem(widgets.Button):
                 halign="center",
                 valign="center",
                 child=[
-                    widgets.Icon(image=application.icon, pixel_size=32, halign="center"),
-                    widgets.Label(label=application.name, halign="center", css_classes=["app-label"], ellipsize="end")
-                ]
+                    widgets.Icon(
+                        image=application.icon, pixel_size=32, halign="center"
+                    ),
+                    widgets.Label(
+                        label=application.name,
+                        halign="center",
+                        css_classes=["app-label"],
+                        ellipsize="end",
+                    ),
+                ],
             )
 
         super().__init__(
@@ -47,7 +84,7 @@ class AppItem(widgets.Button):
             css_classes=["app-item"],
             halign="fill",
             hexpand=True,
-            child=child_widget
+            child=child_widget,
         )
 
         if is_featured or layout == "list":
@@ -69,7 +106,9 @@ class AppItem(widgets.Button):
             IgnisMenuSeparator(),
             IgnisMenuItem(
                 label="Unpin App" if self._application.is_pinned else "Pin App",
-                on_activate=lambda item, app=self._application: (self.__unpin_app() if app.is_pinned else self.__pin_app()),
+                on_activate=lambda item, app=self._application: (
+                    self.__unpin_app() if app.is_pinned else self.__pin_app()
+                ),
             ),
         ]
 
@@ -104,8 +143,9 @@ class AppItem(widgets.Button):
         self._application.launch(terminal_format="kitty %command%")
         window_manager.close_window("Launcher")
 
+
 class PinnedAppItem(widgets.Button):
-    def __init__(self, application: Application, launcher_instance: 'Launcher') -> None:
+    def __init__(self, application: Application, launcher_instance: "Launcher") -> None:
         self._application = application
         self._launcher = launcher_instance
         super().__init__(
@@ -114,8 +154,10 @@ class PinnedAppItem(widgets.Button):
             child=widgets.Box(
                 halign="center",
                 valign="center",
-                child=[widgets.Icon(image=application.icon, pixel_size=32, halign="center")]
-            )
+                child=[
+                    widgets.Icon(image=application.icon, pixel_size=32, halign="center")
+                ],
+            ),
         )
         self.set_size_request(64, 64)
 
@@ -133,7 +175,9 @@ class PinnedAppItem(widgets.Button):
             IgnisMenuSeparator(),
             IgnisMenuItem(
                 label="Unpin App" if self._application.is_pinned else "Pin App",
-                on_activate=lambda item, app=self._application: (self.__unpin_app() if app.is_pinned else self.__pin_app()),
+                on_activate=lambda item, app=self._application: (
+                    self.__unpin_app() if app.is_pinned else self.__pin_app()
+                ),
             ),
         ]
 
@@ -168,6 +212,7 @@ class PinnedAppItem(widgets.Button):
         self._application.launch(terminal_format="kitty %command%")
         window_manager.close_window("Launcher")
 
+
 class Launcher(widgets.Window):
     def __init__(self):
         self._main_content_container = widgets.Box(
@@ -175,7 +220,7 @@ class Launcher(widgets.Window):
             spacing=0,
             css_classes=["main-content-container"],
             halign="fill",
-            hexpand=True
+            hexpand=True,
         )
 
         self._pinned_apps_container = widgets.Grid(
@@ -190,13 +235,13 @@ class Launcher(widgets.Window):
             label="push_pin",
             css_classes=["icon", "pin-icon"],
             valign="end",
-            vexpand=True
+            vexpand=True,
         )
         self._pin_hint_label = widgets.Label(
             label="Right click on an item to pin it.",
             css_classes=["pin-hint-label"],
             valign="start",
-            vexpand=True
+            vexpand=True,
         )
 
         self._app_container = widgets.Box(
@@ -207,17 +252,14 @@ class Launcher(widgets.Window):
             hexpand=True,
         )
 
-        search_icon = widgets.Label(
-            label="search",
-            css_classes=["icon", "search-icon"]
-        )
+        search_icon = widgets.Label(label="search", css_classes=["icon", "search-icon"])
 
         self._entry = widgets.Entry(
             placeholder_text="Search",
             css_classes=["launcher-search"],
             on_change=self.__search,
             on_accept=self.__on_accept,
-            hexpand=True
+            hexpand=True,
         )
 
         self._clear_button = Button.button(
@@ -227,7 +269,7 @@ class Launcher(widgets.Window):
             size="xs",
             type="text",
             vexpand=False,
-            css_classes=["clear-button"]
+            css_classes=["clear-button"],
         )
 
         self._layout_button = Button.button(
@@ -237,14 +279,14 @@ class Launcher(widgets.Window):
             size="xs",
             type="text",
             vexpand=False,
-            css_classes=["layout-toggle-button"]
+            css_classes=["layout-toggle-button"],
         )
 
         self._search_bar_container = widgets.Box(
             child=[search_icon, self._entry, self._clear_button, self._layout_button],
             spacing=5,
             css_classes=["search-bar-container"],
-            hexpand=True
+            hexpand=True,
         )
 
         self.__update_layout_button_icon()
@@ -253,8 +295,7 @@ class Launcher(widgets.Window):
         self._main_content_container.append(self._search_bar_container)
 
         self._pinned_revealer = widgets.Revealer(
-            transition_type='slide_down',
-            reveal_child=True
+            transition_type="slide_down", reveal_child=True
         )
         self._pinned_revealer.set_child(self._pinned_apps_container)
         self._main_content_container.append(self._pinned_revealer)
@@ -264,13 +305,12 @@ class Launcher(widgets.Window):
             valign="fill",
             css_classes=["outer-box"],
             child=self._app_container,
-            height_request=550
+            height_request=550,
         )
         self._scroll_container.set_overflow(Gtk.Overflow.HIDDEN)
 
         self._scroll_revealer = widgets.Revealer(
-            transition_type='slide_down',
-            reveal_child=False
+            transition_type="slide_down", reveal_child=False
         )
         self._scroll_revealer.set_child(self._scroll_container)
         self._main_content_container.append(self._scroll_revealer)
@@ -282,9 +322,7 @@ class Launcher(widgets.Window):
             halign="center",
             valign="center",
             css_classes=["launcher-window"],
-            child=[
-                self._main_content_container
-            ]
+            child=[self._main_content_container],
         )
         actual_launcher_content_box.width_request = 600
 
@@ -292,13 +330,13 @@ class Launcher(widgets.Window):
             vexpand=True,
             hexpand=True,
             can_focus=False,
-            on_click=lambda x: window_manager.close_window("Launcher")
+            on_click=lambda x: window_manager.close_window("Launcher"),
         )
 
         main_overlay = widgets.Overlay(
             css_classes=["popup-close"],
             child=close_button,
-            overlays=[actual_launcher_content_box]
+            overlays=[actual_launcher_content_box],
         )
 
         super().__init__(
@@ -311,8 +349,10 @@ class Launcher(widgets.Window):
             kb_mode="exclusive",
             anchor=["left", "right", "top", "bottom"],
             default_width=600,
-            setup=lambda self: self.connect("notify::visible", self.__on_visibility_change),
-            child=main_overlay
+            setup=lambda self: self.connect(
+                "notify::visible", self.__on_visibility_change
+            ),
+            child=main_overlay,
         )
 
     def __update_layout_button_icon(self):
@@ -333,7 +373,7 @@ class Launcher(widgets.Window):
             size="xs",
             type="text",
             vexpand=False,
-            css_classes=["layout-toggle-button"]
+            css_classes=["layout-toggle-button"],
         )
 
         # Re-add the button to the search container
@@ -357,7 +397,9 @@ class Launcher(widgets.Window):
 
     def __populate_pinned_apps_list(self):
         while self._pinned_apps_container.get_last_child():
-            self._pinned_apps_container.remove(self._pinned_apps_container.get_last_child())
+            self._pinned_apps_container.remove(
+                self._pinned_apps_container.get_last_child()
+            )
 
         pinned_apps = applications.pinned
 
@@ -377,7 +419,9 @@ class Launcher(widgets.Window):
                 row = i // 8
                 self._pinned_apps_container.attach(item, col, row, 1, 1)
 
-    def __populate_apps(self, apps: list[Application], featured_app: Application | None = None) -> None:
+    def __populate_apps(
+        self, apps: list[Application], featured_app: Application | None = None
+    ) -> None:
         while self._app_container.get_last_child():
             self._app_container.remove(self._app_container.get_last_child())
 
@@ -387,7 +431,9 @@ class Launcher(widgets.Window):
         layout = self._get_layout()
 
         if featured_app:
-            self._app_container.append(AppItem(featured_app, self, is_featured=True, layout=layout))
+            self._app_container.append(
+                AppItem(featured_app, self, is_featured=True, layout=layout)
+            )
 
         if layout == "list":
             for app in apps:
@@ -426,7 +472,6 @@ class Launcher(widgets.Window):
             self._scroll_revealer.set_reveal_child(False)
             # Revert to the default state by populating the list with no apps
             self.__populate_apps([], None)
-
 
     def __clear_search(self, *args) -> None:
         self._entry.text = ""

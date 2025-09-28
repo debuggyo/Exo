@@ -71,7 +71,7 @@
         }
     }
     .app-item {
-        border-radius: 10px;
+        border-radius: 15px;
         background-color: transparent;
         padding: 8px 1rem;
 
@@ -81,15 +81,17 @@
 
         &:focus {
             outline: none;
-            background-color: colors.$primary_container;
-            border: none;
-            .app-label {
-                color: colors.$on_primary_container;
-            }
+            background-color: colors.$surface_container_highest;
         }
 
         .app-label {
+            font-weight: 500;
+            color: colors.$on_surface;
+        }
+
+        .app-description {
             font-weight: 400;
+            color: colors.$on_surface_variant;
         }
     }
 }
