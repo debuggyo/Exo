@@ -42,7 +42,7 @@ class UserSettings(OptionsManager):
                 systeminfotray: bool = True
                 clock: bool = True
                 tasks: bool = False
-                launcher: bool = True
+                launcher: bool = False
 
             class BarID(OptionsGroup):
                 launcher: int = 0
