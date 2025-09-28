@@ -345,7 +345,7 @@ class ExoInstaller:
                 "cargo",
                 "gnome-bluetooth-libs",
                 "adw-gtk3-theme",
-                "google-noto-sans-symbols-fonts",
+                "material-icons-fonts",
                 "meson",
                 "ninja-build",
                 "pkg-config",
