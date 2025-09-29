@@ -20,6 +20,15 @@ class UserSettings(OptionsManager):
             color_scheme: str = "tonal_spot"
             dark_mode: bool = True
 
+            class AutoDark(OptionsGroup):
+                enabled: bool = False
+                start_hour: int = 22
+                start_min: int = 0
+                end_hour: int = 6
+                end_min: int = 0
+
+            auto_dark = AutoDark()
+
         wallcolors = WallpaperColors()
 
     class Interface(OptionsGroup):

@@ -61,7 +61,7 @@ class BarCategory(widgets.Box):
 
         self.append(
             SwitchRow(
-                label="Floating Bar",
+                title="Floating Bar",
                 description="Make the bar float away from the edges of the screen.",
                 active=user_settings.interface.bar.floating,
                 on_change=lambda x, active: BarStyles.setFloating(active),
@@ -70,7 +70,7 @@ class BarCategory(widgets.Box):
 
         self.append(
             SwitchRow(
-                label="Separated Islands",
+                title="Separated Islands",
                 description="Seperate the bar into 3 separate 'islands'.",
                 active=user_settings.interface.bar.separation,
                 on_change=lambda x, active: BarStyles.setSeparation(active),
@@ -79,7 +79,7 @@ class BarCategory(widgets.Box):
 
         self.append(
             SwitchRow(
-                label="Extend to Edges",
+                title="Extend to Edges",
                 description="Make the bar span the full width of the screen.",
                 active=(not user_settings.interface.bar.centered),
                 on_change=lambda x, active: BarStyles.setBarCenter(not active),
@@ -147,7 +147,7 @@ class Bar2Category(widgets.Box):
 
         self.append(
             SwitchRow(
-                label="Floating Bar",
+                title="Floating Bar",
                 description="Make the bar float away from the edges of the screen.",
                 active=user_settings.interface.bar2.floating,
                 on_change=lambda x, active: BarStyles.setFloating(active, 1),
@@ -156,7 +156,7 @@ class Bar2Category(widgets.Box):
 
         self.append(
             SwitchRow(
-                label="Separated Islands",
+                title="Separated Islands",
                 description="Seperate the bar into 3 separate 'islands'.",
                 active=user_settings.interface.bar2.separation,
                 on_change=lambda x, active: BarStyles.setSeparation(active, 1),
@@ -165,7 +165,7 @@ class Bar2Category(widgets.Box):
 
         self.append(
             SwitchRow(
-                label="Extend to Edges",
+                title="Extend to Edges",
                 description="Make the bar span the full width of the screen.",
                 active=(not user_settings.interface.bar2.centered),
                 on_change=lambda x, active: BarStyles.setBarCenter(not active, 1),
@@ -206,7 +206,7 @@ class NotificationsCategory(widgets.Box):
         )
         self.append(
             SwitchRow(
-                label="Compact Pop-up",
+                title="Compact Pop-up",
                 description="Show a more compact pop-up for incoming notifications.",
                 active=user_settings.interface.notifications.compact_popup,
                 on_change=lambda x,
@@ -393,19 +393,19 @@ class ExtraBarCategory(widgets.Box):
                     ],
                 ),
                 SwitchRow(
-                    label="Use 24 hour time",
+                    title="Use 24 hour time",
                     description="Toggle between 12-hour (AM/PM) and 24-hour time formats.",
                     active=self.military_time,
                     on_change=lambda x, active: BarStyles.setMilitaryTime(active),
                 ),
                 SwitchRow(
-                    label="Show the date",
+                    title="Show the date",
                     description="Toggle the visibility of the date in the bar.",
                     active=self.show_date,
                     on_change=lambda x, active: BarStyles.setDateVisibility(active),
                 ),
                 SwitchRow(
-                    label="Swap the day and month",
+                    title="Swap the day and month",
                     description="Use the American date format.",
                     active=self.day_month_swapped,
                     on_change=lambda x, active: BarStyles.setDayMonthSwapped(active),
@@ -440,13 +440,13 @@ class MiscCategory(widgets.Box):
             child=[
                 CategoryLabel("Miscellaneous"),
                 SwitchRow(
-                    label="Rounded Shell Corners",
+                    title="Rounded Shell Corners",
                     description="Add a curve outside the shell that warps around the screen.",
                     active=user_settings.interface.misc.shell_corners,
                     on_change=lambda x, active: BarStyles.setShellCorners(active),
                 ),
                 SwitchRow(
-                    label="Rounded Screen Corners",
+                    title="Rounded Screen Corners",
                     description="Add rounded corners to the screen.",
                     active=self.screen_corners,
                     on_change=lambda x, active: BarStyles.setScreenCorners(active),

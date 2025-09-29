@@ -4,8 +4,9 @@ from gi.repository import GLib, Gtk
 
 from ignis import widgets
 from scripts import Wallpaper
+from scripts.auto_dark import setAutoDark
 from user_settings import user_settings
-from ..widgets import CategoryLabel, SettingsRow
+from ..widgets import CategoryLabel, SettingsRow, SwitchRow
 from ignis.app import IgnisApp
 
 app = IgnisApp.get_initialized()
@@ -245,6 +246,70 @@ class WallColorCategory(widgets.Box):
                 vertical=True,
                 child=[theme_selector_row],
                 css_classes=["colors-row"],
+            )
+        )
+        self.append(
+            SwitchRow(
+                title="Auto Dark",
+                description="Automatically set the dark theme based on the time of day.",
+                active=user_settings.appearance.wallcolors.auto_dark.enabled,
+                on_change=lambda x, active: setAutoDark(active),
+            )
+        )
+        self.append(
+            SettingsRow(
+                title="Start Time",
+                description="Time of day to enable dark mode when Auto Dark is enabled.",
+                child=[
+                    widgets.SpinButton(
+                        min=0,
+                        max=24,
+                        step=1,
+                        value=user_settings.appearance.wallcolors.auto_dark.start_hour,
+                        on_change=lambda _,
+                        value: user_settings.appearance.wallcolors.auto_dark.set_start_hour(
+                            value
+                        ),
+                    ),
+                    widgets.SpinButton(
+                        min=0,
+                        max=60,
+                        step=1,
+                        value=user_settings.appearance.wallcolors.auto_dark.start_min,
+                        on_change=lambda _,
+                        value: user_settings.appearance.wallcolors.auto_dark.set_start_min(
+                            value
+                        ),
+                    ),
+                ],
+            )
+        )
+        self.append(
+            SettingsRow(
+                title="End Time",
+                description="Time of day to disable dark mode when Auto Dark is enabled.",
+                child=[
+                    widgets.SpinButton(
+                        min=0,
+                        max=24,
+                        step=1,
+                        value=user_settings.appearance.wallcolors.auto_dark.end_hour,
+                        on_change=lambda _,
+                        value: user_settings.appearance.wallcolors.auto_dark.set_end_hour(
+                            int(value)
+                        ),
+                    ),
+                    widgets.SpinButton(
+                        min=0,
+                        max=60,
+                        step=1,
+                        value=user_settings.appearance.wallcolors.auto_dark.end_min,
+                        on_change=lambda _,
+                        value: user_settings.appearance.wallcolors.auto_dark.set_end_min(
+                            int(value)
+                        ),
+                    ),
+                ],
             )
         )
         self.append(

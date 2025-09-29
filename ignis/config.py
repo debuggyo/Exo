@@ -11,7 +11,7 @@ from modules import (
 )
 from ignis.css_manager import CssInfoPath, CssManager
 from ignis import utils
-from scripts import BarStyles, Wallpaper
+from scripts import BarStyles, Wallpaper, auto_dark
 from user_settings import user_settings
 
 Wallpaper.generatePreviews()
@@ -63,3 +63,7 @@ PowerMenu()
 M3Test()
 
 NotificationPopup(0)
+
+
+# Auto Dark Mode
+utils.Poll(60000, lambda _: auto_dark())

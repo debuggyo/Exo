@@ -353,7 +353,7 @@ class BarCategory(widgets.Box):
 
         self.append(
             SwitchRow(
-                label="Floating Bar",
+                title="Floating Bar",
                 description="Make the bar float away from the edges of the screen.",
                 active=user_settings.interface.bar.floating,
                 on_change=lambda x, active: BarStyles.setFloating(active),
@@ -362,7 +362,7 @@ class BarCategory(widgets.Box):
 
         self.append(
             SwitchRow(
-                label="Separated Islands",
+                title="Separated Islands",
                 description="Seperate the bar into 3 separate 'islands'.",
                 active=user_settings.interface.bar.separation,
                 on_change=lambda x, active: BarStyles.setSeparation(active),
@@ -371,7 +371,7 @@ class BarCategory(widgets.Box):
 
         self.append(
             SwitchRow(
-                label="Extend to Edges",
+                title="Extend to Edges",
                 description="Make the bar span the full width of the screen.",
                 active=(not user_settings.interface.bar.centered),
                 on_change=lambda x, active: BarStyles.setBarCenter(not active),
@@ -390,13 +390,13 @@ class MiscCategory(widgets.Box):
             child=[
                 CategoryLabel("Miscellaneous"),
                 SwitchRow(
-                    label="Rounded Shell Corners",
+                    title="Rounded Shell Corners",
                     description="Add a curve outside the shell that warps around the screen.",
                     active=user_settings.interface.misc.shell_corners,
                     on_change=lambda x, active: BarStyles.setShellCorners(active),
                 ),
                 SwitchRow(
-                    label="Rounded Screen Corners",
+                    title="Rounded Screen Corners",
                     description="Add rounded corners to the screen.",
                     active=self.screen_corners,
                     on_change=lambda x, active: BarStyles.setScreenCorners(active),

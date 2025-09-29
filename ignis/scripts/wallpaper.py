@@ -4,12 +4,23 @@ import json
 from ignis import utils
 from user_settings import user_settings
 from ignis.css_manager import CssManager
+
 css_manager = CssManager.get_default()
 from .send_notification import send_notification
 
+
 class Wallpaper:
     def setWall(path):
-        schemes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot"]
+        schemes = [
+            "content",
+            "expressive",
+            "fidelity",
+            "fruit-salad",
+            "monochrome",
+            "neutral",
+            "rainbow",
+            "tonal-spot",
+        ]
         colorScheme = user_settings.appearance.wallcolors.color_scheme
         if user_settings.appearance.wallcolors.dark_mode:
             mode = "dark"
@@ -17,9 +28,17 @@ class Wallpaper:
             mode = "light"
 
         if colorScheme in schemes:
-            asyncio.create_task(utils.exec_sh_async(f"matugen image -t scheme-{colorScheme} '{path}' -m '{mode}'"))
+            asyncio.create_task(
+                utils.exec_sh_async(
+                    f"matugen image -t scheme-{colorScheme} '{path}' -m '{mode}'"
+                )
+            )
         else:
-            asyncio.create_task(utils.exec_sh_async(f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'"))
+            asyncio.create_task(
+                utils.exec_sh_async(
+                    f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'"
+                )
+            )
 
         send_notification("Wallpaper Set!", str(os.path.basename(path)))
         user_settings.appearance.wallcolors.set_wallpaper_path(path)
@@ -27,7 +46,16 @@ class Wallpaper:
         utils.Timeout(ms=3000, target=lambda: css_manager.reload_all_css())
 
     def setColors(colorScheme):
-        schemes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot"]
+        schemes = [
+            "content",
+            "expressive",
+            "fidelity",
+            "fruit-salad",
+            "monochrome",
+            "neutral",
+            "rainbow",
+            "tonal-spot",
+        ]
         path = user_settings.appearance.wallcolors.wallpaper_path
         if user_settings.appearance.wallcolors.dark_mode:
             mode = "dark"
@@ -35,17 +63,33 @@ class Wallpaper:
             mode = "light"
 
         if colorScheme in schemes:
-            asyncio.create_task(utils.exec_sh_async(f"matugen image -t scheme-{colorScheme} '{path}' -m '{mode}'"))
+            asyncio.create_task(
+                utils.exec_sh_async(
+                    f"matugen image -t scheme-{colorScheme} '{path}' -m '{mode}'"
+                )
+            )
         else:
-            asyncio.create_task(utils.exec_sh_async(f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'"))
+            asyncio.create_task(
+                utils.exec_sh_async(
+                    f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'"
+                )
+            )
 
         user_settings.appearance.wallcolors.set_color_scheme(colorScheme)
         Wallpaper.generatePreviews()
         utils.Timeout(ms=3000, target=lambda: css_manager.reload_all_css())
 
-
     def setDarkMode(active):
-        schemes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot"]
+        schemes = [
+            "content",
+            "expressive",
+            "fidelity",
+            "fruit-salad",
+            "monochrome",
+            "neutral",
+            "rainbow",
+            "tonal-spot",
+        ]
         colorScheme = user_settings.appearance.wallcolors.color_scheme
         path = user_settings.appearance.wallcolors.wallpaper_path
         if active:
@@ -54,11 +98,27 @@ class Wallpaper:
             mode = "light"
 
         if colorScheme in schemes:
-            asyncio.create_task(utils.exec_sh_async(f"matugen image -t scheme-{colorScheme} '{path}' -m '{mode}'"))
-            asyncio.create_task(utils.exec_sh_async(f"gsettings set org.gnome.desktop.interface color-scheme 'prefer-{mode}'"))
+            asyncio.create_task(
+                utils.exec_sh_async(
+                    f"matugen image -t scheme-{colorScheme} '{path}' -m '{mode}'"
+                )
+            )
+            asyncio.create_task(
+                utils.exec_sh_async(
+                    f"gsettings set org.gnome.desktop.interface color-scheme 'prefer-{mode}'"
+                )
+            )
         else:
-            asyncio.create_task(utils.exec_sh_async(f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'"))
-            asyncio.create_task(utils.exec_sh_async(f"gsettings set org.gnome.desktop.interface color-scheme 'prefer-{mode}'"))
+            asyncio.create_task(
+                utils.exec_sh_async(
+                    f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'"
+                )
+            )
+            asyncio.create_task(
+                utils.exec_sh_async(
+                    f"gsettings set org.gnome.desktop.interface color-scheme 'prefer-{mode}'"
+                )
+            )
 
         user_settings.appearance.wallcolors.set_dark_mode(active)
         Wallpaper.generatePreviews()
@@ -67,12 +127,23 @@ class Wallpaper:
     @staticmethod
     def generatePreviews():
         async def do_generate():
-            schemes = ["content", "expressive", "fidelity", "fruit-salad", "monochrome", "neutral", "rainbow", "tonal-spot"]
+            schemes = [
+                "content",
+                "expressive",
+                "fidelity",
+                "fruit-salad",
+                "monochrome",
+                "neutral",
+                "rainbow",
+                "tonal-spot",
+            ]
             path = user_settings.appearance.wallcolors.wallpaper_path
             if not path or not os.path.exists(path):
                 return
 
-            current_mode = "dark" if user_settings.appearance.wallcolors.dark_mode else "light"
+            current_mode = (
+                "dark" if user_settings.appearance.wallcolors.dark_mode else "light"
+            )
             current_scheme = user_settings.appearance.wallcolors.color_scheme
             if current_scheme not in schemes:
                 current_scheme = "tonal-spot"
@@ -91,9 +162,8 @@ class Wallpaper:
 
             all_results = await asyncio.gather(*(tasks_palette + tasks_theme))
 
-            results_palette = all_results[:len(schemes)]
-            results_theme = all_results[len(schemes):]
-
+            results_palette = all_results[: len(schemes)]
+            results_theme = all_results[len(schemes) :]
 
             for i, result in enumerate(results_palette):
                 scheme = schemes[i]
@@ -101,20 +171,28 @@ class Wallpaper:
                     try:
                         data = json.loads(result.stdout)
                         # matugen-bin
-                        if current_mode in data.get('colors', {}):
-                            for color_name, color_value in data['colors'][current_mode].items():
-                                variable_name = f"palette-{scheme}-{color_name.replace('_', '-')}"
+                        if current_mode in data.get("colors", {}):
+                            for color_name, color_value in data["colors"][
+                                current_mode
+                            ].items():
+                                variable_name = (
+                                    f"palette-{scheme}-{color_name.replace('_', '-')}"
+                                )
                                 scss_content += f"${variable_name}: {color_value};\n"
                         # matugen-git (as of r107.ga49399b)
                         else:
-                            for color_name, values in data['colors'].items():
+                            for color_name, values in data["colors"].items():
                                 if current_mode in values:
                                     color_value = values[current_mode]
                                     variable_name = f"palette-{scheme}-{color_name.replace('_', '-')}"
-                                    scss_content += f"${variable_name}: {color_value};\n"
+                                    scss_content += (
+                                        f"${variable_name}: {color_value};\n"
+                                    )
                     except json.JSONDecodeError as e:
-                        stderr = result.stderr if result.stderr else ''
-                        print(f"Failed to decode json for palette {scheme}: {stderr} | {e}")
+                        stderr = result.stderr if result.stderr else ""
+                        print(
+                            f"Failed to decode json for palette {scheme}: {stderr} | {e}"
+                        )
                         pass
 
             for i, result in enumerate(results_theme):
@@ -123,24 +201,34 @@ class Wallpaper:
                     try:
                         # matugen-bin
                         data = json.loads(result.stdout)
-                        if mode in data.get('colors', {}):
-                            for color_name, color_value in data['colors'][mode].items():
-                                variable_name = f"theme-{mode}-{color_name.replace('_', '-')}"
+                        if mode in data.get("colors", {}):
+                            for color_name, color_value in data["colors"][mode].items():
+                                variable_name = (
+                                    f"theme-{mode}-{color_name.replace('_', '-')}"
+                                )
                                 scss_content += f"${variable_name}: {color_value};\n"
                         # matugen-git (as of r107.ga49399b)
                         else:
-                            for color_name, values in data['colors'].items():
+                            for color_name, values in data["colors"].items():
                                 if mode in values:
                                     color_value = values[mode]
-                                    variable_name = f"theme-{mode}-{color_name.replace('_', '-')}"
-                                    scss_content += f"${variable_name}: {color_value};\n"
+                                    variable_name = (
+                                        f"theme-{mode}-{color_name.replace('_', '-')}"
+                                    )
+                                    scss_content += (
+                                        f"${variable_name}: {color_value};\n"
+                                    )
                     except json.JSONDecodeError as e:
-                        stderr = result.stderr if result.stderr else ''
-                        print(f"Failed to decode json for theme preview {mode}: {stderr} | {e}")
+                        stderr = result.stderr if result.stderr else ""
+                        print(
+                            f"Failed to decode json for theme preview {mode}: {stderr} | {e}"
+                        )
                         pass
             if not scss_content:
                 return
-            scss_file_path = os.path.expanduser("~/.config/ignis/styles/preview-colors.scss")
+            scss_file_path = os.path.expanduser(
+                "~/.config/ignis/styles/preview-colors.scss"
+            )
             os.makedirs(os.path.dirname(scss_file_path), exist_ok=True)
             with open(scss_file_path, "w") as f:
                 f.write(scss_content)

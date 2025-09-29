@@ -131,7 +131,7 @@ class SettingsRow(widgets.Box):
         )
 
 
-def SwitchRow(label: str, active, on_change, **kwargs):
+def SwitchRow(active, on_change, **kwargs):
     switch = widgets.Switch(
         active=active,
         valign="center",
@@ -139,7 +139,6 @@ def SwitchRow(label: str, active, on_change, **kwargs):
     )
 
     row_content = SettingsRow(
-        title=label,
         vertical=False,
         css_classes=["switch-row"],
         child=[switch],
