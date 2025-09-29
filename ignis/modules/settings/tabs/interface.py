@@ -272,6 +272,8 @@ class BarModuleSettings(SettingsRow):
                 ),
                 widgets.Separator(),
                 widgets.Switch(
+                    vexpand=False,
+                    valign="center",
                     active=getattr(
                         user_settings.interface.modules.visibility,
                         self._widget_name,
