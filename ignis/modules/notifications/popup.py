@@ -14,18 +14,13 @@ class Popup(widgets.Box):
         self._box = box
         self._window = window
 
-        if user_settings.interface.bar.side == "bottom":
-            transition_type = "slide_up"
-        else:
-            transition_type = "slide_down"
-
         widget = ExoNotification(notification)
         widget.css_classes = ["notification-popup"]
         self._inner = widgets.Revealer(
-            transition_type="crossfade", child=widget, hexpand=True, halign="fill"
+            transition_type="slide_down", child=widget, hexpand=True, halign="fill"
         )
         self._outer = widgets.Revealer(
-            transition_type=transition_type,
+            transition_type="slide_down",
             child=self._inner,
             hexpand=True,
             halign="fill",
