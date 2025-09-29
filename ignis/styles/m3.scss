@@ -296,6 +296,10 @@ $square-radius: 12px;
     .m3-button {
         transition: 200ms;
 
+        &.xs {
+            border-radius: 8px;
+        }
+
         &:first-child {
             border-top-left-radius: 20px;
             border-bottom-left-radius: 20px;
