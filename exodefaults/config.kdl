@@ -98,8 +98,7 @@ binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
 
     // Open/close the Overview: a zoomed-out view of workspaces and windows.
-    // You can also move the mouse into the top-left hot corner,
-    // or do a four-finger swipe up on a touchpad.
+    // You can also do a four-finger swipe up on a touchpad.
     Mod+O repeat=false { toggle-overview; }
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.
@@ -126,8 +125,6 @@ binds {
     XF86AudioPrev         allow-when-locked=true { spawn-sh "playerctl previous"; }
 
     // Example brightness key mappings for brightnessctl.
-    // You can use regular spawn with multiple arguments too (to avoid going through "sh"),
-    // but you need to manually put each argument in separate "" quotes.
     XF86MonBrightnessUp   allow-when-locked=true { spawn "brightnessctl" "--class=backlight" "set" "+10%"; }
     XF86MonBrightnessDown allow-when-locked=true { spawn "brightnessctl" "--class=backlight" "set" "10%-"; }
 
