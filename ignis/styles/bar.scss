@@ -692,7 +692,7 @@
         .right-widgets {
             padding: 2px;
         }
-        &:not(.windows) .workspaces:not(.dots) {
+        .workspaces:not(.windows):not(.dots) {
             padding: 0px;
             .workspace {
                 padding: 1px 0px;
