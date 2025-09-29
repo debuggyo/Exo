@@ -97,7 +97,9 @@ binds {
     // shows a list of important hotkeys.
     Mod+Shift+Slash { show-hotkey-overlay; }
 
-    Mod+Grave { toggle-overview; }
+    // Open/close the Overview: a zoomed-out view of workspaces and windows.
+    // You can also do a four-finger swipe up on a touchpad.
+    Mod+O repeat=false { toggle-overview; }
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+T { spawn "kitty"; }
@@ -106,6 +108,7 @@ binds {
     Mod+E { spawn "nautilus"; }
     Mod+Escape { spawn "ignis" "toggle-window" "PowerMenu"; }
     Mod+I { spawn "ignis" "toggle-window" "Settings"; }
+    Mod+A { spawn "ignis" "toggle-window" "QuickCenter"; }
 
     // Example volume keys mappings for PipeWire & WirePlumber.
     // The allow-when-locked=true property makes them work even when the session is locked.
@@ -114,7 +117,18 @@ binds {
     XF86AudioMute        allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
     XF86AudioMicMute     allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
 
-    Mod+Q { close-window; }
+    // Example media keys mapping using playerctl.
+    // This will work with any MPRIS-enabled media player.
+    XF86AudioNext         allow-when-locked=true { spawn-sh "playerctl next"; }
+    XF86AudioPause        allow-when-locked=true { spawn-sh "playerctl play-pause"; }
+    XF86AudioPlay         allow-when-locked=true { spawn-sh "playerctl play-pause"; }
+    XF86AudioPrev         allow-when-locked=true { spawn-sh "playerctl previous"; }
+
+    // Example brightness key mappings for brightnessctl.
+    XF86MonBrightnessUp   allow-when-locked=true { spawn "brightnessctl" "--class=backlight" "set" "+10%"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "brightnessctl" "--class=backlight" "set" "10%-"; }
+
+    Mod+Q repeat=false { close-window; }
 
     Mod+Left  { focus-column-left; }
     Mod+Down  { focus-window-down; }
@@ -211,6 +225,8 @@ binds {
     // Move the focused window between the floating and the tiling layout.
     Mod+V       { toggle-window-floating; }
     Mod+Shift+V { switch-focus-between-floating-and-tiling; }
+
+    Mod+Tab { focus-workspace-previous; }
 
     Mod+Shift+S { screenshot show-pointer=false; }
     Ctrl+Print { screenshot-screen show-pointer=false; }

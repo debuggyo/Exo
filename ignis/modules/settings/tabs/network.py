@@ -188,7 +188,7 @@ class NetworkTab(widgets.Box):
         box.append(CategoryLabel("Wi-Fi & Ethernet"))
 
         self.wifi_switch_row = SwitchRow(
-            label="Wi-Fi",
+            title="Wi-Fi",
             description="Toggle Wi-Fi on or off.",
             active=self.network_service.wifi.enabled,
             on_change=lambda x, active: setattr(
