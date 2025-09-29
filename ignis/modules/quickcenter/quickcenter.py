@@ -9,6 +9,7 @@ from ignis.services.niri import NiriService
 window_manager = WindowManager.get_default()
 notifications = NotificationService.get_default()
 
+
 class QuickCenter(widgets.RevealerWindow):
     def open_window(self, window):
         window_manager.close_window("QuickCenter")
@@ -31,7 +32,7 @@ class QuickCenter(widgets.RevealerWindow):
                     on_click=lambda x: self.open_window("PowerMenu"),
                     vexpand=False,
                     valign="center",
-                    size="xs"
+                    size="xs",
                 ),
                 Button.button(
                     icon="settings",
@@ -40,7 +41,7 @@ class QuickCenter(widgets.RevealerWindow):
                     on_click=lambda x: self.open_window("Settings"),
                     vexpand=False,
                     valign="center",
-                    size="xs"
+                    size="xs",
                 ),
                 Button.button(
                     icon="clear_all",
@@ -56,7 +57,7 @@ class QuickCenter(widgets.RevealerWindow):
                         "notifications", lambda value: len(value) != 0
                     ),
                 ),
-            ]
+            ],
         )
 
         self.content_box = widgets.Box(
@@ -112,21 +113,38 @@ class QuickCenter(widgets.RevealerWindow):
         self.revealer.reveal_child = self.visible
 
     def update_side(self):
-        side = user_settings.interface.bar.side
+        position = user_settings.interface.modules
+        location = position.location.systeminfotray
+        bar = (
+            user_settings.interface.bar
+            if position.bar_id.systeminfotray == 0
+            else user_settings.interface.bar
+        )
+        side = bar.side
+        if side in ["left", "right"]:
+            self.actual_content_box.set_halign("start" if side == "left" else "end")
+            self.actual_content_box.anchor = ["top", "bottom", side]
+        else:
+            if location == "center":
+                self.actual_content_box.set_halign("center")
+                self.actual_content_box.anchor = ["top", "bottom"]
+            else:
+                self.actual_content_box.set_halign("start" if location == 0 else "end")
+                self.actual_content_box.anchor = [
+                    "top",
+                    "bottom",
+                    "left" if location == 0 else "end",
+                ]
+
         self.revealer.transition_type = "none"
         if self.niri and self.niri.is_available:
-            if side == "left":
-                self.revealer.transition_type = "slide_right"
-                self.content_box.set_halign("end")
-            else:
-                self.revealer.transition_type = "slide_left"
-                self.content_box.set_halign("start")
-
-        if side == "left":
-            self.actual_content_box.set_halign("start")
-            self.actual_content_box.anchor = ["top", "bottom", "left"]
-        else:
-            self.actual_content_box.set_halign("end")
-            self.actual_content_box.anchor = ["top", "bottom", "right"]
+            self.revealer.transition_type = (
+                "slide_right"
+                if self.actual_content_box.halign == "start"
+                else "slide_left"
+            )
+            self.content_box.set_halign(
+                "end" if self.actual_content_box.halign == "start" else "end"
+            )
 
         self.actual_content_box.queue_resize()
