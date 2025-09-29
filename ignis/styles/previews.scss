@@ -152,8 +152,9 @@
 }
 
 .palette-preview-btn {
-    border-radius: 8px;
+    border-radius: 16px;
     background-color: colors.$surface_container_highest;
+    padding: 8px;
 
     .preview {
         border-radius: 50px;
@@ -161,21 +162,8 @@
     }
     &.selected {
         outline: 2px solid colors.$primary;
-        outline-offset: 2px;
+        outline-offset: -2px;
         border-radius: 16px;
-    }
-
-    &:first-child {
-        border-top-left-radius: 16px;
-    }
-    &:nth-child(3) {
-        border-top-right-radius: 16px;
-    }
-    &:nth-last-child(2) {
-        border-bottom-left-radius: 16px;
-    }
-    &:last-child {
-        border-bottom-right-radius: 16px;
     }
 }
 
