@@ -192,7 +192,7 @@ class BluetoothTab(widgets.Box):
 
         wifi_service = self.bluetooth_service
         self.powered_switch_row = SwitchRow(
-            label="Bluetooth",
+            title="Bluetooth",
             description="Toggle the Bluetooth adapter on or off.",
             active=wifi_service.powered,
             on_change=lambda x, active: setattr(wifi_service, "powered", active),
