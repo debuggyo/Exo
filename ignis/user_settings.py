@@ -85,6 +85,7 @@ class UserSettings(OptionsManager):
 
         class Notifications(OptionsGroup):
             anchor: list = ["top", "right"]
+            compact_popup: bool = False
 
         class Launcher(OptionsGroup):
             layout: str = "grid"

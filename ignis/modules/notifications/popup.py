@@ -14,8 +14,16 @@ class Popup(widgets.Box):
         self._box = box
         self._window = window
 
-        widget = ExoNotification(notification)
-        widget.css_classes = ["notification-popup"]
+        widget = ExoNotification(
+            notification,
+            compact_popup=user_settings.interface.notifications.compact_popup,
+        )
+        widget.css_classes = [
+            "notification-popup",
+            "compact-popup"
+            if user_settings.interface.notifications.compact_popup
+            else None,
+        ]
         self._inner = widgets.Revealer(
             transition_type="slide_down", child=widget, hexpand=True, halign="fill"
         )
@@ -41,7 +49,6 @@ class Popup(widgets.Box):
             self._outer.reveal_child = False
             utils.Timeout(self._outer.transition_duration, box_destroy)
 
-        self._inner.transition_type = "crossfade"
         self._inner.reveal_child = False
         utils.Timeout(self._outer.transition_duration, outer_close)
 
@@ -86,8 +93,9 @@ class NotificationPopup(widgets.Window):
             child=PopupBox(window=self, monitor=monitor),
             visible=False,
             dynamic_input_region=True,
-            css_classes=["notification-popup-container"],
-            style="min-width: 29rem;",
+            css_classes=[
+                "notification-popup-container",
+            ],
         )
         self._update_window_properties()
 

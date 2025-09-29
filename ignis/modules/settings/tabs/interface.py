@@ -204,6 +204,15 @@ class NotificationsCategory(widgets.Box):
                 ],
             )
         )
+        self.append(
+            SwitchRow(
+                label="Compact Pop-up",
+                description="Show a more compact pop-up for incoming notifications.",
+                active=user_settings.interface.notifications.compact_popup,
+                on_change=lambda x,
+                active: user_settings.interface.notifications.set_compact_popup(active),
+            )
+        )
 
         self.append(
             SettingsRow(
