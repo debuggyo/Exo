@@ -34,6 +34,15 @@ css_manager.apply_css(
         priority="user",
     )
 )
+if not user_settings.appearance.wallcolors.dark_mode:
+    css_manager.apply_css(
+        CssInfoPath(
+            name="lightthemeoverrides",
+            path=os.path.expanduser("~/.config/ignis/styles/lightthemeoverrides.scss"),
+            compiler_function=lambda path: utils.sass_compile(path=path),
+            priority="user",
+        )
+    )
 
 QuickCenter()
 bar = Bar()

@@ -3,7 +3,7 @@ import asyncio
 import json
 from ignis import utils
 from user_settings import user_settings
-from ignis.css_manager import CssManager
+from ignis.css_manager import CssManager, CssInfoPath
 
 css_manager = CssManager.get_default()
 from .send_notification import send_notification
@@ -94,8 +94,21 @@ class Wallpaper:
         path = user_settings.appearance.wallcolors.wallpaper_path
         if active:
             mode = "dark"
+            if "lightthemeoverrides" in css_manager.list_css_info_names():
+                css_manager.remove_css("lightthemeoverrides")
         else:
             mode = "light"
+            if "lightthemeoverrides" not in css_manager.list_css_info_names():
+                css_manager.apply_css(
+                    CssInfoPath(
+                        name="lightthemeoverrides",
+                        path=os.path.expanduser(
+                            "~/.config/ignis/styles/lightthemeoverrides.scss"
+                        ),
+                        compiler_function=lambda path: utils.sass_compile(path=path),
+                        priority="user",
+                    )
+                )
 
         if colorScheme in schemes:
             asyncio.create_task(
