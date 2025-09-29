@@ -86,5 +86,18 @@
 
     .quick-sliders-container {
         margin: 10px;
+        margin-top: 0px;
+
+        .m3-slider {
+            border-radius: 8px;
+        }
+        .m3-slider:first-child {
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+        }
+        .m3-slider:last-child {
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
     }
 }
