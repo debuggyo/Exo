@@ -141,13 +141,15 @@
         .settings-row-title {
             font-weight: 400;
             font-size: 1rem;
+            line-height: 16px;
             color: colors.$on_surface;
         }
         .settings-row-description {
             font-weight: 400;
             font-size: 1rem;
+            line-height: 16px;
             color: colors.$on_surface_variant;
-            opacity: 0.7;
+            opacity: 0.8;
         }
     }
 

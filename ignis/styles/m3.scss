@@ -23,6 +23,7 @@ $square-radius: 12px;
         background-color 200ms;
     label {
         font-weight: 400;
+        line-height: 0px;
     }
     .m3-button-icon {
         font-family: "Material Symbols Outlined";
@@ -298,6 +299,7 @@ $square-radius: 12px;
 
         &.xs {
             border-radius: 8px;
+            min-width: 24px;
         }
 
         &:first-child {
