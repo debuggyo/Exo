@@ -41,6 +41,8 @@ class ExoNotification(widgets.Box):
             if notification.body
             else None
         )
+        if compact_popup:
+            self._body_label.set_single_line_mode(True)
 
         self._expand_button = (
             Button.button(
