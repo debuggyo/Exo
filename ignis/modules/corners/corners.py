@@ -6,7 +6,15 @@ class Corners:
     _windows = []
 
     @classmethod
-    def corner(cls, anchors: list, name, exclusivity, corner_type, size: int = 25):
+    def corner(
+        cls,
+        anchors: list,
+        name,
+        exclusivity,
+        corner_type,
+        size: int = 25,
+        layer: str = "top",
+    ):
         css_classes = [f"{corner_type}-corner"]
 
         for win in cls._windows:
@@ -25,6 +33,7 @@ class Corners:
             input_width=0,
             input_height=0,
             child=widgets.Corner(orientation="-".join(anchors)),
+            layer=layer,
         )
         cls._windows.append(win)
         return win
@@ -32,7 +41,16 @@ class Corners:
     @classmethod
     def screen(cls, anchors: list, corner_size):
         name = "screen_corner_" + "_".join(anchors)
-        return cls.corner(anchors, name, "ignore", "screen", corner_size)
+        return cls.corner(
+            anchors,
+            name,
+            "ignore",
+            "screen",
+            corner_size,
+            "overlay"
+            if user_settings.interface.misc.screen_corners == "always"
+            else "top",
+        )
 
     @classmethod
     def bar(cls, anchors: list):
@@ -53,7 +71,7 @@ class Corners:
         elif bar.density == 3:
             optimal_size = 17.5
 
-        if misc.screen_corners:
+        if misc.screen_corners != "disabled":
             if bar.floating and not bar.centered:
                 corners = [
                     (

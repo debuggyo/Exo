@@ -24,10 +24,6 @@ class BarStyles:
             return user_settings.interface.bar2
         return user_settings.interface.bar
 
-    @staticmethod
-    def _get_misc_settings():
-        return user_settings.interface.misc
-
     @classmethod
     def set_bar_instance(cls, bar):
         cls.bar_instance = bar
@@ -293,28 +289,22 @@ class BarStyles:
 
     @staticmethod
     def setShellCorners(enabled: bool):
-        # shell_corners is a global setting, so bar_id is not relevant here.
-        BarStyles._get_misc_settings().set_shell_corners(enabled)
+        user_settings.interface.misc.set_shell_corners(enabled)
         rebuild_corners()
 
     @staticmethod
     def setBarCenter(enabled: bool, bar_id: int = 0):
-        # setBarCenter should control if the specific bar is centered.
         bar_settings = BarStyles._get_bar_settings(bar_id)
         bar_settings.set_centered(enabled)
-        # Re-apply side settings to update anchors based on the new centered state.
         BarStyles.setSide(bar_settings.side, bar_id)
         rebuild_corners()
         if BarStyles.bar_instance:
             BarStyles._apply_css(BarStyles.bar_instance.get_window(bar_id), bar_id)
 
     @staticmethod
-    def setScreenCorners(enabled: bool):
-        # screen_corners is a global setting, so bar_id is not relevant here.
-        misc_settings = BarStyles._get_misc_settings()
-        misc_settings.set_screen_corners(enabled)
+    def setScreenCorners(enabled: str):
+        user_settings.interface.misc.set_screen_corners(enabled)
         rebuild_corners()
-        # No bar-specific CSS application is needed here, as it's a global screen setting.
 
     @staticmethod
     def setMilitaryTime(enabled: bool):

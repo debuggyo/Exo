@@ -101,7 +101,7 @@ class UserSettings(OptionsManager):
 
         class Misc(OptionsGroup):
             shell_corners: bool = True
-            screen_corners: bool = True
+            screen_corners: str = "not_fullscreen"
 
         modules = Modules()
         bar = Bar()
