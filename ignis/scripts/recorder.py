@@ -11,6 +11,7 @@ command_manager = CommandManager.get_default()
 recorder = RecorderService.get_default()
 last_recording_path = None
 recording_indicator_instance = None
+options = user_settings.services.recorder
 
 
 def set_indicator(indicator):
@@ -25,7 +26,10 @@ def _on_recording_started(service):
         if user_settings.interface.modules.options.recording_indicator != "never":
             recording_indicator_instance.start_timer()
 
-    send_notification("Recording Started", f"Recording to: {last_recording_path}")
+        if options.start_notification:
+            send_notification(
+                "Recording Started", f"Recording to: {last_recording_path}"
+            )
 
 
 def _on_recording_stopped(service):
@@ -33,9 +37,10 @@ def _on_recording_stopped(service):
     if recording_indicator_instance:
         recording_indicator_instance.stop_timer()
     if last_recording_path:
-        send_notification(
-            "Recording Stopped", f"Recording saved to: {last_recording_path}"
-        )
+        if options.stop_notification:
+            send_notification(
+                "Recording Stopped", f"Recording saved to: {last_recording_path}"
+            )
     last_recording_path = None
 
 
@@ -79,7 +84,12 @@ def _record_source(source: str, *args: str, **kwargs):
     last_recording_path = file_path
 
     asyncio.create_task(
-        _start_recording_task(source=source, file_path=file_path, **kwargs)
+        _start_recording_task(
+            source=source,
+            file_path=file_path,
+            audio_devices=["default_output"] if options.record_audio else None,
+            **kwargs,
+        )
     )
 
 
@@ -101,7 +111,7 @@ def unpause_recording():
 
 
 def record_screen(*args: str):
-    _record_source("screen", audio_devices=["default_output"], *args)
+    _record_source("screen", *args)
 
 
 def record_portal(*args: str):
