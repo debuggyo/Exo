@@ -19,7 +19,7 @@ class WallColorCategory(widgets.Box):
             vertical=True,
             spacing=5,
             child=[
-                CategoryLabel("Appearance"),
+                CategoryLabel("Appearance", "palette"),
             ],
         )
 

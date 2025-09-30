@@ -4,6 +4,7 @@ from .interface import InterfaceTab
 from .network import NetworkTab
 from .bluetooth import BluetoothTab
 from .about import AboutTab
+from .services import ServicesTab
 
 __all__ = [
     "QuickTab",
@@ -12,4 +13,5 @@ __all__ = [
     "NetworkTab",
     "BluetoothTab",
     "AboutTab",
+    "ServicesTab",
 ]

@@ -18,7 +18,7 @@ class WallColorCategory(widgets.Box):
             vertical=True,
             spacing=5,
             child=[
-                CategoryLabel("Appearance"),
+                CategoryLabel("Appearance", "palette"),
             ],
         )
 
@@ -309,7 +309,7 @@ class BarCategory(widgets.Box):
             spacing=5,
         )
 
-        self.append(CategoryLabel("Bar"))
+        self.append(CategoryLabel("Bar", "toolbar"))
 
         self.append(
             SettingsRow(
@@ -388,7 +388,7 @@ class MiscCategory(widgets.Box):
             vertical=True,
             spacing=5,
             child=[
-                CategoryLabel("Miscellaneous"),
+                CategoryLabel("Miscellaneous", "more_horiz"),
                 SwitchRow(
                     title="Rounded Shell Corners",
                     description="Add a curve outside the shell that warps around the screen.",

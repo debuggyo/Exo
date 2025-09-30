@@ -2,13 +2,26 @@ from ignis import widgets
 from modules.m3components import Button
 
 
-class CategoryLabel(widgets.Label):
-    def __init__(self, title):
+class CategoryLabel(widgets.Box):
+    def __init__(self, title: str = None, icon: str = None):
         super().__init__(
             css_classes=["settings-category-label"],
-            label=title,
-            justify="left",
-            halign="start",
+            spacing=5,
+            child=[
+                widgets.Label(
+                    css_classes=["m3-icon"],
+                    label=icon,
+                    justify="left",
+                    halign="start",
+                )
+                if icon
+                else None,
+                widgets.Label(
+                    label=title,
+                    justify="left",
+                    halign="start",
+                ),
+            ],
         )
 
 

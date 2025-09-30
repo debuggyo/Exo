@@ -110,8 +110,17 @@ class UserSettings(OptionsManager):
         launcher = Launcher()
         misc = Misc()
 
+    class Services(OptionsGroup):
+        class Recorder(OptionsGroup):
+            start_notification: bool = True
+            stop_notification: bool = True
+            record_audio: bool = True
+
+        recorder = Recorder()
+
     appearance = Appearance()
     interface = Interface()
+    services = Services()
 
 
 user_settings = UserSettings()

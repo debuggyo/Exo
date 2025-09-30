@@ -17,7 +17,7 @@ class BarCategory(widgets.Box):
             spacing=5,
         )
 
-        self.append(CategoryLabel("Bar"))
+        self.append(CategoryLabel("Bar", "toolbar"))
 
         self.append(
             SettingsRow(
@@ -95,7 +95,7 @@ class Bar2Category(widgets.Box):
             spacing=5,
         )
 
-        self.append(CategoryLabel("Second Bar"))
+        self.append(CategoryLabel("Second Bar", "bottom_navigation"))
 
         self.append(
             SettingsRow(
@@ -181,7 +181,7 @@ class NotificationsCategory(widgets.Box):
             spacing=5,
         )
 
-        self.append(CategoryLabel("Notifications"))
+        self.append(CategoryLabel("Notifications", "notifications"))
 
         self.append(
             SettingsRow(
@@ -309,7 +309,7 @@ class BarModulesCategory(widgets.Box):
             vertical=True,
             spacing=5,
             child=[
-                CategoryLabel("Bar Modules"),
+                CategoryLabel("Bar Modules", "dashboard_2"),
             ],
         )
 
@@ -375,7 +375,7 @@ class ExtraBarCategory(widgets.Box):
             vertical=True,
             spacing=5,
             child=[
-                CategoryLabel("Extra Module Options"),
+                CategoryLabel("Extra Module Options", "settings"),
                 SettingsRow(
                     title="Workspace Indicator Style",
                     description="Pick between 3 different Workspace Indicator styles.",
@@ -438,7 +438,7 @@ class MiscCategory(widgets.Box):
             vertical=True,
             spacing=5,
             child=[
-                CategoryLabel("Miscellaneous"),
+                CategoryLabel("Miscellaneous", "more_horiz"),
                 SwitchRow(
                     title="Rounded Shell Corners",
                     description="Add a curve outside the shell that warps around the screen.",

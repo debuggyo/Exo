@@ -7,6 +7,7 @@ from .tabs import (
     NetworkTab,
     BluetoothTab,
     AboutTab,
+    ServicesTab,
 )
 from modules.m3components import NavigationRail
 from ignis.app import IgnisApp
@@ -34,6 +35,7 @@ class Settings(widgets.RegularWindow):
             "quick": ("bolt", "Quick"),
             "appearance": ("palette", "Appearance"),
             "interface": ("tune", "Interface"),
+            "services": ("api", "Services"),
             "network": ("network_wifi", "Network"),
             "bluetooth": ("bluetooth", "Bluetooth"),
             "about": ("info", "System"),
@@ -98,6 +100,8 @@ class Settings(widgets.RegularWindow):
             self.content_scroll.set_child(AppearanceTab())
         elif key == "interface":
             self.content_scroll.set_child(InterfaceTab())
+        elif key == "services":
+            self.content_scroll.set_child(ServicesTab())
         elif key == "network":
             self.content_scroll.set_child(NetworkTab())
         elif key == "bluetooth":
