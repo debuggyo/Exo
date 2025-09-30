@@ -395,11 +395,25 @@ class MiscCategory(widgets.Box):
                     active=user_settings.interface.misc.shell_corners,
                     on_change=lambda x, active: BarStyles.setShellCorners(active),
                 ),
-                SwitchRow(
+                SettingsRow(
                     title="Rounded Screen Corners",
-                    description="Add rounded corners to the screen.",
-                    active=self.screen_corners,
-                    on_change=lambda x, active: BarStyles.setScreenCorners(active),
+                    description="Round the corners of the screen.",
+                    child=[
+                        make_toggle_buttons(
+                            [
+                                ("Disabled", "disabled", "close"),
+                                (
+                                    "When not fullscreen",
+                                    "not_fullscreen",
+                                    "fullscreen_exit",
+                                ),
+                                ("Always", "always", "check"),
+                            ],
+                            lambda: user_settings.interface.misc.screen_corners,
+                            BarStyles.setScreenCorners,
+                            on_any_click=None,
+                        ),
+                    ],
                 ),
             ],
         )
