@@ -23,11 +23,12 @@ class QuickSliders(widgets.Box):
             children.append(self.volume_slider)
 
         if backlight.available:
+            current_brightness = backlight.brightness / backlight.max_brightness
             self.backlight_slider = Slider.slider(
                 min=0,
                 max=100,
                 step=1.0,
-                value=(backlight.brightness / backlight.max_brightness),
+                value=current_brightness,
                 on_change=self.on_backlight_changed,
                 icon="brightness_6",
             )
