@@ -133,8 +133,9 @@ class RecordingIndicator:
 
     def update_visibility(self):
         mode = user_settings.interface.modules.options.recording_indicator
+        enabled = user_settings.interface.modules.visibility.recording_indicator
 
-        if mode == "never":
+        if not enabled:
             self.container.set_visible(False)
             self.timer_box.set_visible(False)
         elif mode == "always":

@@ -102,6 +102,7 @@ class BarStyles:
             BarStyles.bar_instance.clock.update_layout()
             BarStyles.bar_instance.media.update_layout()
             BarStyles.bar_instance.recording_indicator.update_layout()
+            BarStyles.bar_instance.recording_indicator.update_visibility()
             BarStyles.bar_instance.systeminfotray.update_layout()
             BarStyles.bar_instance.window_info.update_layout()
             BarStyles.bar_instance.workspaces.update_layout()
@@ -263,6 +264,7 @@ class BarStyles:
     @staticmethod
     def setRecordingIndicator(mode: str, bar_id: int = 0):
         user_settings.interface.modules.options.set_recording_indicator(mode)
+        BarStyles._update_all_layouts()
 
     @staticmethod
     def setWorkspacesStyle(style: str, bar_id: int = 0):
