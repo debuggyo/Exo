@@ -186,7 +186,7 @@ class Media:
             self.__update_players()
 
     def __update_players(self):
-        if self.main_box:
+        if self.main_box and user_settings.interface.modules.visibility.media:
             has_players = len(mpris.players) > 0
             self.main_box.set_visible(has_players)
 
