@@ -1,4 +1,4 @@
-from ignis import widgets
+from ignis import widgets, utils
 from ignis.services.audio import AudioService
 from ignis.services.backlight import BacklightService
 from modules.m3components import Slider
@@ -25,9 +25,9 @@ class QuickSliders(widgets.Box):
         if backlight.available:
             self.backlight_slider = Slider.slider(
                 min=0,
-                max=backlight.max_brightness,
+                max=100,
                 step=1.0,
-                value=backlight.brightness,
+                value=(backlight.brightness / backlight.max_brightness),
                 on_change=self.on_backlight_changed,
                 icon="brightness_6",
             )
@@ -39,7 +39,7 @@ class QuickSliders(widgets.Box):
             halign="fill",
             spacing=2,
             vertical=True,
-            child=children
+            child=children,
         )
 
     def on_volume_changed(self, slider):
@@ -48,4 +48,4 @@ class QuickSliders(widgets.Box):
 
     def on_backlight_changed(self, slider):
         value = slider.value
-        backlight.brightness = int(value)
+        backlight.brightness = int((value / 100) * backlight.max_brightness)
