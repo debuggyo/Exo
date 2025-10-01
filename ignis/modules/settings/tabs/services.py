@@ -2,7 +2,7 @@ from ignis import widgets
 from modules.m3components.button import Button
 from user_settings import user_settings
 from ..widgets import CategoryLabel, SettingsRow, SwitchRow, make_toggle_buttons
-from scripts import send_notification
+from scripts import BarStyles, send_notification
 from ignis.options import options
 
 
