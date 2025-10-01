@@ -51,6 +51,34 @@ class NotificationsCategory(widgets.Box):
                     ],
                 ),
                 SettingsRow(
+                    title="Popup Location",
+                    description="Pick a location for your notification popups.",
+                    child=[
+                        make_toggle_buttons(
+                            [
+                                ("", ["top", "left"], "north_west"),
+                                ("Top", ["top"], "north"),
+                                ("", ["top", "right"], "north_east"),
+                                ("", ["bottom", "left"], "south_west"),
+                                ("Bottom", ["bottom"], "south"),
+                                ("", ["bottom", "right"], "south_east"),
+                            ],
+                            lambda: user_settings.interface.notifications.anchor,
+                            user_settings.interface.notifications.set_anchor,
+                            on_any_click=None,
+                        ),
+                    ],
+                ),
+                SwitchRow(
+                    title="Compact Pop-up",
+                    description="Show a more compact pop-up for incoming notifications.",
+                    active=user_settings.interface.notifications.compact_popup,
+                    on_change=lambda x,
+                    active: user_settings.interface.notifications.set_compact_popup(
+                        active
+                    ),
+                ),
+                SettingsRow(
                     title="Send a Test Notification",
                     child=[
                         Button.button(
@@ -99,6 +127,21 @@ class RecordingCategory(widgets.Box):
                     description="Record the systems audio when recording.",
                     active=self.recorder.record_audio,
                     on_change=lambda x, active: self.recorder.set_record_audio(active),
+                ),
+                SettingsRow(
+                    title="Recording Indicator",
+                    description="When to show the recording indicator in the bar.",
+                    child=[
+                        make_toggle_buttons(
+                            [
+                                ("Always", "always", "visibility"),
+                                ("When Recording", "recording", "screen_record"),
+                            ],
+                            lambda: user_settings.interface.modules.options.recording_indicator,
+                            BarStyles.setRecordingIndicator,
+                            on_any_click=None,
+                        ),
+                    ],
                 ),
             ],
         )

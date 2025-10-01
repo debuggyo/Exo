@@ -173,65 +173,6 @@ class Bar2Category(widgets.Box):
         )
 
 
-class NotificationsCategory(widgets.Box):
-    def __init__(self):
-        super().__init__(
-            css_classes=["settings-category"],
-            vertical=True,
-            spacing=5,
-        )
-
-        self.append(CategoryLabel("Notifications", "notifications"))
-
-        self.append(
-            SettingsRow(
-                title="Popup Location",
-                description="Pick a location for your notification popups.",
-                child=[
-                    make_toggle_buttons(
-                        [
-                            ("", ["top", "left"], "north_west"),
-                            ("Top", ["top"], "north"),
-                            ("", ["top", "right"], "north_east"),
-                            ("", ["bottom", "left"], "south_west"),
-                            ("Bottom", ["bottom"], "south"),
-                            ("", ["bottom", "right"], "south_east"),
-                        ],
-                        lambda: user_settings.interface.notifications.anchor,
-                        user_settings.interface.notifications.set_anchor,
-                        on_any_click=None,
-                    ),
-                ],
-            )
-        )
-        self.append(
-            SwitchRow(
-                title="Compact Pop-up",
-                description="Show a more compact pop-up for incoming notifications.",
-                active=user_settings.interface.notifications.compact_popup,
-                on_change=lambda x,
-                active: user_settings.interface.notifications.set_compact_popup(active),
-            )
-        )
-
-        self.append(
-            SettingsRow(
-                title="Send a Test Notification",
-                child=[
-                    Button.button(
-                        icon="notifications_unread",
-                        label="Test Notification",
-                        halign="start",
-                        size="xs",
-                        on_click=lambda x: send_notification(
-                            "Test Notification", "This is a test notification!"
-                        ),
-                    )
-                ],
-            )
-        )
-
-
 class BarModuleSettings(SettingsRow):
     def __init__(self, name: str, widget_name: str, description: str):
         self._widget_name = widget_name
@@ -410,21 +351,6 @@ class ExtraBarCategory(widgets.Box):
                     active=self.day_month_swapped,
                     on_change=lambda x, active: BarStyles.setDayMonthSwapped(active),
                 ),
-                SettingsRow(
-                    title="Recording Indicator",
-                    description="When to show the recording indicator in the bar.",
-                    child=[
-                        make_toggle_buttons(
-                            [
-                                ("Always", "always", "visibility"),
-                                ("When Recording", "recording", "screen_record"),
-                            ],
-                            lambda: user_settings.interface.modules.options.recording_indicator,
-                            BarStyles.setRecordingIndicator,
-                            on_any_click=None,
-                        ),
-                    ],
-                ),
             ],
         )
 
@@ -483,7 +409,6 @@ class InterfaceTab(widgets.Box):
         self.append(Bar2Category())
         self.append(BarModulesCategory())
         self.append(ExtraBarCategory())
-        self.append(NotificationsCategory())
         self.append(MiscCategory())
         self.hexpand = True
         self.vexpand = True
