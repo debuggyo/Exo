@@ -431,6 +431,8 @@ class ExoInstaller:
                     print(
                         f"{self.Colors.RED}Failed to install matugen via cargo.{self.Colors.ENDC}"
                     )
+                else:
+                    self.run_command(["export", "PATH=\"$PATH:~/.cargo/bin\""])
             elif self.distro == "ubuntu":
                 result = self.run_command(["sudo", "apt", "update"])
                 if result is None or (
