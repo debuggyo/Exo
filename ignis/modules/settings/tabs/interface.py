@@ -86,6 +86,24 @@ class BarCategory(widgets.Box):
             )
         )
 
+        self.append(
+            SwitchRow(
+                title="Module Backgrounds",
+                description="Add a background to all modules.",
+                active=user_settings.interface.bar.module_backgrounds,
+                on_change=lambda x, active: BarStyles.setModuleBackgrounds(active),
+            )
+        )
+
+        self.append(
+            SwitchRow(
+                title="Bar Backgrounds",
+                description="Add a background to the bar.",
+                active=user_settings.interface.bar.bar_background,
+                on_change=lambda x, active: BarStyles.setBarBackground(active),
+            )
+        )
+
 
 class Bar2Category(widgets.Box):
     def __init__(self):
@@ -169,6 +187,24 @@ class Bar2Category(widgets.Box):
                 description="Make the bar span the full width of the screen.",
                 active=(not user_settings.interface.bar2.centered),
                 on_change=lambda x, active: BarStyles.setBarCenter(not active, 1),
+            )
+        )
+
+        self.append(
+            SwitchRow(
+                title="Module Backgrounds",
+                description="Add a background to all modules.",
+                active=user_settings.interface.bar2.module_backgrounds,
+                on_change=lambda x, active: BarStyles.setModuleBackgrounds(active, 1),
+            )
+        )
+
+        self.append(
+            SwitchRow(
+                title="Bar Backgrounds",
+                description="Add a background to the bar.",
+                active=user_settings.interface.bar2.bar_background,
+                on_change=lambda x, active: BarStyles.setBarBackground(active, 1),
             )
         )
 

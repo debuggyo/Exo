@@ -45,8 +45,10 @@ class BarStyles:
         floating = bar_settings.floating
         centered = bar_settings.centered
         compact_mode = bar_settings.density
+        module_backgrounds = bar_settings.module_backgrounds
+        bar_background = bar_settings.bar_background
 
-        all_possible_classes = {
+        all_possible_classes = [
             "hug",
             "extrapadding",
             "round",
@@ -57,12 +59,14 @@ class BarStyles:
             "compact-plus",
             "ultracompact",
             "vertical",
+            "module-backgrounds",
+            "bar-background",
             "top",
             "bottom",
             "left",
             "right",
             "horizontal",
-        }
+        ]
 
         for css_class in all_possible_classes:
             window.remove_css_class(css_class)
@@ -92,6 +96,12 @@ class BarStyles:
             window.add_css_class("vertical")
         else:
             window.add_css_class("horizontal")
+
+        if module_backgrounds:
+            window.add_css_class("module-backgrounds")
+
+        if bar_background:
+            window.add_css_class("bar-background")
 
         window.add_css_class(side)
 
@@ -276,6 +286,18 @@ class BarStyles:
     @staticmethod
     def setSeparation(enabled: bool, bar_id: int = 0):
         BarStyles._get_bar_settings(bar_id).set_separation(enabled)
+        if BarStyles.bar_instance:
+            BarStyles._apply_css(BarStyles.bar_instance.get_window(bar_id), bar_id)
+
+    @staticmethod
+    def setBarBackground(enabled: bool, bar_id: int = 0):
+        BarStyles._get_bar_settings(bar_id).set_bar_background(enabled)
+        if BarStyles.bar_instance:
+            BarStyles._apply_css(BarStyles.bar_instance.get_window(bar_id), bar_id)
+
+    @staticmethod
+    def setModuleBackgrounds(enabled: bool, bar_id: int = 0):
+        BarStyles._get_bar_settings(bar_id).set_module_backgrounds(enabled)
         if BarStyles.bar_instance:
             BarStyles._apply_css(BarStyles.bar_instance.get_window(bar_id), bar_id)
 

@@ -82,6 +82,8 @@ class UserSettings(OptionsManager):
             floating: bool = False
             separation: bool = False
             centered: bool = False
+            bar_background: bool = True
+            module_backgrounds: bool = True
 
         class Bar2(OptionsGroup):
             enabled: bool = True
@@ -91,6 +93,8 @@ class UserSettings(OptionsManager):
             floating: bool = False
             separation: bool = False
             centered: bool = False
+            bar_background: bool = True
+            module_backgrounds: bool = True
 
         class Notifications(OptionsGroup):
             anchor: list = ["top", "right"]

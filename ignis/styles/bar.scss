@@ -10,21 +10,26 @@
 }
 
 .bar {
-    background: colors.$surface;
+    &.bar-background {
+        background: colors.$surface;
+    }
     color: colors.$on_background;
 
     &.floating {
         border-radius: 50rem;
-        &:not(.separated) {
-            box-shadow: 0px 0px 0px 1px inset rgba(colors.$outline_variant, 0.5);
-        }
-        &.separated {
-            .left-widgets,
-            .center-widgets,
-            .right-widgets {
-                &:not(.empty) {
-                    box-shadow: 0px 0px 0px 1px inset
-                        rgba(colors.$outline_variant, 0.5);
+        &.bar-background {
+            &:not(.separated) {
+                box-shadow: 0px 0px 0px 1px inset
+                    rgba(colors.$outline_variant, 0.5);
+            }
+            &.separated {
+                .left-widgets,
+                .center-widgets,
+                .right-widgets {
+                    &:not(.empty) {
+                        box-shadow: 0px 0px 0px 1px inset
+                            rgba(colors.$outline_variant, 0.5);
+                    }
                 }
             }
         }
@@ -52,11 +57,13 @@
 
     &.separated {
         background: transparent;
-        .left-widgets,
-        .center-widgets,
-        .right-widgets {
-            &:not(.empty) {
-                background: colors.$background;
+        &.bar-background {
+            .left-widgets,
+            .center-widgets,
+            .right-widgets {
+                &:not(.empty) {
+                    background: colors.$background;
+                }
             }
         }
 
@@ -126,35 +133,21 @@
         .left-widgets,
         .center-widgets,
         .right-widgets {
-            & > box,
-            & > button:not(.active) {
-                background: transparent;
-                border-radius: 20px;
-            }
-            padding: 2px 5px;
-        }
-        .system-info-tray:hover,
-        .launcher-button:hover {
-            background: colors.$primary_container;
-            color: colors.$on_primary_container;
+            padding: 2px 2px;
         }
     }
     &.ultracompact {
         .left-widgets,
         .center-widgets,
         .right-widgets {
-            & > box,
-            & > button {
-                background: transparent;
-                border-radius: 20px;
-            }
-            padding: 0px 5px;
+            padding: 0px 0px;
         }
-        .system-info-tray:hover,
-        .launcher-button:hover {
-            background: colors.$primary_container;
-            color: colors.$on_primary_container;
-        }
+    }
+
+    .system-info-tray:hover,
+    .recording-indicator:hover {
+        background: colors.$primary_container;
+        color: colors.$on_primary_container;
     }
 }
 
@@ -164,21 +157,32 @@
     padding: 5px;
     & > box,
     & > button {
-        border-radius: 5px;
-        background: colors.$surface_container;
+        border-radius: 15px;
+    }
+}
 
-        &:first-child {
-            border-top-left-radius: 20px;
-            border-bottom-left-radius: 20px;
-        }
+.module-backgrounds {
+    .left-widgets,
+    .center-widgets,
+    .right-widgets {
+        & > box,
+        & > button {
+            border-radius: 5px;
+            background: colors.$surface_container;
 
-        &:last-child {
-            border-top-right-radius: 20px;
-            border-bottom-right-radius: 20px;
-        }
+            &:first-child {
+                border-top-left-radius: 20px;
+                border-bottom-left-radius: 20px;
+            }
 
-        button {
-            background: transparent;
+            &:last-child {
+                border-top-right-radius: 20px;
+                border-bottom-right-radius: 20px;
+            }
+
+            button {
+                background: transparent;
+            }
         }
     }
 }
@@ -206,7 +210,6 @@
 // Workspaces
 .workspaces {
     padding: 2px;
-    border-radius: 20px 5px 5px 20px;
 
     .workspace {
         padding: 0;
@@ -531,21 +534,23 @@
 
 // Vertical Bar
 .vertical {
-    .left-widgets,
-    .center-widgets,
-    .right-widgets {
-        & > box,
-        & > button {
-            border-radius: 5px;
+    &.module-backgrounds {
+        .left-widgets,
+        .center-widgets,
+        .right-widgets {
+            & > box,
+            & > button {
+                border-radius: 5px;
 
-            &:first-child {
-                border-top-left-radius: 20px;
-                border-top-right-radius: 20px;
-            }
+                &:first-child {
+                    border-top-left-radius: 20px;
+                    border-top-right-radius: 20px;
+                }
 
-            &:last-child {
-                border-bottom-left-radius: 20px;
-                border-bottom-right-radius: 20px;
+                &:last-child {
+                    border-bottom-left-radius: 20px;
+                    border-bottom-right-radius: 20px;
+                }
             }
         }
     }
