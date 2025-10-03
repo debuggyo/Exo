@@ -85,6 +85,60 @@ def make_toggle_buttons(
     )
 
 
+def make_independent_toggle_buttons(items, on_any_click=None, bar_id=None):
+    buttons = []
+
+    def update_active():
+        for btn, get_bool in buttons:
+            is_active = get_bool()
+            if is_active:
+                btn.add_css_class("active")
+                btn.add_css_class("filled")
+            else:
+                btn.remove_css_class("active")
+                btn.remove_css_class("filled")
+
+    for item in items:
+        if len(item) == 4:
+            label, get_bool, set_bool, icon = item
+        else:
+            label, get_bool, set_bool = item
+            icon = None
+
+        def click_handler(_, g=get_bool, s=set_bool):
+            current_value = g()
+            new_value = not current_value
+
+            if bar_id:
+                s(new_value, bar_id)
+            else:
+                s(new_value)
+
+            update_active()
+            if on_any_click:
+                on_any_click()
+
+        btn = Button.button(
+            label=label,
+            icon=icon,
+            on_click=click_handler,
+            shape="square",
+            hexpand=True,
+            halign="fill",
+            size="xs",
+        )
+        buttons.append((btn, get_bool))
+
+    update_active()
+
+    return Button.connected_group(
+        [b for b, _ in buttons],
+        homogeneous=False,
+        halign="start",
+        hexpand=False,
+    )
+
+
 class SettingsRow(widgets.Box):
     def __init__(
         self,

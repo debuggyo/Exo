@@ -5,7 +5,13 @@ from gi.repository import GLib, Gtk
 from ignis import widgets
 from scripts import Wallpaper, BarStyles
 from user_settings import user_settings
-from ..widgets import CategoryLabel, SettingsRow, SwitchRow, make_toggle_buttons
+from ..widgets import (
+    CategoryLabel,
+    SettingsRow,
+    SwitchRow,
+    make_toggle_buttons,
+    make_independent_toggle_buttons,
+)
 from ignis.app import IgnisApp
 
 app = IgnisApp.get_initialized()
@@ -303,6 +309,7 @@ class WallColorCategory(widgets.Box):
 
 class BarCategory(widgets.Box):
     def __init__(self):
+        bar = user_settings.interface.bar
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
@@ -323,7 +330,7 @@ class BarCategory(widgets.Box):
                             ("Left", "left", "align_horizontal_left"),
                             ("Right", "right", "align_horizontal_right"),
                         ],
-                        lambda: user_settings.interface.bar.side,
+                        lambda: bar.side,
                         BarStyles.setSide,
                         on_any_click=None,
                     )
@@ -343,7 +350,7 @@ class BarCategory(widgets.Box):
                             ("Compact", 2, "density_small"),
                             ("Condensed", 3, "list"),
                         ],
-                        lambda: user_settings.interface.bar.density,
+                        lambda: bar.density,
                         BarStyles.setCompact,
                         on_any_click=None,
                     )
@@ -352,29 +359,58 @@ class BarCategory(widgets.Box):
         )
 
         self.append(
-            SwitchRow(
-                title="Floating Bar",
-                description="Make the bar float away from the edges of the screen.",
-                active=user_settings.interface.bar.floating,
-                on_change=lambda x, active: BarStyles.setFloating(active),
+            SettingsRow(
+                title="Extra Modifiers",
+                description="Add extra modifiers to the bar (You can select multiple).",
+                child=[
+                    make_independent_toggle_buttons(
+                        [
+                            (
+                                "Floating",
+                                bar.get_floating,
+                                BarStyles.setFloating,
+                                "page_header",
+                            ),
+                            (
+                                "Separated",
+                                bar.get_separation,
+                                BarStyles.setSeparation,
+                                "more_horiz",
+                            ),
+                            (
+                                "Centered",
+                                bar.get_centered,
+                                BarStyles.setBarCenter,
+                                "code",
+                            ),
+                        ]
+                    )
+                ],
             )
         )
 
         self.append(
-            SwitchRow(
-                title="Separated Islands",
-                description="Seperate the bar into 3 separate 'islands'.",
-                active=user_settings.interface.bar.separation,
-                on_change=lambda x, active: BarStyles.setSeparation(active),
-            )
-        )
-
-        self.append(
-            SwitchRow(
-                title="Extend to Edges",
-                description="Make the bar span the full width of the screen.",
-                active=(not user_settings.interface.bar.centered),
-                on_change=lambda x, active: BarStyles.setBarCenter(not active),
+            SettingsRow(
+                title="Backgrounds",
+                description="Add or remove the backgrounds of the Bar/Modules.",
+                child=[
+                    make_independent_toggle_buttons(
+                        [
+                            (
+                                "Bar",
+                                bar.get_bar_background,
+                                BarStyles.setBarBackground,
+                                "toolbar",
+                            ),
+                            (
+                                "Modules",
+                                bar.get_module_backgrounds,
+                                BarStyles.setModuleBackgrounds,
+                                "more_horiz",
+                            ),
+                        ]
+                    )
+                ],
             )
         )
 
