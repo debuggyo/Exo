@@ -400,12 +400,12 @@ switch {
 .m3-slider {
     background-color: colors.$surface_container;
     border-radius: 24px;
-    padding: 8px 16px;
-    .m3-slider-icon {
+    padding: 10px 16px;
+    .m3-icon {
         font-family: "Material Symbols Outlined";
-        font-size: 24px;
+        font-size: 1.5rem;
         color: colors.$on_surface;
-        margin-right: 10px;
+        margin-right: 0px;
     }
     scale {
         padding: 0px;

@@ -120,7 +120,12 @@ class UserSettings(OptionsManager):
             stop_notification: bool = True
             record_audio: bool = True
 
+        class OSD(OptionsGroup):
+            anchor: list = ["bottom", "right"]
+            vertical: bool = False
+
         recorder = Recorder()
+        osd = OSD()
 
     appearance = Appearance()
     interface = Interface()

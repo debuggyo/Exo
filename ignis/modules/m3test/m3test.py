@@ -2,7 +2,9 @@ from ignis import widgets, utils
 from modules.m3components import Button, Slider
 from ignis.services.notifications import Notification, NotificationService
 from gi.repository import GLib
+
 notifications = NotificationService.get_default()
+
 
 class Popup(widgets.Revealer):
     def __init__(self, notification: Notification, **kwargs):
@@ -14,6 +16,7 @@ class Popup(widgets.Revealer):
     def destroy(self):
         self.reveal_child = False
         utils.Timeout(self.transition_duration, self.unparent)
+
 
 class NotificationList(widgets.Box):
     __gtype_name__ = "NotificationList"
@@ -66,6 +69,7 @@ class NotificationList(widgets.Box):
         )
         return contents
 
+
 class M3Test(widgets.RegularWindow):
     def __init__(self) -> None:
         super().__init__(
@@ -82,104 +86,186 @@ class M3Test(widgets.RegularWindow):
                     halign="center",
                     child=[
                         # Label Only
-                        widgets.Label(label="Label Only", css_classes=["settings-category-label"]),
+                        widgets.Label(
+                            label="Label Only", css_classes=["settings-category-label"]
+                        ),
                         Button.button(label="Elevated", type="elevated"),
                         Button.button(label="Filled", type="filled"),
                         Button.button(label="Tonal", type="tonal"),
                         Button.button(label="Outlined", type="outlined"),
                         Button.button(label="Text", type="text"),
-
                         # Icon + Label
-                        widgets.Label(label="Icon + Label", css_classes=["settings-category-label"]),
+                        widgets.Label(
+                            label="Icon + Label",
+                            css_classes=["settings-category-label"],
+                        ),
                         Button.button(icon="edit", label="Elevated", type="elevated"),
                         Button.button(icon="edit", label="Filled", type="filled"),
                         Button.button(icon="edit", label="Tonal", type="tonal"),
                         Button.button(icon="edit", label="Outlined", type="outlined"),
                         Button.button(icon="edit", label="Text", type="text"),
-
                         # Icon Only
-                        widgets.Label(label="Icon Only", css_classes=["settings-category-label"]),
+                        widgets.Label(
+                            label="Icon Only", css_classes=["settings-category-label"]
+                        ),
                         Button.button(icon="edit", type="elevated"),
                         Button.button(icon="edit", type="filled"),
                         Button.button(icon="edit", type="tonal"),
                         Button.button(icon="edit", type="outlined"),
                         Button.button(icon="edit", type="text"),
-
                         # Extra Small
-                        widgets.Label(label="Extra Small", css_classes=["settings-category-label"]),
-                        Button.button(icon="edit", label="Elevated", type="elevated", size="xs"),
-                        Button.button(icon="edit", label="Filled", type="filled", size="xs"),
-                        Button.button(icon="edit", label="Tonal", type="tonal", size="xs"),
-                        Button.button(icon="edit", label="Outlined", type="outlined", size="xs"),
-                        Button.button(icon="edit", label="Text", type="text", size="xs"),
-
+                        widgets.Label(
+                            label="Extra Small", css_classes=["settings-category-label"]
+                        ),
+                        Button.button(
+                            icon="edit", label="Elevated", type="elevated", size="xs"
+                        ),
+                        Button.button(
+                            icon="edit", label="Filled", type="filled", size="xs"
+                        ),
+                        Button.button(
+                            icon="edit", label="Tonal", type="tonal", size="xs"
+                        ),
+                        Button.button(
+                            icon="edit", label="Outlined", type="outlined", size="xs"
+                        ),
+                        Button.button(
+                            icon="edit", label="Text", type="text", size="xs"
+                        ),
                         # Small
-                        widgets.Label(label="Small", css_classes=["settings-category-label"]),
+                        widgets.Label(
+                            label="Small", css_classes=["settings-category-label"]
+                        ),
                         Button.button(icon="edit", label="Elevated", type="elevated"),
                         Button.button(icon="edit", label="Filled", type="filled"),
                         Button.button(icon="edit", label="Tonal", type="tonal"),
                         Button.button(icon="edit", label="Outlined", type="outlined"),
                         Button.button(icon="edit", label="Text", type="text"),
-
                         # Medium
-                        widgets.Label(label="Medium", css_classes=["settings-category-label"]),
-                        Button.button(icon="edit", label="Elevated", type="elevated", size="m"),
-                        Button.button(icon="edit", label="Filled", type="filled", size="m"),
-                        Button.button(icon="edit", label="Tonal", type="tonal", size="m"),
-                        Button.button(icon="edit", label="Outlined", type="outlined", size="m"),
+                        widgets.Label(
+                            label="Medium", css_classes=["settings-category-label"]
+                        ),
+                        Button.button(
+                            icon="edit", label="Elevated", type="elevated", size="m"
+                        ),
+                        Button.button(
+                            icon="edit", label="Filled", type="filled", size="m"
+                        ),
+                        Button.button(
+                            icon="edit", label="Tonal", type="tonal", size="m"
+                        ),
+                        Button.button(
+                            icon="edit", label="Outlined", type="outlined", size="m"
+                        ),
                         Button.button(icon="edit", label="Text", type="text", size="m"),
-
                         # Large
-                        widgets.Label(label="Large", css_classes=["settings-category-label"]),
-                        Button.button(icon="edit", label="Elevated", type="elevated", size="l"),
-                        Button.button(icon="edit", label="Filled", type="filled", size="l"),
-                        Button.button(icon="edit", label="Tonal", type="tonal", size="l"),
-                        Button.button(icon="edit", label="Outlined", type="outlined", size="l"),
+                        widgets.Label(
+                            label="Large", css_classes=["settings-category-label"]
+                        ),
+                        Button.button(
+                            icon="edit", label="Elevated", type="elevated", size="l"
+                        ),
+                        Button.button(
+                            icon="edit", label="Filled", type="filled", size="l"
+                        ),
+                        Button.button(
+                            icon="edit", label="Tonal", type="tonal", size="l"
+                        ),
+                        Button.button(
+                            icon="edit", label="Outlined", type="outlined", size="l"
+                        ),
                         Button.button(icon="edit", label="Text", type="text", size="l"),
-
                         # Extra Large
-                        widgets.Label(label="Extra Large", css_classes=["settings-category-label"]),
-                        Button.button(icon="edit", label="Elevated", type="elevated", size="xl"),
-                        Button.button(icon="edit", label="Filled", type="filled", size="xl"),
-                        Button.button(icon="edit", label="Tonal", type="tonal", size="xl"),
-                        Button.button(icon="edit", label="Outlined", type="outlined", size="xl"),
-                        Button.button(icon="edit", label="Text", type="text", size="xl"),
-
+                        widgets.Label(
+                            label="Extra Large", css_classes=["settings-category-label"]
+                        ),
+                        Button.button(
+                            icon="edit", label="Elevated", type="elevated", size="xl"
+                        ),
+                        Button.button(
+                            icon="edit", label="Filled", type="filled", size="xl"
+                        ),
+                        Button.button(
+                            icon="edit", label="Tonal", type="tonal", size="xl"
+                        ),
+                        Button.button(
+                            icon="edit", label="Outlined", type="outlined", size="xl"
+                        ),
+                        Button.button(
+                            icon="edit", label="Text", type="text", size="xl"
+                        ),
                         # Connected Button Groups
-                        widgets.Label(label="Connected Button Groups", css_classes=["settings-category-label"]),
+                        widgets.Label(
+                            label="Connected Button Groups",
+                            css_classes=["settings-category-label"],
+                        ),
                         Button.connected_group(
                             child=[
-                                Button.button(icon="counter_1", label="First", shape="square"),
-                                Button.button(icon="counter_2", label="Second", shape="square"),
-                                Button.button(icon="counter_3", label="Third", shape="square"),
-                                Button.button(icon="counter_4", label="Fourth", shape="square"),
-                                Button.button(icon="counter_5", label="Fifth", shape="square"),
-                                Button.button(icon="counter_6", label="Sixth", shape="square"),
+                                Button.button(
+                                    icon="counter_1", label="First", shape="square"
+                                ),
+                                Button.button(
+                                    icon="counter_2", label="Second", shape="square"
+                                ),
+                                Button.button(
+                                    icon="counter_3", label="Third", shape="square"
+                                ),
+                                Button.button(
+                                    icon="counter_4", label="Fourth", shape="square"
+                                ),
+                                Button.button(
+                                    icon="counter_5", label="Fifth", shape="square"
+                                ),
+                                Button.button(
+                                    icon="counter_6", label="Sixth", shape="square"
+                                ),
                             ]
                         ),
-
                         # Switches
-                        widgets.Label(label="Switches", css_classes=["settings-category-label"]),
+                        widgets.Label(
+                            label="Switches", css_classes=["settings-category-label"]
+                        ),
                         widgets.Switch(halign="center"),
                         widgets.Switch(active=True, halign="center"),
-
                         # Checkboxes
-                        widgets.Label(label="Checkboxes", css_classes=["settings-category-label"]),
+                        widgets.Label(
+                            label="Checkboxes", css_classes=["settings-category-label"]
+                        ),
                         widgets.CheckButton(label="Checkbox 1", halign="center"),
-                        widgets.CheckButton(label="Checkbox 2", active=True, halign="center"),
-
+                        widgets.CheckButton(
+                            label="Checkbox 2", active=True, halign="center"
+                        ),
                         # Radio Buttons
-                        widgets.Label(label="Radio Buttons", css_classes=["settings-category-label"]),
-                        widgets.CheckButton(group=widgets.CheckButton(label='Radio Button 2'), label="Radio Button 1", halign="center"),
-                        widgets.CheckButton(group=widgets.CheckButton(label='Radio Button 3'), label="Radio Button 2", halign="center"),
-                        widgets.CheckButton(group=widgets.CheckButton(label='Radio Button 4'), label="Radio Button 3", halign="center"),
-                        widgets.CheckButton(group=widgets.CheckButton(label='radiobutton'), label="Radio Button 4", halign="center"),
-
+                        widgets.Label(
+                            label="Radio Buttons",
+                            css_classes=["settings-category-label"],
+                        ),
+                        widgets.CheckButton(
+                            group=widgets.CheckButton(label="Radio Button 2"),
+                            label="Radio Button 1",
+                            halign="center",
+                        ),
+                        widgets.CheckButton(
+                            group=widgets.CheckButton(label="Radio Button 3"),
+                            label="Radio Button 2",
+                            halign="center",
+                        ),
+                        widgets.CheckButton(
+                            group=widgets.CheckButton(label="Radio Button 4"),
+                            label="Radio Button 3",
+                            halign="center",
+                        ),
+                        widgets.CheckButton(
+                            group=widgets.CheckButton(label="radiobutton"),
+                            label="Radio Button 4",
+                            halign="center",
+                        ),
                         # Sliders
-                        widgets.Label(label="Sliders", css_classes=["settings-category-label"]),
-                        Slider.slider(0, 100, 10, icon="volume_up")
-
-
+                        widgets.Label(
+                            label="Sliders", css_classes=["settings-category-label"]
+                        ),
+                        Slider.slider(0, 100, 10, icon="volume_up"),
+                        Slider.slider(0, 100, 10, icon="volume_up", sensitive=False),
                         # Notifications
                         # widgets.Box(
                         #     vertical=True,
@@ -215,7 +301,7 @@ class M3Test(widgets.RegularWindow):
                         #         ),
                         #     ],
                         # )
-                    ]
+                    ],
                 )
-            )
+            ),
         )

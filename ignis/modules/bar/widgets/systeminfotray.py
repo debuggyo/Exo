@@ -165,13 +165,13 @@ class SystemInfoTray:
 
     def _on_audio_scroll_up(self, widget):
         current_volume = self.audio_service.speaker.volume
-        new_volume = current_volume + 5
+        new_volume = current_volume - 5
         new_volume = max(0, min(100, new_volume))
         self.audio_service.speaker.volume = new_volume
 
     def _on_audio_scroll_down(self, widget):
         current_volume = self.audio_service.speaker.volume
-        new_volume = current_volume - 5
+        new_volume = current_volume + 5
         new_volume = max(0, min(100, new_volume))
         self.audio_service.speaker.volume = new_volume
 

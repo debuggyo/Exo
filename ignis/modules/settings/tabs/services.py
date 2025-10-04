@@ -159,6 +159,49 @@ class RecordingCategory(widgets.Box):
         )
 
 
+class OSDCategory(widgets.Box):
+    def __init__(self):
+        self.recorder = user_settings.services.recorder
+
+        super().__init__(
+            css_classes=["settings-category"],
+            vertical=True,
+            spacing=5,
+            child=[
+                CategoryLabel("OSD", "toast"),
+                SettingsRow(
+                    title="Popup Location",
+                    description="Pick a location for your OSD popups.",
+                    child=[
+                        make_toggle_buttons(
+                            [
+                                ("", ["top", "left"], "north_west"),
+                                ("Top", ["top"], "north"),
+                                ("", ["top", "right"], "north_east"),
+                                ("", ["left"], "west"),
+                                ("", ["right"], "east"),
+                                ("", ["bottom", "left"], "south_west"),
+                                ("Bottom", ["bottom"], "south"),
+                                ("", ["bottom", "right"], "south_east"),
+                            ],
+                            lambda: user_settings.services.osd.anchor,
+                            user_settings.services.osd.set_anchor,
+                            on_any_click=None,
+                        ),
+                    ],
+                ),
+                SwitchRow(
+                    title="Vertical",
+                    description="Use a vertical OSD. Only takes effect when located in corners.",
+                    active=user_settings.services.osd.vertical,
+                    on_change=lambda x, active: user_settings.services.osd.set_vertical(
+                        active
+                    ),
+                ),
+            ],
+        )
+
+
 class ServicesTab(widgets.Box):
     def __init__(self):
         super().__init__(
@@ -171,3 +214,4 @@ class ServicesTab(widgets.Box):
         )
         self.append(NotificationsCategory())
         self.append(RecordingCategory())
+        self.append(OSDCategory())

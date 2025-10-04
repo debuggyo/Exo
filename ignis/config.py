@@ -6,6 +6,7 @@ from modules import (
     Launcher,
     PowerMenu,
     QuickCenter,
+    OSD,
     M3Test,
     NotificationPopup,
 )
@@ -69,6 +70,7 @@ if (
 Settings()
 Launcher()
 PowerMenu()
+OSD()
 M3Test()
 
 NotificationPopup(0)
