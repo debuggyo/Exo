@@ -556,11 +556,9 @@ class FontCategory(widgets.Box):
 
         font_name = font_desc.to_string()
 
-        # Set for current application
         settings = Gtk.Settings.get_default()
         settings.set_property("gtk-font-name", font_name)
 
-        # Set globally
         os.system(f"gsettings set org.gnome.desktop.interface font-name '{font_name}'")
 
 
