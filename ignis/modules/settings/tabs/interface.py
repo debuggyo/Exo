@@ -155,6 +155,7 @@ class Bar2Category(widgets.Box):
                         lambda: bar.side,
                         BarStyles.setSide,
                         on_any_click=None,
+                        bar_id=1,
                     )
                 ],
             )
@@ -175,6 +176,7 @@ class Bar2Category(widgets.Box):
                         lambda: bar.density,
                         BarStyles.setCompact,
                         on_any_click=None,
+                        bar_id=1,
                     )
                 ],
             )
