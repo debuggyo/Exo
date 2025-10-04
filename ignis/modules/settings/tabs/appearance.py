@@ -1,6 +1,6 @@
 import os
 import threading
-from gi.repository import GLib, Gtk
+from gi.repository import GLib, Gtk, Pango
 
 from ignis import widgets
 from scripts import Wallpaper
@@ -12,14 +12,14 @@ from ignis.app import IgnisApp
 app = IgnisApp.get_initialized()
 
 
-class WallColorCategory(widgets.Box):
+class WallpaperCategory(widgets.Box):
     def __init__(self):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
             spacing=5,
             child=[
-                CategoryLabel("Appearance", "palette"),
+                CategoryLabel("Wallpaper", "image"),
             ],
         )
 
@@ -75,6 +75,34 @@ class WallColorCategory(widgets.Box):
 
         wallpaper_overlay.add_overlay(file_chooser_button)
         wallpaper_overlay.add_overlay(self.wallpaper_filename_label)
+
+        self.append(
+            SettingsRow(
+                title="Wallpaper",
+                description="Set your wallpaper.",
+                vertical=True,
+                child=[wallpaper_overlay],
+                css_classes=["wall-row"],
+            )
+        )
+
+    def _set_and_update_wallpaper(self, path):
+        if path:
+            Wallpaper.setWall(path)
+            self.wallpaper_picture.image = path
+            self.wallpaper_filename_label.label = os.path.basename(path)
+
+
+class ColorCategory(widgets.Box):
+    def __init__(self):
+        super().__init__(
+            css_classes=["settings-category"],
+            vertical=True,
+            spacing=5,
+            child=[
+                CategoryLabel("Colors", "palette"),
+            ],
+        )
 
         self.palettes = [
             "content",
@@ -232,15 +260,6 @@ class WallColorCategory(widgets.Box):
 
         self.append(
             SettingsRow(
-                title="Wallpaper",
-                description="Set your wallpaper.",
-                vertical=True,
-                child=[wallpaper_overlay],
-                css_classes=["wall-row"],
-            )
-        )
-        self.append(
-            SettingsRow(
                 title="Themes",
                 description="Set your theme.",
                 vertical=True,
@@ -325,6 +344,35 @@ class WallColorCategory(widgets.Box):
         self._update_palette_selection()
         self._update_theme_selection()
 
+    def _update_palette_selection(self):
+        selected_palette = user_settings.appearance.wallcolors.color_scheme
+        for btn in self.palette_buttons:
+            if btn.palette_name == selected_palette:
+                btn.add_css_class("selected")
+            else:
+                btn.remove_css_class("selected")
+
+    def _update_theme_selection(self):
+        selected_dark = user_settings.appearance.wallcolors.dark_mode
+        for btn in self.theme_buttons:
+            if btn.is_dark == selected_dark:
+                btn.add_css_class("selected")
+            else:
+                btn.remove_css_class("selected")
+
+
+class QuickSelectCategory(widgets.Box):
+    def __init__(self, wallpaper_category_ref):
+        super().__init__(
+            css_classes=["settings-category"],
+            vertical=True,
+            spacing=5,
+            child=[
+                CategoryLabel("Quick Select", "image"),
+            ],
+        )
+        self.wallpaper_category_ref = wallpaper_category_ref
+
         self.thumbnail_overlays = []
 
         quick_select_container = widgets.Box(
@@ -355,9 +403,7 @@ class WallColorCategory(widgets.Box):
         loading_label = widgets.Label(label="Loading wallpapers...")
         self.gallery_content_container.append(loading_label)
 
-        loader_thread = threading.Thread(target=self._find_and_create_gallery_async)
-        loader_thread.daemon = True
-        loader_thread.start()
+        self._find_and_create_gallery_async()
 
         self.append(
             SettingsRow(
@@ -368,32 +414,6 @@ class WallColorCategory(widgets.Box):
             )
         )
 
-    def _update_palette_selection(self):
-        selected_palette = user_settings.appearance.wallcolors.color_scheme
-        for btn in self.palette_buttons:
-            if btn.palette_name == selected_palette:
-                btn.add_css_class("selected")
-            else:
-                btn.remove_css_class("selected")
-
-    def _update_theme_selection(self):
-        selected_dark = user_settings.appearance.wallcolors.dark_mode
-        for btn in self.theme_buttons:
-            if btn.is_dark == selected_dark:
-                btn.add_css_class("selected")
-            else:
-                btn.remove_css_class("selected")
-
-    def _set_and_update_wallpaper(self, path):
-        if path:
-            Wallpaper.setWall(path)
-            self.wallpaper_picture.image = path
-            self.wallpaper_filename_label.label = os.path.basename(path)
-
-    def _on_thumbnail_clicked(self, path):
-        self._set_and_update_wallpaper(path)
-        self._update_selected_icons()
-
     def _on_quickselect_folder_selected(self, dialog, file):
         path = file.get_path()
         if path:
@@ -401,33 +421,35 @@ class WallColorCategory(widgets.Box):
             self._find_and_create_gallery_async()
 
     def _find_and_create_gallery_async(self):
-        wallpaper_dir = user_settings.appearance.wallcolors.quickselect_path
-        if not wallpaper_dir or not os.path.isdir(os.path.expanduser(wallpaper_dir)):
-            wallpaper_dir = os.path.expanduser("~/Pictures/Wallpapers")
+        def do_find_and_build():
+            wallpaper_dir = user_settings.appearance.wallcolors.quickselect_path
+            if not wallpaper_dir or not os.path.isdir(
+                os.path.expanduser(wallpaper_dir)
+            ):
+                wallpaper_dir = os.path.expanduser("~/Pictures/Wallpapers")
 
-        if not os.path.isdir(wallpaper_dir):
-            GLib.idle_add(self._replace_gallery_content, None)
-            return
+            if not os.path.isdir(wallpaper_dir):
+                GLib.idle_add(self._replace_gallery_content, None)
+                return
 
-        supported_extensions = (".png", ".jpg", ".jpeg", ".gif")
-        image_files = []
-        try:
-            with os.scandir(wallpaper_dir) as entries:
-                for entry in entries:
-                    if entry.is_file() and entry.name.lower().endswith(
-                        supported_extensions
-                    ):
-                        image_files.append(entry.path)
-        except Exception:
-            GLib.idle_add(self._replace_gallery_content, None)
-            return
+            supported_extensions = (".png", ".jpg", ".jpeg", ".gif")
+            image_files = []
+            try:
+                with os.scandir(wallpaper_dir) as entries:
+                    for entry in entries:
+                        if entry.is_file() and entry.name.lower().endswith(
+                            supported_extensions
+                        ):
+                            image_files.append(entry.path)
+            except Exception:
+                GLib.idle_add(self._replace_gallery_content, None)
+                return
 
-        image_files.sort()
-        if not image_files:
-            GLib.idle_add(self._replace_gallery_content, None)
-            return
+            image_files.sort()
+            if not image_files:
+                GLib.idle_add(self._replace_gallery_content, None)
+                return
 
-        def build_gallery():
             gallery_grid = widgets.Grid(
                 halign="fill",
                 hexpand=True,
@@ -441,8 +463,9 @@ class WallColorCategory(widgets.Box):
             for idx, file_path in enumerate(image_files):
                 is_selected = file_path == current_path
                 btn = widgets.Button(
-                    on_click=lambda btn, path=file_path: self._on_thumbnail_clicked(
-                        path
+                    on_click=lambda btn, path=file_path: (
+                        self.wallpaper_category_ref._set_and_update_wallpaper(path),
+                        self._update_selected_icons(),
                     ),
                     child=widgets.Picture(
                         image=file_path,
@@ -472,14 +495,19 @@ class WallColorCategory(widgets.Box):
                 self._replace_gallery_content, gallery_scroll, temp_thumbnails
             )
 
-        threading.Thread(target=build_gallery, daemon=True).start()
+        loader_thread = threading.Thread(target=do_find_and_build)
+        loader_thread.daemon = True
+        loader_thread.start()
 
     def _update_selected_icons(self):
         current_path = user_settings.appearance.wallcolors.wallpaper_path
-        for overlay in self.thumbnail_overlays:
-            is_selected = overlay.wallpaper_path == current_path
-            selected_icon = overlay.selected_icon
-            selected_icon.visible = is_selected
+        for btn in self.thumbnail_overlays:
+            if btn.wallpaper_path == current_path:
+                btn.add_css_class("selected")
+                btn.get_child().add_css_class("selected")
+            else:
+                btn.remove_css_class("selected")
+                btn.get_child().remove_css_class("selected")
 
     def _replace_gallery_content(self, new_child, thumbnail_buttons=None):
         while self.gallery_content_container.get_last_child():
@@ -500,6 +528,42 @@ class WallColorCategory(widgets.Box):
             )
 
 
+class FontCategory(widgets.Box):
+    def __init__(self):
+        super().__init__(vertical=True, spacing=5)
+        self.append(CategoryLabel("Fonts", "custom_typography"))
+
+        font_dialog = Gtk.FontDialog()
+        font_button = Gtk.FontDialogButton(dialog=font_dialog)
+
+        settings = Gtk.Settings.get_default()
+        font_name = settings.get_property("gtk-font-name")
+        font_button.set_font_desc(Pango.FontDescription.from_string(font_name))
+        self.append(
+            SettingsRow(
+                title="Font", description="Select a system font.", child=[font_button]
+            )
+        )
+
+        font_button.connect("notify::font-desc", self.on_font_set)
+
+        self.append(font_button)
+
+    def on_font_set(self, button, _):
+        font_desc = button.get_font_desc()
+        if not font_desc:
+            return
+
+        font_name = font_desc.to_string()
+
+        # Set for current application
+        settings = Gtk.Settings.get_default()
+        settings.set_property("gtk-font-name", font_name)
+
+        # Set globally
+        os.system(f"gsettings set org.gnome.desktop.interface font-name '{font_name}'")
+
+
 class AppearanceTab(widgets.Box):
     def __init__(self):
         super().__init__(
@@ -510,4 +574,8 @@ class AppearanceTab(widgets.Box):
             halign="center",
             width_request=800,
         )
-        self.append(WallColorCategory())
+        wallpaper_category = WallpaperCategory()
+        self.append(wallpaper_category)
+        self.append(ColorCategory())
+        self.append(FontCategory())
+        self.append(QuickSelectCategory(wallpaper_category_ref=wallpaper_category))

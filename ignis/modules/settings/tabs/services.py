@@ -1,7 +1,13 @@
 from ignis import widgets
 from modules.m3components.button import Button
 from user_settings import user_settings
-from ..widgets import CategoryLabel, SettingsRow, SwitchRow, make_toggle_buttons
+from ..widgets import (
+    CategoryLabel,
+    SettingsRow,
+    SwitchRow,
+    make_toggle_buttons,
+    make_independent_toggle_buttons,
+)
 from scripts import BarStyles, send_notification
 from ignis.options import options
 
@@ -106,21 +112,27 @@ class RecordingCategory(widgets.Box):
             spacing=5,
             child=[
                 CategoryLabel("Recording", "screen_record"),
-                SwitchRow(
-                    title="Recording Started Notification",
-                    description="Send a notification when recording starts.",
-                    active=self.recorder.start_notification,
-                    on_change=lambda x, active: self.recorder.set_start_notification(
-                        active
-                    ),
-                ),
-                SwitchRow(
-                    title="Recording Stopped Notification",
-                    description="Send a notification when recording stops.",
-                    active=self.recorder.start_notification,
-                    on_change=lambda x, active: self.recorder.set_stop_notification(
-                        active
-                    ),
+                SettingsRow(
+                    title="Notifications",
+                    description="When should the recorder send a notification.",
+                    child=[
+                        make_independent_toggle_buttons(
+                            [
+                                (
+                                    "Started",
+                                    self.recorder.get_start_notification,
+                                    self.recorder.set_start_notification,
+                                    "play_arrow",
+                                ),
+                                (
+                                    "Stopped",
+                                    self.recorder.get_stop_notification,
+                                    self.recorder.set_stop_notification,
+                                    "stop",
+                                ),
+                            ]
+                        )
+                    ],
                 ),
                 SwitchRow(
                     title="Record Audio",

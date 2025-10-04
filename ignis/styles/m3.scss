@@ -584,3 +584,55 @@ scrollbar {
         margin: 2px;
     }
 }
+
+/* Font Picker */
+.fontchooser {
+    background-color: colors.$background;
+    padding: 5px;
+
+    entry {
+        background-color: colors.$surface_container_high;
+        border-radius: 10px;
+    }
+
+    .suggested-action {
+        background-color: colors.$primary;
+        color: colors.$on_primary;
+        border-radius: 20px;
+    }
+
+    scale {
+        padding: 0px;
+        trough {
+            background-color: colors.$secondary_container;
+            border-radius: 8px;
+            highlight {
+                background-color: colors.$primary;
+                min-height: 16px;
+                border-radius: 20px;
+            }
+        }
+
+        value {
+            margin-top: -36px;
+            background-color: colors.$surface_container_high;
+            border-radius: 20px;
+            padding: 0.2rem 1rem;
+            opacity: 0;
+        }
+
+        &:active {
+            slider {
+                outline-width: 4px;
+                min-width: 2px;
+            }
+            value {
+                opacity: 1;
+            }
+        }
+
+        mark {
+            background-color: colors.$surface_container_highest;
+        }
+    }
+}
