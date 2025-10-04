@@ -1,0 +1,47 @@
+@use "../colors";
+
+// Power Options
+.osd {
+    background: colors.$surface_container;
+    border: 1px solid rgba(colors.$outline_variant, 0.5);
+    padding: 10px;
+    border-radius: 25px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+
+    .m3-icon {
+        font-size: 1.5rem;
+        margin: -10px 0px;
+        color: colors.$on_surface;
+    }
+
+    scale {
+        all: unset;
+        padding: 0px;
+        opacity: 1;
+        trough {
+            opacity: 1;
+            background-color: colors.$secondary_container;
+            border-radius: 8px;
+            box-shadow: inset 0px 0px 0px 5px colors.$surface_container;
+            highlight {
+                background-color: colors.$primary;
+                min-height: 16px;
+                min-width: 16px;
+                border-radius: 20px;
+            }
+            slider {
+                opacity: 0;
+            }
+        }
+    }
+
+    &.vertical {
+        .m3-icon {
+            margin: 0px -10px;
+        }
+
+        scale {
+            transform: rotate(180deg);
+        }
+    }
+}
