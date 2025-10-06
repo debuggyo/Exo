@@ -23,25 +23,31 @@
 
     scrolledwindow viewport {
         margin: 0px 0px 0px 0px;
-        border-radius: 25px 0px 0px 0px;
+        border-radius: 16px 0px 0px 0px;
         background-color: colors.$surface;
     }
 
     .settings-body {
-        padding: 20px 10px;
+        padding: 1rem 10px;
         .settings-category {
             margin: 0px;
-            border-radius: 10px;
+            border-radius: 24px;
+            background-color: colors.$surface_container;
+            padding: 8px;
+            separator {
+                background-color: colors.$outline_variant;
+                margin: 0px 1rem;
+            }
         }
 
         .wallpaper-preview {
-            border-radius: 20px;
+            border-radius: 16px;
         }
 
         .wallpaper-button-overlay {
             color: transparent;
             transition: 100ms;
-            border-radius: 20px;
+            border-radius: 16px;
             outline-offset: 2px;
 
             &:hover {
@@ -58,28 +64,24 @@
 
         .folder-chooser-button {
             background-color: colors.$surface_container_high;
-            border-radius: 20px;
+            border-radius: 16px;
             font-weight: 500;
             padding: 0.5rem 1.5rem;
         }
 
         .wallpaper-gallery-container {
-            padding: 5px;
-            background-color: colors.$surface_container_high;
-            border-radius: 20px;
-
-            scrolledwindow viewport {
-                background-color: colors.$surface_container_high;
-            }
+            padding: 0px;
+            border-radius: 16px;
 
             .wallpaper-thumbnail {
                 padding: 0px;
+                border-radius: 8px;
             }
         }
 
         scrolledwindow viewport {
             margin: 0px;
-            border-radius: 15px;
+            border-radius: 12px;
         }
     }
 
@@ -125,17 +127,18 @@
 }
 
 .settings-category-label {
-    margin-left: 0.5rem;
     font-size: 1.2rem;
     font-weight: 500;
+    padding: 0.2rem 1rem;
+    margin-bottom: 0.2rem;
 }
 
 .settings-row,
 .row-button {
     min-width: 800px;
-    padding: 0.5rem 1rem;
-    background-color: colors.$surface_container;
-    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    /* background-color: colors.$surface_container; */
+    border-radius: 16px;
 
     .settings-row-header {
         .settings-row-title {
@@ -163,13 +166,8 @@
         }
     }
 
-    &:nth-child(2) {
-        border-top-left-radius: 16px;
-        border-top-right-radius: 16px;
-    }
-    &:last-child {
-        border-bottom-left-radius: 16px;
-        border-bottom-right-radius: 16px;
+    :not(:last-child) {
+        margin: -1px 0px;
     }
 
     &.module-options {

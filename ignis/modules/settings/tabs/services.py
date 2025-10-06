@@ -17,7 +17,7 @@ class NotificationsCategory(widgets.Box):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
-            spacing=5,
+            spacing=0,
             child=[
                 CategoryLabel("Notifications", "notifications"),
                 SwitchRow(
@@ -26,6 +26,7 @@ class NotificationsCategory(widgets.Box):
                     active=options.notifications.dnd,
                     on_change=lambda x, active: options.notifications.set_dnd(active),
                 ),
+                widgets.Separator(),
                 SettingsRow(
                     title="Popup Timeout",
                     description="How long (in seconds) should a notification popup stay on screen.",
@@ -42,6 +43,7 @@ class NotificationsCategory(widgets.Box):
                         )
                     ],
                 ),
+                widgets.Separator(),
                 SettingsRow(
                     title="Max Popups",
                     description="How many popup notifications can be shown at once.",
@@ -56,6 +58,7 @@ class NotificationsCategory(widgets.Box):
                         )
                     ],
                 ),
+                widgets.Separator(),
                 SettingsRow(
                     title="Popup Location",
                     description="Pick a location for your notification popups.",
@@ -75,6 +78,7 @@ class NotificationsCategory(widgets.Box):
                         ),
                     ],
                 ),
+                widgets.Separator(),
                 SwitchRow(
                     title="Compact Pop-up",
                     description="Show a more compact pop-up for incoming notifications.",
@@ -84,6 +88,7 @@ class NotificationsCategory(widgets.Box):
                         active
                     ),
                 ),
+                widgets.Separator(),
                 SettingsRow(
                     title="Send a Test Notification",
                     child=[
@@ -109,7 +114,7 @@ class RecordingCategory(widgets.Box):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
-            spacing=5,
+            spacing=0,
             child=[
                 CategoryLabel("Recording", "screen_record"),
                 SettingsRow(
@@ -134,12 +139,14 @@ class RecordingCategory(widgets.Box):
                         )
                     ],
                 ),
+                widgets.Separator(),
                 SwitchRow(
                     title="Record Audio",
                     description="Record the systems audio when recording.",
                     active=self.recorder.record_audio,
                     on_change=lambda x, active: self.recorder.set_record_audio(active),
                 ),
+                widgets.Separator(),
                 SettingsRow(
                     title="Recording Indicator",
                     description="When to show the recording indicator in the bar.",
@@ -166,7 +173,7 @@ class OSDCategory(widgets.Box):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
-            spacing=5,
+            spacing=0,
             child=[
                 CategoryLabel("OSD", "toast"),
                 SettingsRow(
@@ -190,6 +197,7 @@ class OSDCategory(widgets.Box):
                         ),
                     ],
                 ),
+                widgets.Separator(),
                 SwitchRow(
                     title="Vertical",
                     description="Use a vertical OSD. Only takes effect when located in corners.",
@@ -206,7 +214,7 @@ class ServicesTab(widgets.Box):
     def __init__(self):
         super().__init__(
             vertical=True,
-            spacing=20,
+            spacing=8,
             css_classes=["settings-body"],
             hexpand=False,
             halign="center",

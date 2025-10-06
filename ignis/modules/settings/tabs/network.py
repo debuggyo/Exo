@@ -12,7 +12,7 @@ class NetworkTab(widgets.Box):
     def __init__(self):
         super().__init__(
             vertical=True,
-            spacing=10,
+            spacing=8,
             css_classes=["settings-body"],
             hexpand=False,
             halign="center",
@@ -29,7 +29,7 @@ class NetworkTab(widgets.Box):
             widgets.Box(
                 css_classes=["settings-category"],
                 vertical=True,
-                spacing=5,
+                spacing=0,
                 child=[
                     CategoryLabel("Miscellaneous"),
                     SettingsRow(
@@ -45,6 +45,7 @@ class NetworkTab(widgets.Box):
                             )
                         ],
                     ),
+                    widgets.Separator(),
                     SettingsRow(
                         title="Refresh Network Status",
                         description="Manually refresh the status of all network connections.",
@@ -184,7 +185,7 @@ class NetworkTab(widgets.Box):
         return row_button
 
     def create_network_category(self):
-        box = widgets.Box(css_classes=["settings-category"], vertical=True, spacing=5)
+        box = widgets.Box(css_classes=["settings-category"], vertical=True, spacing=0)
         box.append(CategoryLabel("Wi-Fi & Ethernet"))
 
         self.wifi_switch_row = SwitchRow(
@@ -196,6 +197,7 @@ class NetworkTab(widgets.Box):
             ),
         )
         box.append(self.wifi_switch_row)
+        box.append(widgets.Separator())
 
         self.wifi_list_box = widgets.Box(
             vertical=True, spacing=5, css_classes=["network-list-container"]
@@ -208,6 +210,7 @@ class NetworkTab(widgets.Box):
                 child=[self.wifi_list_box],
             )
         )
+        box.append(widgets.Separator())
 
         self.ethernet_status_label = widgets.Label(
             label="", css_classes=["status-label"]

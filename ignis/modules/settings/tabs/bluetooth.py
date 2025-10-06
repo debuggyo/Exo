@@ -30,7 +30,7 @@ class BluetoothTab(widgets.Box):
 
         super().__init__(
             vertical=True,
-            spacing=20,
+            spacing=8,
             css_classes=["settings-body"],
             hexpand=False,
             halign="center",
@@ -41,6 +41,7 @@ class BluetoothTab(widgets.Box):
         self.device_category = self.create_device_category()
 
         self.append(self.adapter_category)
+        self.append(widgets.Separator())
         self.append(self.device_category)
 
         self.scan_status_label = widgets.Label(label="")
@@ -49,6 +50,7 @@ class BluetoothTab(widgets.Box):
             label="Scan for Devices",
             on_click=lambda x: asyncio.create_task(self.start_scan()),
         )
+        self.append(widgets.Separator())
         self.append(
             SettingsRow(
                 title="Scan for Devices",
@@ -56,6 +58,7 @@ class BluetoothTab(widgets.Box):
                 child=[self.scan_button],
             )
         )
+        self.append(widgets.Separator())
 
         self.append(
             SettingsRow(
@@ -187,7 +190,7 @@ class BluetoothTab(widgets.Box):
         return row_button
 
     def create_adapter_category(self):
-        box = widgets.Box(css_classes=["settings-category"], vertical=True, spacing=2)
+        box = widgets.Box(css_classes=["settings-category"], vertical=True, spacing=0)
         box.append(CategoryLabel("Bluetooth Adapter"))
 
         wifi_service = self.bluetooth_service
@@ -202,7 +205,7 @@ class BluetoothTab(widgets.Box):
         return box
 
     def create_device_category(self):
-        box = widgets.Box(css_classes=["settings-category"], vertical=True, spacing=2)
+        box = widgets.Box(css_classes=["settings-category"], vertical=True, spacing=0)
         box.append(CategoryLabel("Devices"))
 
         self.device_list_box = widgets.Box(

@@ -22,7 +22,7 @@ class WallColorCategory(widgets.Box):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
-            spacing=5,
+            spacing=0,
             child=[
                 CategoryLabel("Appearance", "palette"),
             ],
@@ -31,8 +31,8 @@ class WallColorCategory(widgets.Box):
         self.wallpaper_picture = widgets.Picture(
             height=300,
             width=560,
-            vexpand=False,
-            hexpand=False,
+            halign="fill",
+            hexpand=True,
             content_fit="cover",
             css_classes=["wallpaper-preview"],
             image=user_settings.appearance.wallcolors.bind("wallpaper_path"),
@@ -76,6 +76,8 @@ class WallColorCategory(widgets.Box):
         wallpaper_overlay = widgets.Overlay(
             css_classes=["wallpaper-overlay"],
             child=self.wallpaper_picture,
+            halign="fill",
+            hexpand=True,
         )
 
         wallpaper_overlay.add_overlay(file_chooser_button)
@@ -267,15 +269,7 @@ class WallColorCategory(widgets.Box):
         top_section.append(wallpaper_overlay)
         top_section.append(right_column)
 
-        self.append(
-            SettingsRow(
-                title="Wallpaper & Colors",
-                description="Set your wallpaper and color scheme.",
-                vertical=True,
-                child=[top_section],
-                css_classes=["wallcolors-row"],
-            )
-        )
+        self.append(top_section)
 
         self._update_palette_selection()
         self._update_theme_selection()
@@ -313,7 +307,7 @@ class BarCategory(widgets.Box):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
-            spacing=5,
+            spacing=0,
         )
 
         self.append(CategoryLabel("Bar", "toolbar"))
@@ -337,6 +331,7 @@ class BarCategory(widgets.Box):
                 ],
             )
         )
+        self.append(widgets.Separator())
 
         self.append(
             SettingsRow(
@@ -357,6 +352,7 @@ class BarCategory(widgets.Box):
                 ],
             )
         )
+        self.append(widgets.Separator())
 
         self.append(
             SettingsRow(
@@ -388,6 +384,7 @@ class BarCategory(widgets.Box):
                 ],
             )
         )
+        self.append(widgets.Separator())
 
         self.append(
             SettingsRow(
@@ -422,7 +419,7 @@ class MiscCategory(widgets.Box):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
-            spacing=5,
+            spacing=0,
             child=[
                 CategoryLabel("Miscellaneous", "more_horiz"),
                 SwitchRow(
@@ -431,6 +428,7 @@ class MiscCategory(widgets.Box):
                     active=user_settings.interface.misc.shell_corners,
                     on_change=lambda x, active: BarStyles.setShellCorners(active),
                 ),
+                widgets.Separator(),
                 SettingsRow(
                     title="Rounded Screen Corners",
                     description="Round the corners of the screen.",
@@ -459,7 +457,7 @@ class QuickTab(widgets.Box):
     def __init__(self):
         super().__init__(
             vertical=True,
-            spacing=20,
+            spacing=8,
             css_classes=["settings-body"],
             hexpand=False,
             halign="center",

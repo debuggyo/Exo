@@ -17,7 +17,7 @@ class WallpaperCategory(widgets.Box):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
-            spacing=5,
+            spacing=0,
             child=[
                 CategoryLabel("Wallpaper", "image"),
             ],
@@ -76,15 +76,7 @@ class WallpaperCategory(widgets.Box):
         wallpaper_overlay.add_overlay(file_chooser_button)
         wallpaper_overlay.add_overlay(self.wallpaper_filename_label)
 
-        self.append(
-            SettingsRow(
-                title="Wallpaper",
-                description="Set your wallpaper.",
-                vertical=True,
-                child=[wallpaper_overlay],
-                css_classes=["wall-row"],
-            )
-        )
+        self.append(wallpaper_overlay)
 
     def _set_and_update_wallpaper(self, path):
         if path:
@@ -98,7 +90,7 @@ class ColorCategory(widgets.Box):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
-            spacing=5,
+            spacing=0,
             child=[
                 CategoryLabel("Colors", "palette"),
             ],
@@ -267,6 +259,7 @@ class ColorCategory(widgets.Box):
                 css_classes=["colors-row"],
             )
         )
+        self.append(widgets.Separator())
         self.append(
             SwitchRow(
                 title="Auto Dark",
@@ -275,6 +268,7 @@ class ColorCategory(widgets.Box):
                 on_change=lambda x, active: setAutoDark(active),
             )
         )
+        self.append(widgets.Separator())
         self.append(
             SettingsRow(
                 title="Start Time",
@@ -303,6 +297,7 @@ class ColorCategory(widgets.Box):
                 ],
             )
         )
+        self.append(widgets.Separator())
         self.append(
             SettingsRow(
                 title="End Time",
@@ -331,6 +326,7 @@ class ColorCategory(widgets.Box):
                 ],
             )
         )
+        self.append(widgets.Separator())
         self.append(
             SettingsRow(
                 title="Color Schemes",
@@ -366,7 +362,7 @@ class QuickSelectCategory(widgets.Box):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
-            spacing=5,
+            spacing=0,
             child=[
                 CategoryLabel("Quick Select", "image"),
             ],
@@ -376,7 +372,7 @@ class QuickSelectCategory(widgets.Box):
         self.thumbnail_overlays = []
 
         quick_select_container = widgets.Box(
-            vertical=True, spacing=10, vexpand=True, valign="fill"
+            vertical=True, spacing=5, vexpand=True, valign="fill"
         )
 
         folder_chooser_button = widgets.FileChooserButton(
@@ -405,14 +401,7 @@ class QuickSelectCategory(widgets.Box):
 
         self._find_and_create_gallery_async()
 
-        self.append(
-            SettingsRow(
-                title="Quick Select",
-                description="Browse local wallpapers for a quick change.",
-                child=[quick_select_container],
-                vertical=True,
-            )
-        )
+        self.append(quick_select_container)
 
     def _on_quickselect_folder_selected(self, dialog, file):
         path = file.get_path()
@@ -530,7 +519,7 @@ class QuickSelectCategory(widgets.Box):
 
 class FontCategory(widgets.Box):
     def __init__(self):
-        super().__init__(vertical=True, spacing=5)
+        super().__init__(css_classes=["settings-category"], vertical=True, spacing=0)
         self.append(CategoryLabel("Fonts", "custom_typography"))
 
         font_dialog = Gtk.FontDialog()
@@ -566,7 +555,7 @@ class AppearanceTab(widgets.Box):
     def __init__(self):
         super().__init__(
             vertical=True,
-            spacing=20,
+            spacing=8,
             css_classes=["settings-body"],
             hexpand=False,
             halign="center",

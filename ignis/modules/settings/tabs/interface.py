@@ -21,7 +21,7 @@ class BarCategory(widgets.Box):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
-            spacing=5,
+            spacing=0,
         )
 
         self.append(CategoryLabel("Bar", "toolbar"))
@@ -46,6 +46,8 @@ class BarCategory(widgets.Box):
             )
         )
 
+        self.append(widgets.Separator())
+
         self.append(
             SettingsRow(
                 title="Density",
@@ -65,6 +67,8 @@ class BarCategory(widgets.Box):
                 ],
             )
         )
+
+        self.append(widgets.Separator())
 
         self.append(
             SettingsRow(
@@ -96,6 +100,8 @@ class BarCategory(widgets.Box):
                 ],
             )
         )
+
+        self.append(widgets.Separator())
 
         self.append(
             SettingsRow(
@@ -129,7 +135,7 @@ class Bar2Category(widgets.Box):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
-            spacing=5,
+            spacing=0,
         )
 
         self.append(CategoryLabel("Second Bar", "bottom_navigation"))
@@ -139,6 +145,8 @@ class Bar2Category(widgets.Box):
                 description="The second bar will be automatically enabled if any modules are located in it.\nIt will automatically be disabled if there are no modules located in it.\nNote: If any disabled modules are located in the second bar, it will still be enabled.",
             )
         )
+
+        self.append(widgets.Separator())
 
         self.append(
             SettingsRow(
@@ -161,6 +169,8 @@ class Bar2Category(widgets.Box):
             )
         )
 
+        self.append(widgets.Separator())
+
         self.append(
             SettingsRow(
                 title="Density",
@@ -181,6 +191,8 @@ class Bar2Category(widgets.Box):
                 ],
             )
         )
+
+        self.append(widgets.Separator())
 
         self.append(
             SettingsRow(
@@ -213,6 +225,8 @@ class Bar2Category(widgets.Box):
                 ],
             )
         )
+
+        self.append(widgets.Separator())
 
         self.append(
             SettingsRow(
@@ -316,7 +330,7 @@ class BarModulesCategory(widgets.Box):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
-            spacing=5,
+            spacing=0,
             child=[
                 CategoryLabel("Bar Modules", "dashboard_2"),
             ],
@@ -371,6 +385,8 @@ class BarModulesCategory(widgets.Box):
             description = module["description"]
 
             self.append(BarModuleSettings(name, widget_name, description))
+            if module != list(modules.values())[-1]:
+                self.append(widgets.Separator())
 
 
 class ExtraBarCategory(widgets.Box):
@@ -382,7 +398,7 @@ class ExtraBarCategory(widgets.Box):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
-            spacing=5,
+            spacing=0,
             child=[
                 CategoryLabel("Extra Module Options", "settings"),
                 SettingsRow(
@@ -401,18 +417,21 @@ class ExtraBarCategory(widgets.Box):
                         )
                     ],
                 ),
+                widgets.Separator(),
                 SwitchRow(
                     title="Use 24 hour time",
                     description="Toggle between 12-hour (AM/PM) and 24-hour time formats.",
                     active=self.military_time,
                     on_change=lambda x, active: BarStyles.setMilitaryTime(active),
                 ),
+                widgets.Separator(),
                 SwitchRow(
                     title="Show the date",
                     description="Toggle the visibility of the date in the bar.",
                     active=self.show_date,
                     on_change=lambda x, active: BarStyles.setDateVisibility(active),
                 ),
+                widgets.Separator(),
                 SwitchRow(
                     title="Swap the day and month",
                     description="Use the American date format.",
@@ -430,7 +449,7 @@ class MiscCategory(widgets.Box):
         super().__init__(
             css_classes=["settings-category"],
             vertical=True,
-            spacing=5,
+            spacing=0,
             child=[
                 CategoryLabel("Miscellaneous", "more_horiz"),
                 SwitchRow(
@@ -439,6 +458,7 @@ class MiscCategory(widgets.Box):
                     active=user_settings.interface.misc.shell_corners,
                     on_change=lambda x, active: BarStyles.setShellCorners(active),
                 ),
+                widgets.Separator(),
                 SettingsRow(
                     title="Rounded Screen Corners",
                     description="Round the corners of the screen.",
@@ -467,7 +487,7 @@ class InterfaceTab(widgets.Box):
     def __init__(self):
         super().__init__(
             vertical=True,
-            spacing=20,
+            spacing=8,
             css_classes=["settings-body"],
             hexpand=False,
             halign="center",
