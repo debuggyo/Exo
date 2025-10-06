@@ -58,16 +58,20 @@ class QuickSliders(widgets.Box):
             child=children,
         )
 
-        GLib.idle_add(lambda: asyncio.create_task(self._set_initial_values()))
-
-    async def _set_initial_values(self):
-        await asyncio.sleep(0.1)
         if audio.speaker:
-            self.volume_slider.set_value(audio.speaker.volume)
+            audio.speaker.connect("notify::volume", self._on_volume_changed)
+            audio.speaker.connect("notify::is-muted", self._on_volume_changed)
         if backlight.available:
-            self.backlight_slider.set_value(
-                (backlight.brightness / backlight.max_brightness) * 100
-            )
+            backlight.connect("notify::brightness", self._on_brightness_changed)
+
+    def _on_volume_changed(self, stream, *_):
+        if stream.is_muted:
+            self.volume_slider.set_value(0)
+        else:
+            self.volume_slider.set_value(stream.volume)
+
+    def _on_brightness_changed(self, backlight, *_):
+        self.backlight_slider.set_value(backlight.brightness / backlight.max_brightness)
 
     def on_volume_changed(self, slider):
         value = slider.get_value()
