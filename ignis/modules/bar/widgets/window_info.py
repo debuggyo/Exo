@@ -41,7 +41,8 @@ class WindowInfo:
         )
 
         self.update_layout()
-        utils.Poll(100, lambda _: self.update())
+        if self.niri.is_available:
+            self.niri.active_window.connect("notify::title", self.update)
 
     def _is_same_app(self, id1: str, id2: str):
         if not id1 or not id2:
@@ -50,7 +51,7 @@ class WindowInfo:
         id2_lower = id2.lower()
         return id1_lower in id2_lower or id2_lower in id1_lower
 
-    def update(self):
+    def update(self, *args):
         FALLBACK_ICON = "application-x-executable-symbolic"
 
         if self.niri.is_available:

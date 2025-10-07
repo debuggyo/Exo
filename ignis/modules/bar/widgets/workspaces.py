@@ -211,14 +211,19 @@ class Workspaces(widgets.EventBox):
 
         if SERVICE:
             workspaces = SERVICE.workspaces
+            buttons = list(self._workspace_box)
 
-            last_child = self._workspace_box.get_last_child()
-            while last_child:
-                self._workspace_box.remove(last_child)
+            current_ws_ids = [str(b.workspace.id) for b in buttons]
+            new_ws_ids = [str(ws.id) for ws in workspaces]
+
+            if current_ws_ids != new_ws_ids:
                 last_child = self._workspace_box.get_last_child()
+                while last_child:
+                    self._workspace_box.remove(last_child)
+                    last_child = self._workspace_box.get_last_child()
 
-            for workspace in workspaces:
-                self._workspace_box.append(WorkspaceButton(workspace))
+                for workspace in workspaces:
+                    self._workspace_box.append(WorkspaceButton(workspace))
         else:
             pass
 
