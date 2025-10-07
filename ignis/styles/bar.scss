@@ -380,7 +380,7 @@
     }
 
     .recording-icon {
-        font-family: "Material Symbols Outlined";
+        font-family: "Material Symbols Outlined", "Material Icons Outlined";
         font-size: 12pt;
         font-weight: 600;
     }
@@ -408,7 +408,7 @@
         }
         .battery-status {
             font-size: 10pt;
-            font-family: "Material Symbols Outlined";
+            font-family: "Material Symbols Outlined", "Material Icons Outlined";
         }
     }
     &.low {
@@ -439,7 +439,7 @@
     .system-info-tray-container {
         padding: 0px;
         .icon {
-            font-family: "Material Symbols Outlined";
+            font-family: "Material Symbols Outlined", "Material Icons Outlined";
             font-size: 13.5pt;
             font-weight: 500;
         }

@@ -13,9 +13,9 @@
         color: colors.$on_background;
         margin: 2.5px;
         border-radius: 20px;
-        
+
         .power-menu-icon {
-            font-family: "Material Symbols Outlined";
+            font-family: "Material Symbols Outlined", "Material Icons Outlined";
             font-size: 48pt;
         }
 
@@ -24,7 +24,7 @@
             font-weight: 500;
             color: colors.$on_surface_variant;
         }
-        
+
         &:hover {
             background-color: colors.$surface_container_high;
         }
@@ -32,10 +32,12 @@
         &:focus {
             background-color: colors.$primary_container;
             color: colors.$on_primary_container;
-            font-variation-settings: 'FILL' 1;
+            font-variation-settings: "FILL" 1;
             outline: none;
 
-            .power-menu-label {color: colors.$on_primary_container}
+            .power-menu-label {
+                color: colors.$on_primary_container;
+            }
         }
     }
 }

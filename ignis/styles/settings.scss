@@ -11,7 +11,7 @@
         padding: 5px 1rem;
         color: colors.$on_surface;
         .header-title-icon {
-            font-family: "Material Symbols Outlined";
+            font-family: "Material Symbols Outlined", "Material Icons Outlined";
             font-variation-settings: "FILL" 1;
             font-size: 2rem;
         }
@@ -118,7 +118,8 @@
             }
 
             .icon-label {
-                font-family: "Material Symbols Outlined";
+                font-family:
+                    "Material Symbols Outlined", "Material Icons Outlined";
                 font-size: 14pt;
                 font-weight: 600;
             }

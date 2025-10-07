@@ -15,7 +15,7 @@
             border-radius: 20px;
         }
         .notification-center-info-icon {
-            font-family: "Material Symbols Outlined";
+            font-family: "Material Symbols Outlined", "Material Icons Outlined";
             font-size: 24pt;
             color: colors.$on_surface_variant;
             margin-bottom: 5px;
@@ -51,7 +51,8 @@
             border-radius: 8px;
 
             .quick-toggle-icon {
-                font-family: "Material Symbols Outlined";
+                font-family:
+                    "Material Symbols Outlined", "Material Icons Outlined";
                 font-size: 16pt;
             }
 
