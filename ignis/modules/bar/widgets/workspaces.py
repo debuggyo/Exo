@@ -201,7 +201,6 @@ class Workspaces(widgets.EventBox):
         )
         current_style = user_settings.interface.modules.options.workspaces_style
 
-        # Get current workspace IDs
         current_workspace_ids = []
         if SERVICE:
             if isinstance(SERVICE, NiriService):
@@ -209,7 +208,6 @@ class Workspaces(widgets.EventBox):
             elif isinstance(SERVICE, HyprlandService):
                 current_workspace_ids = [ws.id for ws in SERVICE.workspaces]
 
-        # Check if a full rebuild is needed
         if (
             current_style != self._last_style
             or current_workspace_ids != self._last_workspace_ids
@@ -237,15 +235,10 @@ class Workspaces(widgets.EventBox):
                 for workspace in SERVICE.workspaces:
                     self._workspace_box.append(WorkspaceButton(workspace))
             else:
-                pass  # Should not happen if SERVICE is None, but good to be explicit
+                pass
         elif SERVICE:
-            # If no full rebuild, just update existing buttons
             for child in self._workspace_box:
                 if isinstance(child, WorkspaceButton):
-                    # Call the existing update methods on the WorkspaceButton instances
-                    # to refresh their state (active class, icons)
-                    # update_css_classes also handles active state
-                    child.update_css_classes()
                     if current_style == "windows":
                         child._update_icons()
 
