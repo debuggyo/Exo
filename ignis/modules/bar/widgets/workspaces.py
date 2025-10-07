@@ -184,6 +184,9 @@ class Workspaces(widgets.EventBox):
             on_scroll_down=lambda self: self.workspaces_scroll(-1),
         )
 
+        self._last_style = None
+        self._last_workspace_ids = []
+
         if SERVICE:
             SERVICE.connect("notify::workspaces", self.update_workspaces)
             self.update_workspaces()
@@ -196,30 +199,55 @@ class Workspaces(widgets.EventBox):
             if user_settings.interface.modules.bar_id.workspaces == 0
             else user_settings.interface.bar2
         )
-        style = user_settings.interface.modules.options.workspaces_style
+        current_style = user_settings.interface.modules.options.workspaces_style
 
-        self._workspace_box.remove_css_class("dots")
-        self._workspace_box.remove_css_class("windows")
-        self._workspace_box.remove_css_class("numbers")
-
-        if style == "dots":
-            self._workspace_box.add_css_class("dots")
-        elif style == "windows":
-            self._workspace_box.add_css_class("windows")
-        elif style == "numbers":
-            self._workspace_box.add_css_class("numbers")
-
+        # Get current workspace IDs
+        current_workspace_ids = []
         if SERVICE:
-            workspaces = SERVICE.workspaces
-            last_child = self._workspace_box.get_last_child()
-            while last_child:
-                self._workspace_box.remove(last_child)
-                last_child = self._workspace_box.get_last_child()
+            if isinstance(SERVICE, NiriService):
+                current_workspace_ids = [ws.idx for ws in SERVICE.workspaces]
+            elif isinstance(SERVICE, HyprlandService):
+                current_workspace_ids = [ws.id for ws in SERVICE.workspaces]
 
-            for workspace in workspaces:
-                self._workspace_box.append(WorkspaceButton(workspace))
-        else:
-            pass
+        # Check if a full rebuild is needed
+        if (
+            current_style != self._last_style
+            or current_workspace_ids != self._last_workspace_ids
+        ):
+            self._last_style = current_style
+            self._last_workspace_ids = current_workspace_ids
+
+            self._workspace_box.remove_css_class("dots")
+            self._workspace_box.remove_css_class("windows")
+            self._workspace_box.remove_css_class("numbers")
+
+            if current_style == "dots":
+                self._workspace_box.add_css_class("dots")
+            elif current_style == "windows":
+                self._workspace_box.add_css_class("windows")
+            elif current_style == "numbers":
+                self._workspace_box.add_css_class("numbers")
+
+            if SERVICE:
+                last_child = self._workspace_box.get_last_child()
+                while last_child:
+                    self._workspace_box.remove(last_child)
+                    last_child = self._workspace_box.get_last_child()
+
+                for workspace in SERVICE.workspaces:
+                    self._workspace_box.append(WorkspaceButton(workspace))
+            else:
+                pass  # Should not happen if SERVICE is None, but good to be explicit
+        elif SERVICE:
+            # If no full rebuild, just update existing buttons
+            for child in self._workspace_box:
+                if isinstance(child, WorkspaceButton):
+                    # Call the existing update methods on the WorkspaceButton instances
+                    # to refresh their state (active class, icons)
+                    # update_css_classes also handles active state
+                    child.update_css_classes()
+                    if current_style == "windows":
+                        child._update_icons()
 
     def update_layout(self):
         bar = (
