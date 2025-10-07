@@ -43,6 +43,8 @@ class WindowInfo:
         self.update_layout()
         if self.niri.is_available:
             self.niri.active_window.connect("notify::title", self.update)
+        elif self.hyprland.is_available:
+            self.hyprland.active_window.connect("notify::title", self.update)
 
     def _is_same_app(self, id1: str, id2: str):
         if not id1 or not id2:
