@@ -48,7 +48,7 @@ class PowerMenu(widgets.RevealerWindow):
                 PowerMenuButton(
                     icon="restart_alt",
                     label="Reboot",
-                    command="reboot || systemctl restart",
+                    command="reboot || systemctl reboot",
                 ),
                 PowerMenuButton(icon="lock", label="Lock Screen", command="hyprlock"),
                 PowerMenuButton(
