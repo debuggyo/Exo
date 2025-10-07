@@ -71,7 +71,9 @@ class QuickSliders(widgets.Box):
             self.volume_slider.set_value(stream.volume)
 
     def _on_brightness_changed(self, backlight, *_):
-        self.backlight_slider.set_value(backlight.brightness / backlight.max_brightness)
+        self.backlight_slider.set_value(
+            (backlight.brightness / backlight.max_brightness) * 100
+        )
 
     def on_volume_changed(self, slider):
         value = slider.get_value()
