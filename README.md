@@ -6,7 +6,7 @@
 
 *Built with Ignis for the modern Wayland experience*
 
-[![Discord](https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/XjyxD3y5a5)
+[![Discord](https://img.shields.io/badge/Discord-Join%20Server-5865F2?logo=discord&logoColor=white)](https://discord.gg/XjyxD3y5a5)
 ![Stars](https://img.shields.io/github/stars/debuggyo/Exo)
 ![Last Commit](https://img.shields.io/github/last-commit/debuggyo/Exo)
 
