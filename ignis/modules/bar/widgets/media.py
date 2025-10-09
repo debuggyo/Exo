@@ -93,7 +93,7 @@ class Player(widgets.Box):
 
         self.play_pause_label = widgets.Label(
             css_classes=["overlay-icon"],
-            style="font-family: 'Material Symbols Outlined';",
+            style="font-family: 'Material Symbols Outlined', 'Material Icons Outlined';",
             halign="center",
             valign="center",
         )
