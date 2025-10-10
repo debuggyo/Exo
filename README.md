@@ -90,6 +90,7 @@ https://github.com/user-attachments/assets/78e35d82-5fe9-4986-b545-80fc59bc4784
 ### Automatic Installation (Recommended)
 
 The installer script automatically handles cloning, dependency installation, and configuration for Arch-based, Fedora-based, and Ubuntu-based distributions.
+Exo works best on **Arch** and many dependencies are known to have troubles installing on other distros, use at your own risk.
 
 ```bash
 # Install prerequisites
