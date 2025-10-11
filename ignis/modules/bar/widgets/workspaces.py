@@ -13,6 +13,16 @@ elif HyprlandService.get_default().is_available:
 APPLICATIONS = ApplicationsService.get_default()
 
 
+class DummyWorkspace:
+    def __init__(self, id: int):
+        self.id = id
+        self.idx = id
+
+    def switch_to(self):
+        if SERVICE:
+            SERVICE.switch_to_workspace(self.id)
+
+
 def get_active_workspace():
     if not SERVICE:
         return None
@@ -66,6 +76,10 @@ class WorkspaceButton(widgets.Button):
                 self.add_css_class("active")
             else:
                 self.remove_css_class("active")
+            if not self._get_windows_for_workspace():
+                self.add_css_class("empty")
+            else:
+                self.remove_css_class("empty")
 
         if SERVICE:
             SERVICE.connect("notify::workspaces", update_css_classes)
@@ -177,6 +191,15 @@ class Workspaces(widgets.EventBox):
             valign="center",
             vexpand=True,
         )
+        user_settings.interface.modules.options.connect_option(
+            "workspaces_style", lambda: self.update_workspaces()
+        )
+        user_settings.interface.modules.options.connect_option(
+            "fixed_workspaces_enabled", lambda: self.update_workspaces()
+        )
+        user_settings.interface.modules.options.connect_option(
+            "fixed_workspaces_amount", lambda: self.update_workspaces()
+        )
 
         super().__init__(
             child=[self._workspace_box],
@@ -186,12 +209,14 @@ class Workspaces(widgets.EventBox):
 
         self._last_style = None
         self._last_workspace_ids = []
+        self._last_fixed_enabled = False
 
         if SERVICE:
             SERVICE.connect("notify::workspaces", self.update_workspaces)
+            SERVICE.connect("notify::active-workspace", self.update_workspaces)
             self.update_workspaces()
 
-        self.update_layout()
+            self.update_layout()
 
     def update_workspaces(self, *args):
         bar = (
@@ -203,17 +228,30 @@ class Workspaces(widgets.EventBox):
 
         current_workspace_ids = []
         if SERVICE:
+            fixed_enabled = (
+                user_settings.interface.modules.options.fixed_workspaces_enabled
+            )
             if isinstance(SERVICE, NiriService):
                 current_workspace_ids = [ws.idx for ws in SERVICE.workspaces]
             elif isinstance(SERVICE, HyprlandService):
                 current_workspace_ids = [ws.id for ws in SERVICE.workspaces]
 
+            if fixed_enabled != self._last_fixed_enabled:
+                self._last_style = None
+            self._last_workspace_ids = []
         if (
             current_style != self._last_style
             or current_workspace_ids != self._last_workspace_ids
         ):
             self._last_style = current_style
             self._last_workspace_ids = current_workspace_ids
+
+            fixed_enabled = (
+                user_settings.interface.modules.options.fixed_workspaces_enabled
+            )
+            fixed_amount = int(
+                user_settings.interface.modules.options.fixed_workspaces_amount
+            )
 
             self._workspace_box.remove_css_class("dots")
             self._workspace_box.remove_css_class("windows")
@@ -232,15 +270,71 @@ class Workspaces(widgets.EventBox):
                     self._workspace_box.remove(last_child)
                     last_child = self._workspace_box.get_last_child()
 
-                for workspace in SERVICE.workspaces:
+                workspaces_to_display = []
+                if SERVICE:
+                    all_workspaces_map = {}
+                    if isinstance(SERVICE, NiriService):
+                        for ws in SERVICE.workspaces:
+                            all_workspaces_map[ws.idx] = ws
+                    elif isinstance(SERVICE, HyprlandService):
+                        for ws in SERVICE.workspaces:
+                            all_workspaces_map[ws.id] = ws
+
+                    if fixed_enabled and fixed_amount > 0:
+                        active_workspace = get_active_workspace()
+                        if active_workspace:
+                            if isinstance(SERVICE, NiriService):
+                                active_workspace_id = active_workspace.idx
+                            elif isinstance(SERVICE, HyprlandService):
+                                active_workspace_id = active_workspace.id
+                            else:
+                                active_workspace_id = None
+
+                        if active_workspace_id is not None:
+                            if fixed_amount == 1:
+                                page_base_id = active_workspace_id
+                            else:
+                                page_base_id = (
+                                    (active_workspace_id - 1) // fixed_amount
+                                ) * fixed_amount + 1
+
+                            start_id = page_base_id
+                            end_id = page_base_id + fixed_amount - 1
+                            for i in range(start_id, end_id + 1):
+                                if i in all_workspaces_map:
+                                    workspaces_to_display.append(all_workspaces_map[i])
+                                else:
+                                    workspaces_to_display.append(DummyWorkspace(i))
+                        else:
+                            for i in range(1, fixed_amount + 1):
+                                if i in all_workspaces_map:
+                                    workspaces_to_display.append(all_workspaces_map[i])
+                                else:
+                                    workspaces_to_display.append(DummyWorkspace(i))
+                    else:
+                        workspaces_to_display = sorted(
+                            list(all_workspaces_map.values()),
+                            key=lambda ws: ws.idx
+                            if isinstance(SERVICE, NiriService)
+                            else ws.id,
+                        )
+
+                for workspace in workspaces_to_display:
                     self._workspace_box.append(WorkspaceButton(workspace))
             else:
                 pass
         elif SERVICE:
-            for child in self._workspace_box:
-                if isinstance(child, WorkspaceButton):
-                    if current_style == "windows":
-                        child._update_icons()
+            fixed_enabled = (
+                user_settings.interface.modules.options.fixed_workspaces_enabled
+            )
+            if fixed_enabled:
+                self._last_style = None
+                self.update_workspaces()
+            else:
+                for child in self._workspace_box:
+                    if isinstance(child, WorkspaceButton):
+                        if current_style == "windows":
+                            child._update_icons()
 
     def update_layout(self):
         bar = (
@@ -266,6 +360,9 @@ class Workspaces(widgets.EventBox):
     def workspaces_scroll(self, difference: int):
         if not SERVICE:
             return
+
+        fixed_enabled = user_settings.interface.modules.options.fixed_workspaces_enabled
+        fixed_amount = user_settings.interface.modules.options.fixed_workspaces_amount
 
         active_workspace_id = None
 

@@ -69,6 +69,8 @@ class UserSettings(OptionsManager):
                 military_time: bool = False
                 recording_indicator: str = "recording"
                 workspaces_style: str = "numbers"
+                fixed_workspaces_enabled: bool = False
+                fixed_workspaces_amount: int = 10
 
             location = Locations()
             visibility = Visibility()

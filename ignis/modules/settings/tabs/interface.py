@@ -390,9 +390,7 @@ class BarModulesCategory(widgets.Box):
 
 
 class ExtraBarCategory(widgets.Box):
-    military_time = user_settings.interface.modules.options.military_time
-    show_date = user_settings.interface.modules.options.show_date
-    day_month_swapped = user_settings.interface.modules.options.day_month_swapped
+    options = user_settings.interface.modules.options
 
     def __init__(self):
         super().__init__(
@@ -411,7 +409,7 @@ class ExtraBarCategory(widgets.Box):
                                 ("Numbers", "numbers", "counter_1"),
                                 ("Dots", "dots", "more_horiz"),
                             ],
-                            lambda: user_settings.interface.modules.options.workspaces_style,
+                            lambda: self.options.workspaces_style,
                             BarStyles.setWorkspacesStyle,
                             on_any_click=None,
                         )
@@ -419,23 +417,46 @@ class ExtraBarCategory(widgets.Box):
                 ),
                 widgets.Separator(),
                 SwitchRow(
+                    title="Fixed Workspaces",
+                    description="Show a specific amount of workspaces",
+                    active=self.options.fixed_workspaces_enabled,
+                    on_change=lambda x,
+                    active: self.options.set_fixed_workspaces_enabled(active),
+                ),
+                widgets.Separator(),
+                SettingsRow(
+                    title="Fixed Workspaces Amount",
+                    description="How many workspaces to show.",
+                    child=[
+                        widgets.SpinButton(
+                            min=1,
+                            max=20,
+                            step=1,
+                            value=self.options.fixed_workspaces_amount,
+                            on_change=lambda x,
+                            value: self.options.set_fixed_workspaces_amount(int(value)),
+                        )
+                    ],
+                ),
+                widgets.Separator(),
+                SwitchRow(
                     title="Use 24 hour time",
                     description="Toggle between 12-hour (AM/PM) and 24-hour time formats.",
-                    active=self.military_time,
+                    active=self.options.military_time,
                     on_change=lambda x, active: BarStyles.setMilitaryTime(active),
                 ),
                 widgets.Separator(),
                 SwitchRow(
                     title="Show the date",
                     description="Toggle the visibility of the date in the bar.",
-                    active=self.show_date,
+                    active=self.options.show_date,
                     on_change=lambda x, active: BarStyles.setDateVisibility(active),
                 ),
                 widgets.Separator(),
                 SwitchRow(
                     title="Swap the day and month",
                     description="Use the American date format.",
-                    active=self.day_month_swapped,
+                    active=self.options.day_month_swapped,
                     on_change=lambda x, active: BarStyles.setDayMonthSwapped(active),
                 ),
             ],

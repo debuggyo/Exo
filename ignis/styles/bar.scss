@@ -226,12 +226,17 @@
             background: colors.$surface_container_highest;
         }
 
+        &.empty {
+            opacity: 0.5;
+        }
+
         &.active {
             background: colors.$primary;
             color: colors.$on_primary;
             padding: 0px 10px;
             font-weight: 700;
             border-radius: 20px;
+            opacity: 1;
         }
     }
 
