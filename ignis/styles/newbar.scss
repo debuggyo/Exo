@@ -1,0 +1,48 @@
+@use "../colors.scss";
+
+.bar-window {
+    &.full {
+        background-color: colors.$background;
+
+        &.floating {
+            border-radius: 20px;
+        }
+    }
+    &.gradient {
+        &.top {
+            background-image: linear-gradient(
+                to bottom,
+                colors.$background,
+                transparent
+            );
+        }
+        &.bottom {
+            background-image: linear-gradient(
+                to top,
+                colors.$background,
+                transparent
+            );
+        }
+        &.left {
+            background-image: linear-gradient(
+                to right,
+                colors.$background,
+                transparent
+            );
+        }
+        &.right {
+            background-image: linear-gradient(
+                to left,
+                colors.$background,
+                transparent
+            );
+        }
+    }
+
+    .bar-area:not(.empty) {
+        margin: 5px;
+        padding: 0px 1rem;
+        background-color: colors.$surface_container_highest;
+        border-radius: 20px;
+    }
+}
