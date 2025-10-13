@@ -1,6 +1,10 @@
 @use "../colors.scss";
 
+// Window
 .bar-window {
+    color: colors.$on_background;
+
+    /* Backgrounds */
     &.full {
         background-color: colors.$background;
 
@@ -12,37 +16,177 @@
         &.top {
             background-image: linear-gradient(
                 to bottom,
-                colors.$background,
+                rgba(colors.$background, 0.8),
                 transparent
             );
         }
         &.bottom {
             background-image: linear-gradient(
                 to top,
-                colors.$background,
+                rgba(colors.$background, 0.8),
                 transparent
             );
         }
         &.left {
             background-image: linear-gradient(
                 to right,
-                colors.$background,
+                rgba(colors.$background, 0.8),
                 transparent
             );
         }
         &.right {
             background-image: linear-gradient(
                 to left,
-                colors.$background,
+                rgba(colors.$background, 0.8),
                 transparent
             );
         }
     }
 
+    &.areas,
+    &.gradient {
+        .bar-area.area-background {
+            background-color: colors.$background;
+        }
+
+        &.top {
+            &.centered .bar-area,
+            :not(.start-area) {
+                border-bottom-left-radius: 20px;
+            }
+            &.centered .bar-area,
+            :not(.end-area) {
+                border-bottom-right-radius: 20px;
+            }
+        }
+        &.bottom {
+            &.centered .bar-area,
+            :not(.start-area) {
+                border-top-left-radius: 20px;
+            }
+            &.centered .bar-area,
+            :not(.end-area) {
+                border-top-right-radius: 20px;
+            }
+        }
+        &.left {
+            &.centered .bar-area,
+            :not(.start-area) {
+                border-top-right-radius: 20px;
+            }
+            &.centered .bar-area,
+            :not(.end-area) {
+                border-bottom-right-radius: 20px;
+            }
+        }
+        &.right {
+            &.centered .bar-area,
+            :not(.start-area) {
+                border-bottom-left-radius: 20px;
+            }
+            &.centered .bar-area,
+            :not(.end-area) {
+                border-top-left-radius: 20px;
+            }
+        }
+        &.floating {
+            .bar-area {border-radius: 20px;}
+        }
+    }
+
+    /* Modifiers */
+    &.floating {
+        padding: 5px;
+        &.top {padding-bottom: 0px}
+        &.left {padding-right: 0px}
+        &.right {padding-left: 0px}
+        &.bottom {padding-top: 0px}
+    }
+
+    /* Areas */
     .bar-area:not(.empty) {
-        margin: 5px;
-        padding: 0px 1rem;
-        background-color: colors.$surface_container_highest;
-        border-radius: 20px;
+        &.module-backgrounds-connected .area-modules {
+            background-color: colors.$surface_container_high;
+            border-radius: 20px;
+        }
+        &.module-backgrounds-separate .area-modules > * {
+            background-color: colors.$surface_container_high;
+            border-radius: 8px;
+            &:first-child {
+                border-top-left-radius: 20px;
+                border-bottom-left-radius: 20px;
+            }
+            &:last-child {
+                border-top-right-radius: 20px;
+                border-bottom-right-radius: 20px;
+            }
+        }
+        .area-modules > * {
+            padding: 0px 1rem;
+        }
+    }
+    &.cozy {
+        .bar-area:not(.empty) {
+            padding: 5px;
+        }
+    }
+    &.comfortable {
+        .bar-area:not(.empty) {
+            padding: 2px;
+        }
+    }
+    &.compact {
+        .bar-area:not(.empty) {
+            padding: 0px;
+        }
+    }
+    &.vertical {
+        .bar-area:not(.empty) {
+            &.module-backgrounds-connected .area-modules {
+                border-radius: 20px;
+            }
+            &.module-backgrounds-separate .area-modules > * {
+                border-radius: 8px;
+                &:first-child {
+                    border-top-left-radius: 20px;
+                    border-top-right-radius: 20px;
+                }
+                &:last-child {
+                    border-bottom-left-radius: 20px;
+                    border-bottom-right-radius: 20px;
+                }
+            }
+            .area-modules > * {
+                padding: 1rem 0px;
+            }
+        }
+    }
+}
+
+// Modules
+.exo-clock {
+    .time {
+        font-weight: 500;
+    }
+
+    separator {
+        background-color: colors.$outline_variant;
+        margin: 2px 8px;
+        padding: 1px;
+        &.vertical {
+            margin: 8px 5px;
+        }
+    }
+
+    .date {
+        font-weight: 400;
+        font-size: 8pt;
+        opacity: 0.8;
+    }
+
+    &.two-line:not(.no-date) {
+        .time {
+            margin-bottom: -2px;
+        }
     }
 }
