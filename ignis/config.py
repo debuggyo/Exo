@@ -11,6 +11,7 @@ from modules import (
     NotificationPopup,
 )
 from modules.newbar import Bar as NewBar
+from modules.newbar.modules import *
 from ignis.css_manager import CssInfoPath, CssManager
 from ignis import utils, widgets
 from scripts import BarStyles, Wallpaper, auto_dark
@@ -47,13 +48,13 @@ if not user_settings.appearance.wallcolors.dark_mode:
     )
 
 QuickCenter()
-bar = Bar()
-BarStyles.set_bar_instance(bar)
-BarStyles._apply_css(bar.build(), bar_id=0)
-BarStyles._apply_css(bar.build2(), bar_id=1)
-
-BarStyles.setFloating(user_settings.interface.bar.floating, bar_id=0)
-BarStyles.setFloating(user_settings.interface.bar2.floating, bar_id=1)
+# bar = Bar()
+# BarStyles.set_bar_instance(bar)
+# BarStyles._apply_css(bar.build(), bar_id=0)
+# BarStyles._apply_css(bar.build2(), bar_id=1)
+# 
+# BarStyles.setFloating(user_settings.interface.bar.floating, bar_id=0)
+# BarStyles.setFloating(user_settings.interface.bar2.floating, bar_id=1)
 
 if not user_settings.appearance.wallcolors.wallpaper_path:
     default_wallpaper_path = os.path.expanduser("~/Pictures/Wallpapers/default.png")
@@ -81,28 +82,13 @@ NotificationPopup(0)
 utils.Poll(60000, lambda _: auto_dark())
 
 newbar = NewBar(
-    bar_options={
-        "side": "bottom",
-        "floating": False,
-        "density": 0,
-        "background": "full",
-    },
-    modules={
-        "start": [
-            {"clock": {"density": 0, "vertical": False}},
-        ],
-        "center": [
-            {"clock": {"density": 0, "vertical": False, "military_time": True, "month_before_day": True}},
-            {"clock": {"density": 0, "vertical": False}},
-            {"clock": {"density": 0, "vertical": False, "show_date": False}},
-            {"clock": {"density": 0, "vertical": False, "month_before_day": True}},
-            {"clock": {"density": 0, "vertical": False, "military_time": True}},
-            {"clock": {"density": 0, "vertical": False}},
-        ],
-        "end": [
-            {"clock": {"density": 0, "vertical": False}},
-        ],
-    },
+    start_modules=[
+        Clock(),
+        Clock(show_date=False)
+    ],
+    center_modules=[
+        Clock()
+    ]
 )
 
 # newbar.bar_options = {

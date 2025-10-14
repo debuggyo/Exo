@@ -1,10 +1,6 @@
-from ignis import widgets, utils
+from ignis import widgets
 from ignis.base_widget import BaseWidget
 from ignis.gobject import IgnisProperty
-
-from .modules import (
-    Clock
-)
 
 
 class Bar(widgets.Window, BaseWidget):
@@ -13,30 +9,39 @@ class Bar(widgets.Window, BaseWidget):
 
     def __init__(self, **kwargs):
         widgets.Window.__init__(self, namespace="ExoBar")
+        self._constructing = True
+
         self._monitor: int = 0
         self._bar_id: int = 0
-        self._bar_options: dict = {}
-        self._area_options: dict = {}
-        self._modules: dict = {}
+        self._side: str = "top"
+        self._density: int = 0
+        self._floating: bool = False
+        self._centered: bool = False
+        self._background: str = "full"
+        self._start_background: bool = True
+        self._center_background: bool = True
+        self._end_background: bool = True
+        self._start_module_bg: str = "separated"
+        self._center_module_bg: str = "separated"
+        self._end_module_bg: str = "separated"
+        self._start_modules: list = []
+        self._center_modules: list = []
+        self._end_modules: list = []
 
-        self.build()
+        BaseWidget.__init__(self, **kwargs)
+        self._constructing = False
+        self.rebuild()
 
-    def build(self):
-        # Bar Options
-        self.side = self._bar_options.get("side", "top")
+    def rebuild(self):
+        if getattr(self, "_constructing", False):
+            return
+
         self.vertical = self.side in ["left", "right"]
-        self.density = self._bar_options.get("density", 0)
-        self.floating = self._bar_options.get("floating", False)
-        self.centered = self._bar_options.get("centered", False)
-        self.background = self._bar_options.get("background", "full")
-
-        # Anchors
         self.anchor = [self.side]
         if not self.centered:
             key = {True: ["top", "bottom"], False: ["left", "right"]}
             self.anchor.extend(key[self.vertical])
 
-        # heights
         bar_size_key = {0: 40, 1: 35, 2: 30, 3: 25}
         if self.vertical:
             self.width = bar_size_key.get(self.density, 30)
@@ -49,33 +54,40 @@ class Bar(widgets.Window, BaseWidget):
                 self.height += 5
             self.width = -1
 
-        # Area Options
-        self.area_background = ["start", "center", "end"]
-        self.module_backgrounds = {
-            "start": "separate",
-            "center": "separate",
-            "end": "separate",
-        }
-        for area in ["start", "center", "end"]:
-            if area in self._area_options:
-                if "area_background" in self._area_options[area] and not self._area_options[area]["area_background"]:
-                    self.area_background.remove(area)
-                if "module_backgrounds" in self._area_options[area]:
-                    module_background_option = self._area_options[area]["module_backgrounds"]
-                    if module_background_option in ["connected", "separate", "none"]:
-                        self.module_backgrounds[area] = module_background_option
-
         # Create areas
-        self.start_modules = widgets.Box(vertical=self.vertical, css_classes=["area-modules", "start-modules"])
-        self.center_modules = widgets.Box(vertical=self.vertical, css_classes=["area-modules", "center-modules"])
-        self.end_modules = widgets.Box(vertical=self.vertical, css_classes=["area-modules", "end-modules"])
+        start_modules_box = widgets.Box(
+            vertical=self.vertical,
+            css_classes=["area-modules", "start-modules"],
+            child=self.start_modules,
+        )
 
-        self.start_area = widgets.Box(vertical=self.vertical, css_classes=["bar-area", "start-area"],
-                                      child=self.start_modules)
-        self.center_area = widgets.Box(vertical=self.vertical, css_classes=["bar-area", "center-area"],
-                                       child=self.center_modules)
-        self.end_area = widgets.Box(vertical=self.vertical, css_classes=["bar-area", "end-area"],
-                                    child=self.end_modules)
+        center_modules_box = widgets.Box(
+            vertical=self.vertical,
+            css_classes=["area-modules", "center-modules"],
+            child=self.center_modules,
+        )
+
+        end_modules_box = widgets.Box(
+            vertical=self.vertical,
+            css_classes=["area-modules", "end-modules"],
+            child=self.end_modules,
+        )
+
+        self.start_area = widgets.Box(
+            vertical=self.vertical,
+            css_classes=["bar-area", "start-area"],
+            child=[start_modules_box],
+        )
+        self.center_area = widgets.Box(
+            vertical=self.vertical,
+            css_classes=["bar-area", "center-area"],
+            child=[center_modules_box],
+        )
+        self.end_area = widgets.Box(
+            vertical=self.vertical,
+            css_classes=["bar-area", "end-area"],
+            child=[end_modules_box],
+        )
 
         # Create container
         self.container = widgets.CenterBox(
@@ -87,59 +99,26 @@ class Bar(widgets.Window, BaseWidget):
         )
 
         self.set_child(self.container)
-        self.update_modules(self._modules)
 
-        self.set_monitor(self._monitor)
-        self.set_namespace(f"Bar{self._monitor}{self._bar_id}")
+        self.set_monitor(self.monitor)
+        self.set_namespace(f"Bar{self.monitor}{self.bar_id}")
         self.set_height_request(self.height)
         self.set_width_request(self.width)
         self.set_anchor(self.anchor)
         self.set_exclusivity("exclusive")
 
         self.update_css_classes()
-        return self
-
-    def rebuild(self):
-        # This is a simplified rebuild. A full destroy/re-create can be problematic.
-        # For now, we just re-apply settings.
-        self.build()
-
-    def add_module(self, area, module_name, attrs):
-        AREA_MAPPING = {
-            "start": self.start_modules,
-            "center": self.center_modules,
-            "end": self.end_modules,
-        }
-        MODULE_MAPPING = {
-            "ExampleLabel": widgets.Label,
-            "ExampleButton": widgets.Button,
-            "clock": Clock
-        }
-        func = MODULE_MAPPING.get(module_name)
-        if func:
-            AREA_MAPPING[area].append(func(**attrs))
-
-    def update_modules(self, modules):
-        for area in [self.start_modules, self.center_modules, self.end_modules]:
-            # Clear children
-            child = area.get_first_child()
-            while child:
-                area.remove(child)
-                child = area.get_first_child()
-
-        for area, inner_modules_list in modules.items():
-            for module_data in inner_modules_list:
-                for module_name, attrs in module_data.items():
-                    self.add_module(area, module_name, attrs)
-        self.update_css_classes()
 
     def update_css_classes(self):
         # Window
         classes = ["bar-window", self.side]
         classes.append("vertical" if self.vertical else "horizontal")
-        if self.floating: classes.append("floating")
-        if self.centered: classes.append("centered")
-        if self.background: classes.append(self.background)
+        if self.floating:
+            classes.append("floating")
+        if self.centered:
+            classes.append("centered")
+        if self.background:
+            classes.append(self.background)
         density_key = {0: "cozy", 1: "comfortable", 2: "compact", 3: "condensed"}
         if self.density in density_key:
             classes.append(density_key[self.density])
@@ -147,40 +126,43 @@ class Bar(widgets.Window, BaseWidget):
 
         # Areas
         for area in [self.start_area, self.center_area, self.end_area]:
-            key = {self.start_area: "start", self.center_area: "center", self.end_area: "end"}
-            modules_key = {self.start_area: self.start_modules, self.center_area: self.center_modules,
-                           self.end_area: self.end_modules}
+            modules_key = {
+                self.start_area: self.start_modules,
+                self.center_area: self.center_modules,
+                self.end_area: self.end_modules
+            }
+            backgrounds_key = {
+                self.start_area: self.start_background,
+                self.center_area: self.center_background,
+                self.end_area: self.end_background
+            }
+            modules_bg_key = {
+                self.start_area: self.start_module_bg,
+                self.center_area: self.center_module_bg,
+                self.end_area: self.end_module_bg
+            }
+            all_possible_classes = [
+                "empty", "area-background", "module-backgrounds-connected", "module-backgrounds-separate"
+            ]
 
-            area.remove_css_class("empty")
-            area.remove_css_class("area-background")
-            area.remove_css_class(f"module-backgrounds-{self.module_backgrounds.get(key[area])}")
+            modules = modules_key[area]
+            background = backgrounds_key[area]
+            modules_bg = modules_bg_key[area]
 
-            if len(modules_key[area].child) == 0:
+            for css_class in all_possible_classes:
+                area.remove_css_class(css_class)
+            if len(modules) == 0:
                 area.add_css_class("empty")
-            if key[area] in self.area_background:
+            if background:
                 area.add_css_class("area-background")
-            if key[area] in self.module_backgrounds:
-                area.add_css_class(f"module-backgrounds-{self.module_backgrounds[key[area]]}")
+            if modules_bg == "connected":
+                area.add_css_class("module-backgrounds-connected")
+            elif modules_bg == "separated":
+                area.add_css_class("module-backgrounds-separated")
 
     @IgnisProperty
     def monitor(self) -> int:
         return self._monitor
-
-    @IgnisProperty
-    def bar_id(self) -> int:
-        return self._bar_id
-
-    @IgnisProperty
-    def bar_options(self) -> dict:
-        return self._bar_options
-
-    @IgnisProperty
-    def area_options(self) -> dict:
-        return self._area_options
-
-    @IgnisProperty
-    def modules(self) -> dict:
-        return self._modules
 
     @monitor.setter
     def monitor(self, value: int) -> None:
@@ -189,6 +171,10 @@ class Bar(widgets.Window, BaseWidget):
         self._monitor = value
         self.rebuild()
 
+    @IgnisProperty
+    def bar_id(self) -> int:
+        return self._bar_id
+
     @bar_id.setter
     def bar_id(self, value: int) -> None:
         if self._bar_id == value:
@@ -196,23 +182,150 @@ class Bar(widgets.Window, BaseWidget):
         self._bar_id = value
         self.rebuild()
 
-    @bar_options.setter
-    def bar_options(self, value: dict) -> None:
-        if self._bar_options == value:
+    @IgnisProperty
+    def side(self) -> str:
+        return self._side
+
+    @side.setter
+    def side(self, value: str) -> None:
+        if self._side == value:
             return
-        self._bar_options = value
+        self._side = value
         self.rebuild()
 
-    @area_options.setter
-    def area_options(self, value: dict) -> None:
-        if self._area_options == value:
+    @IgnisProperty
+    def density(self) -> int:
+        return self._density
+
+    @density.setter
+    def density(self, value: int) -> None:
+        if self._density == value:
             return
-        self._area_options = value
+        self._density = value
         self.rebuild()
 
-    @modules.setter
-    def modules(self, value: dict) -> None:
-        if self._modules == value:
+    @IgnisProperty
+    def floating(self) -> bool:
+        return self._floating
+
+    @floating.setter
+    def floating(self, value: bool) -> None:
+        if self._floating == value:
             return
-        self._modules = value
-        self.update_modules(value)
+        self._floating = value
+        self.rebuild()
+
+    @IgnisProperty
+    def centered(self) -> bool:
+        return self._centered
+
+    @centered.setter
+    def centered(self, value: bool) -> None:
+        if self._centered == value:
+            return
+        self._centered = value
+        self.rebuild()
+
+    @IgnisProperty
+    def background(self) -> str:
+        return self._background
+
+    @background.setter
+    def background(self, value: str):
+        if self._background == value:
+            return
+        self._background = value
+        self.rebuild()
+
+    @IgnisProperty
+    def start_background(self) -> bool:
+        return self._start_background
+
+    @start_background.setter
+    def start_background(self, value: bool):
+        if self._start_background == value:
+            return
+        self._start_background = value
+        self.rebuild()
+
+    @IgnisProperty
+    def center_background(self) -> bool:
+        return self._center_background
+
+    @center_background.setter
+    def center_background(self, value: bool):
+        if self._center_background == value:
+            return
+        self._center_background = value
+        self.rebuild()
+
+    @IgnisProperty
+    def end_background(self) -> bool:
+        return self._end_background
+
+    @end_background.setter
+    def end_background(self, value: bool):
+        if self._end_background == value:
+            return
+        self._end_background = value
+        self.rebuild()
+
+    @IgnisProperty
+    def start_module_bg(self) -> str:
+        return self._start_module_bg
+
+    @start_module_bg.setter
+    def start_module_bg(self, value: str):
+        if self._start_module_bg == value:
+            return
+        self._start_module_bg = value
+        self.rebuild()
+
+    @IgnisProperty
+    def center_module_bg(self) -> str:
+        return self._center_module_bg
+
+    @center_module_bg.setter
+    def center_module_bg(self, value: str):
+        if self._center_module_bg == value:
+            return
+        self._center_module_bg = value
+        self.rebuild()
+
+    @IgnisProperty
+    def end_module_bg(self) -> str:
+        return self._end_module_bg
+
+    @end_module_bg.setter
+    def end_module_bg(self, value: str):
+        if self._end_module_bg == value:
+            return
+        self._end_module_bg = value
+        self.rebuild()
+
+    @IgnisProperty
+    def start_modules(self) -> list:
+        return self._start_modules
+
+    @start_modules.setter
+    def start_modules(self, value: list) -> None:
+        self._start_modules = value
+        self.rebuild()
+
+    @IgnisProperty
+    def center_modules(self) -> list:
+        return self._center_modules
+
+    @center_modules.setter
+    def center_modules(self, value: list) -> None:
+        self._center_modules = value
+        self.rebuild()
+
+    @IgnisProperty
+    def end_modules(self) -> list:
+        return self._end_modules
+
+    @end_modules.setter
+    def end_modules(self, value: list) -> None:
+        self._end_modules = value
+        self.rebuild()
