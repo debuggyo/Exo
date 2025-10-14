@@ -8,21 +8,13 @@ class Clock(Gtk.Box, BaseWidget):
     __gtype_name__ = "ExoClock"
     __gproperties__ = {**BaseWidget.gproperties}
 
-    def __init__(
-        self,
-        vertical: bool = False,
-        show_date: bool = True,
-        density: bool = True,
-        month_before_day: bool = False,
-        military_time: bool = False,
-        **kwargs
-    ):
+    def __init__(self, **kwargs):
         Gtk.Box.__init__(self)
-        self._vertical = vertical
-        self._show_date = show_date
-        self._two_line = True if density == 0 else False
-        self._month_before_day = month_before_day
-        self._military_time = military_time
+        self._vertical: bool = False
+        self._show_date: bool = True
+        self._density: int = 0
+        self._month_before_day: bool = False
+        self._military_time: bool = False
 
         self.time_label = Gtk.Label(label="Time", justify=Gtk.Justification.CENTER, vexpand=True)
         self.date_label = Gtk.Label(label="Date", justify=Gtk.Justification.CENTER, vexpand=True)
@@ -52,8 +44,8 @@ class Clock(Gtk.Box, BaseWidget):
         return self._show_date
 
     @IgnisProperty
-    def two_line(self) -> bool:
-        return self._two_line
+    def density(self) -> int:
+        return self._density
 
     @IgnisProperty
     def month_before_day(self) -> bool:
@@ -73,9 +65,9 @@ class Clock(Gtk.Box, BaseWidget):
         self._show_date = value
         self.update_layout()
 
-    @two_line.setter
-    def two_line(self, value: bool) -> None:
-        self._two_line = value
+    @density.setter
+    def density(self, value: int) -> None:
+        self._density = value
         self.update_layout()
 
     @month_before_day.setter
@@ -89,24 +81,26 @@ class Clock(Gtk.Box, BaseWidget):
         self.update_layout()
 
     def update_layout(self):
-        self.set_orientation(Gtk.Orientation.VERTICAL if self._vertical or self._two_line else Gtk.Orientation.HORIZONTAL)
+        two_line = True if self._density == 0 else False
+
+        self.set_orientation(Gtk.Orientation.VERTICAL if self._vertical or two_line else Gtk.Orientation.HORIZONTAL)
         self.date_label.set_visible(True if self._show_date else False)
         self.separator.set_orientation(Gtk.Orientation.HORIZONTAL if self._vertical else Gtk.Orientation.VERTICAL)
-        self.separator.set_visible(True if self._show_date and not self._two_line or self._vertical else False)
+        self.separator.set_visible(True if self._show_date and not two_line or self._vertical else False)
 
         if self._show_date:
-            self.time_label.set_valign(Gtk.Align.END if not self._vertical and self._two_line else Gtk.Align.CENTER)
-            self.date_label.set_valign(Gtk.Align.START if not self._vertical and self._two_line else Gtk.Align.CENTER)
+            self.time_label.set_valign(Gtk.Align.END if not self._vertical and two_line else Gtk.Align.CENTER)
+            self.date_label.set_valign(Gtk.Align.START if not self._vertical and two_line else Gtk.Align.CENTER)
         else:
             self.time_label.set_valign(Gtk.Align.CENTER)
 
-        if not self._vertical and self._two_line: # date under time, horizontal bar
+        if not self._vertical and two_line: # date under time, horizontal bar
             self.set_spacing(0)
         else:
             self.set_spacing(5)
 
         # CSS Classes
-        if self._two_line:
+        if two_line:
             self.add_css_class("two-line")
         else:
             self.remove_css_class("two-line")
