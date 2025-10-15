@@ -345,7 +345,6 @@ class ExoInstaller:
                 "cargo",
                 "gnome-bluetooth-libs",
                 "adw-gtk3-theme",
-                "material-icons-fonts",
                 "meson",
                 "ninja-build",
                 "pkg-config",
@@ -433,6 +432,33 @@ class ExoInstaller:
                     )
                 else:
                     self.run_command(["export", "PATH=\"$PATH:~/.cargo/bin\""])
+                
+                print("\n Installing required fonts...")
+                result = self.run_command(["wget", "https://github.com/google/material-design-icons/raw/refs/heads/master/variablefont/MaterialSymbolsOutlined%5BFILL,GRAD,opsz,wght%5D.ttf"])
+                if result is None or (
+                    hasattr(result, "returncode") and result.returncode != 0
+                ):
+                    print(
+                        f"{self.Colors.RED}Failed to download the font.{self.Colors.ENDC}"
+                    )
+                else:
+                    result = self.run_command(["sudo", "mkdir", "-p", "/usr/share/fonts/material-symbols-icons"])
+                    if result is None or (
+                        hasattr(result, "returncode") and result.returncode != 0
+                    ):
+                        print(
+                            f"{self.Colors.RED}Failed to create the folder for the font.{self.Colors.ENDC}"
+                        )
+                    else:
+                        result = self.run_command(["sudo", "mv", "MaterialSymbolsOutlined[FILL,GRAD,opsz,wght].ttf", "/usr/share/fonts/material-symbols-icons"])
+                        if result is None or (
+                            hasattr(result, "returncode") and result.returncode != 0
+                        ):
+                            print(
+                                f"{self.Colors.RED}Failed to install the font.{self.Colors.ENDC}"
+                            )
+                        else:
+                            self.run_command(["fc-cache", "-v"])
             elif self.distro == "ubuntu":
                 result = self.run_command(["sudo", "apt", "update"])
                 if result is None or (
