@@ -1,18 +1,35 @@
 from ignis import widgets
 from ignis.base_widget import BaseWidget
 from ignis.gobject import IgnisProperty
+from gi.repository import GObject
 
+class BarSide(GObject.GEnum):
+    TOP = 0
+    BOTTOM = 1
+    LEFT = 2
+    RIGHT = 3
+
+class BarBackground(GObject.GEnum):
+    FULL = 0
+    AREAS = 1
+    GRADIENT = 2
+    NONE = 3
+
+class ModuleBackground(GObject.GEnum):
+    SEPARATED = 0
+    CONNECTED = 1
+    NONE = 2
 
 class Bar(widgets.Window, BaseWidget):
     __gtype_name__ = "ExoBar"
     __gproperties__ = {**BaseWidget.gproperties}
 
     def __init__(self, **kwargs):
-        widgets.Window.__init__(self, namespace="ExoBar")
         self._constructing = True
-
+        self._bar_id: int = kwargs.get("bar_id", 0)
+        unique_namespace = f"ExoBar{self.bar_id}"
+        widgets.Window.__init__(self, namespace=unique_namespace)
         self._monitor: int = 0
-        self._bar_id: int = 0
         self._side: str = "top"
         self._density: int = 0
         self._floating: bool = False
@@ -28,6 +45,7 @@ class Bar(widgets.Window, BaseWidget):
         self._center_modules: list = []
         self._end_modules: list = []
 
+
         BaseWidget.__init__(self, **kwargs)
         self._constructing = False
         self.rebuild()
@@ -36,41 +54,55 @@ class Bar(widgets.Window, BaseWidget):
         if getattr(self, "_constructing", False):
             return
 
+        for module in self.start_modules + self.center_modules + self.end_modules:
+            if hasattr(module, "get_parent"):
+                parent = module.get_parent()
+                if parent and hasattr(parent, "remove"):
+                    parent.remove(module)
+
         self.vertical = self.side in ["left", "right"]
         self.anchor = [self.side]
         if not self.centered:
             key = {True: ["top", "bottom"], False: ["left", "right"]}
             self.anchor.extend(key[self.vertical])
 
+        for module in self.start_modules + self.center_modules + self.end_modules:
+            if hasattr(module, "vertical"):
+                module.vertical = self.vertical
+            if hasattr(module, "density"):
+                module.density = self.density
+
         bar_size_key = {0: 40, 1: 35, 2: 30, 3: 25}
         if self.vertical:
             self.width = bar_size_key.get(self.density, 30)
-            if self.floating:
+            if self.floating and self.background != "full":
                 self.width += 5
             self.height = -1
         else:
             self.height = bar_size_key.get(self.density, 30)
-            if self.floating:
+            if self.floating and self.background != "full":
                 self.height += 5
             self.width = -1
 
-        # Create areas
         start_modules_box = widgets.Box(
             vertical=self.vertical,
             css_classes=["area-modules", "start-modules"],
             child=self.start_modules,
+            spacing=2,
         )
 
         center_modules_box = widgets.Box(
             vertical=self.vertical,
             css_classes=["area-modules", "center-modules"],
             child=self.center_modules,
+            spacing=2,
         )
 
         end_modules_box = widgets.Box(
             vertical=self.vertical,
             css_classes=["area-modules", "end-modules"],
             child=self.end_modules,
+            spacing=2,
         )
 
         self.start_area = widgets.Box(
@@ -89,7 +121,6 @@ class Bar(widgets.Window, BaseWidget):
             child=[end_modules_box],
         )
 
-        # Create container
         self.container = widgets.CenterBox(
             vertical=self.vertical,
             start_widget=self.start_area,
@@ -107,10 +138,20 @@ class Bar(widgets.Window, BaseWidget):
         self.set_anchor(self.anchor)
         self.set_exclusivity("exclusive")
 
+        if self.floating and self.background == "full":
+            self.set_margin_top(5 if self.side != "bottom" else 0)
+            self.set_margin_left(5 if self.side != "right" else 0)
+            self.set_margin_right(5 if self.side != "left" else 0)
+            self.set_margin_bottom(5 if self.side != "top" else 0)
+        else:
+            self.set_margin_top(0)
+            self.set_margin_left(0)
+            self.set_margin_right(0)
+            self.set_margin_bottom(0)
+
         self.update_css_classes()
 
     def update_css_classes(self):
-        # Window
         classes = ["bar-window", self.side]
         classes.append("vertical" if self.vertical else "horizontal")
         if self.floating:
@@ -124,7 +165,6 @@ class Bar(widgets.Window, BaseWidget):
             classes.append(density_key[self.density])
         self.set_css_classes(classes)
 
-        # Areas
         for area in [self.start_area, self.center_area, self.end_area]:
             modules_key = {
                 self.start_area: self.start_modules,
@@ -142,7 +182,7 @@ class Bar(widgets.Window, BaseWidget):
                 self.end_area: self.end_module_bg
             }
             all_possible_classes = [
-                "empty", "area-background", "module-backgrounds-connected", "module-backgrounds-separate"
+                "empty", "area-background", "module-backgrounds-connected", "module-backgrounds-separated"
             ]
 
             modules = modules_key[area]
@@ -182,18 +222,28 @@ class Bar(widgets.Window, BaseWidget):
         self._bar_id = value
         self.rebuild()
 
-    @IgnisProperty
+    @IgnisProperty(type=BarSide, default=BarSide.TOP)
     def side(self) -> str:
         return self._side
 
     @side.setter
-    def side(self, value: str) -> None:
-        if self._side == value:
+    def side(self, value: int) -> None:
+        INT_TO_STR = {
+            BarSide.TOP: "top",
+            BarSide.BOTTOM: "bottom",
+            BarSide.LEFT: "left",
+            BarSide.RIGHT: "right",
+        }
+        new_side = INT_TO_STR.get(value)
+
+        if not new_side or self._side == new_side:
             return
-        self._side = value
+
+        self._side = new_side
+        self.set_anchor(None)
         self.rebuild()
 
-    @IgnisProperty
+    @IgnisProperty(type=int, minimum=0, maximum=3, default=0)
     def density(self) -> int:
         return self._density
 
@@ -224,17 +274,26 @@ class Bar(widgets.Window, BaseWidget):
         if self._centered == value:
             return
         self._centered = value
+        self.set_anchor(None)
         self.rebuild()
 
-    @IgnisProperty
+    @IgnisProperty(type=BarBackground, default=BarBackground.FULL)
     def background(self) -> str:
         return self._background
 
     @background.setter
-    def background(self, value: str):
-        if self._background == value:
+    def background(self, value: int):
+        INT_TO_STR = {
+            BarBackground.FULL: "full",
+            BarBackground.AREAS: "areas",
+            BarBackground.GRADIENT: "gradient",
+            BarBackground.NONE: "none",
+        }
+        new_background = INT_TO_STR.get(value)
+
+        if not new_background or self._background == new_background:
             return
-        self._background = value
+        self._background = new_background
         self.rebuild()
 
     @IgnisProperty
@@ -270,37 +329,58 @@ class Bar(widgets.Window, BaseWidget):
         self._end_background = value
         self.rebuild()
 
-    @IgnisProperty
+    @IgnisProperty(type=ModuleBackground, default=ModuleBackground.SEPARATED)
     def start_module_bg(self) -> str:
         return self._start_module_bg
 
     @start_module_bg.setter
-    def start_module_bg(self, value: str):
-        if self._start_module_bg == value:
+    def start_module_bg(self, value: int):
+        INT_TO_STR = {
+            ModuleBackground.SEPARATED: "separated",
+            ModuleBackground.CONNECTED: "connected",
+            ModuleBackground.NONE: "none",
+        }
+        new_bg = INT_TO_STR.get(value)
+
+        if not new_bg or self._start_module_bg == new_bg:
             return
-        self._start_module_bg = value
+        self._start_module_bg = new_bg
         self.rebuild()
 
-    @IgnisProperty
+    @IgnisProperty(type=ModuleBackground, default=ModuleBackground.SEPARATED)
     def center_module_bg(self) -> str:
         return self._center_module_bg
 
     @center_module_bg.setter
-    def center_module_bg(self, value: str):
-        if self._center_module_bg == value:
+    def center_module_bg(self, value: int):
+        INT_TO_STR = {
+            ModuleBackground.SEPARATED: "separated",
+            ModuleBackground.CONNECTED: "connected",
+            ModuleBackground.NONE: "none",
+        }
+        new_bg = INT_TO_STR.get(value)
+
+        if not new_bg or self._center_module_bg == new_bg:
             return
-        self._center_module_bg = value
+        self._center_module_bg = new_bg
         self.rebuild()
 
-    @IgnisProperty
+    @IgnisProperty(type=ModuleBackground, default=ModuleBackground.SEPARATED)
     def end_module_bg(self) -> str:
         return self._end_module_bg
 
     @end_module_bg.setter
-    def end_module_bg(self, value: str):
-        if self._end_module_bg == value:
+    def end_module_bg(self, value: int):
+        INT_TO_STR = {
+            ModuleBackground.SEPARATED: "separated",
+            ModuleBackground.CONNECTED: "connected",
+            ModuleBackground.NONE: "none",
+        }
+        new_bg = INT_TO_STR.get(value)
+
+        if not new_bg or self._end_module_bg == new_bg:
             return
-        self._end_module_bg = value
+        self._end_module_bg = new_bg
         self.rebuild()
 
     @IgnisProperty

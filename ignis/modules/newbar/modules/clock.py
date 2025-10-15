@@ -11,8 +11,8 @@ class Clock(Gtk.Box, BaseWidget):
     def __init__(self, **kwargs):
         Gtk.Box.__init__(self)
         self._vertical: bool = False
-        self._show_date: bool = True
         self._density: int = 0
+        self._show_date: bool = True
         self._month_before_day: bool = False
         self._military_time: bool = False
 
@@ -20,13 +20,19 @@ class Clock(Gtk.Box, BaseWidget):
         self.date_label = Gtk.Label(label="Date", justify=Gtk.Justification.CENTER, vexpand=True)
         self.month_label = Gtk.Label(label="Month", justify=Gtk.Justification.CENTER, vexpand=True)
         self.separator = Gtk.Separator()
+        self.date_separator = Gtk.Separator()
 
         self.append(self.time_label)
         self.append(self.separator)
         self.append(self.date_label)
+        self.append(self.date_separator)
+        self.append(self.month_label)
 
         self.time_label.add_css_class("time")
+        self.separator.add_css_class("main-separator")
         self.date_label.add_css_class("date")
+        self.date_separator.add_css_class("date-separator")
+        self.month_label.add_css_class("month")
         self.add_css_class("exo-clock")
         self.set_overflow(Gtk.Overflow.HIDDEN)
 
@@ -85,8 +91,10 @@ class Clock(Gtk.Box, BaseWidget):
 
         self.set_orientation(Gtk.Orientation.VERTICAL if self._vertical or two_line else Gtk.Orientation.HORIZONTAL)
         self.date_label.set_visible(True if self._show_date else False)
+        self.date_separator.set_visible(True if self._vertical and self._show_date else False)
+        self.month_label.set_visible(True if self._vertical and self._show_date else False)
         self.separator.set_orientation(Gtk.Orientation.HORIZONTAL if self._vertical else Gtk.Orientation.VERTICAL)
-        self.separator.set_visible(True if self._show_date and not two_line or self._vertical else False)
+        self.separator.set_visible(True if self._show_date and not two_line or self._show_date and self._vertical else False)
 
         if self._show_date:
             self.time_label.set_valign(Gtk.Align.END if not self._vertical and two_line else Gtk.Align.CENTER)
@@ -99,6 +107,7 @@ class Clock(Gtk.Box, BaseWidget):
         else:
             self.set_spacing(5)
 
+
         # CSS Classes
         if two_line:
             self.add_css_class("two-line")
@@ -108,12 +117,17 @@ class Clock(Gtk.Box, BaseWidget):
             self.add_css_class("no-date")
         else:
             self.remove_css_class("no-date")
+        if self._vertical:
+            self.add_css_class("clock-vertical")
+        else:
+            self.remove_css_class("clock-vertical")
 
     def update_time(self):
         now = datetime.datetime.now()
         if self._vertical:
             time_format = "%H%n%M" if self._military_time else "%I%n%M"
-            date_format = "%d%n%m" if not self._month_before_day else "%m%n%d"
+            date_format = "%d" if not self._month_before_day else "%m"
+            month_format = "%m" if not self._month_before_day else "%d"
         else:
             time_format = "%H:%M" if self._military_time else "%I:%M %p"
             date_format = "%a %d %b" if not self._month_before_day else "%a %b %d"
@@ -121,3 +135,5 @@ class Clock(Gtk.Box, BaseWidget):
         self.time_label.set_label(now.strftime(time_format))
         if self._show_date:
             self.date_label.set_label(now.strftime(date_format))
+            if self._vertical:
+                self.month_label.set_label(now.strftime(month_format))

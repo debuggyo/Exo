@@ -95,12 +95,21 @@
     }
 
     /* Modifiers */
-    &.floating {
+    &.floating:not(.full) {
         padding: 5px;
         &.top {padding-bottom: 0px}
         &.left {padding-right: 0px}
         &.right {padding-left: 0px}
         &.bottom {padding-top: 0px}
+    }
+
+    &:not(.floating):not(.centered) {
+        &.horizontal {
+            padding: 0px calc(1rem - 5px);
+        }
+        &.vertical {
+            padding: calc(1rem - 5px) 0px;
+        }
     }
 
     /* Areas */
@@ -109,7 +118,7 @@
             background-color: colors.$surface_container_high;
             border-radius: 20px;
         }
-        &.module-backgrounds-separate .area-modules > * {
+        &.module-backgrounds-separated .area-modules > * {
             background-color: colors.$surface_container_high;
             border-radius: 8px;
             &:first-child {
@@ -145,7 +154,7 @@
             &.module-backgrounds-connected .area-modules {
                 border-radius: 20px;
             }
-            &.module-backgrounds-separate .area-modules > * {
+            &.module-backgrounds-separated .area-modules > * {
                 border-radius: 8px;
                 &:first-child {
                     border-top-left-radius: 20px;
@@ -169,16 +178,17 @@
         font-weight: 500;
     }
 
-    separator {
+    .main-separator {
         background-color: colors.$outline_variant;
         margin: 2px 8px;
-        padding: 1px;
+        min-height: 2px;
+        min-width: 2px;
         &.vertical {
             margin: 8px 5px;
         }
     }
 
-    .date {
+    .date, .month {
         font-weight: 400;
         font-size: 8pt;
         opacity: 0.8;
@@ -187,6 +197,49 @@
     &.two-line:not(.no-date) {
         .time {
             margin-bottom: -2px;
+        }
+    }
+
+    .date-separator {
+        min-height: 2px;
+        transform: skewY(-20deg);
+        margin: 0px 5px;
+        background: rgba(colors.$on_surface, 0.3);
+    }
+
+    &.clock-vertical {
+        .date {
+            margin-bottom: -5px;
+            margin-left: -5px;
+        }
+        .month {
+            margin-top: -5px;
+            margin-right: -5px;
+        }
+    }
+}
+
+.exo-window {
+    .title {
+        font-weight: 500;
+        margin-bottom: -2px;
+    }
+
+    .app-id {
+        font-weight: 400;
+        font-size: 8pt;
+        opacity: 0.8;
+    }
+
+    &:not(.window-vertical) {
+        .icon {
+            margin-left: -0.3rem;
+        }
+    }
+
+    &.window-vertical {
+        .icon {
+            margin: -0.5rem 0px;
         }
     }
 }
