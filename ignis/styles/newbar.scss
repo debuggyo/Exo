@@ -103,15 +103,6 @@
         &.bottom {padding-top: 0px}
     }
 
-    &:not(.floating):not(.centered) {
-        &.horizontal {
-            padding: 0px calc(1rem - 5px);
-        }
-        &.vertical {
-            padding: calc(1rem - 5px) 0px;
-        }
-    }
-
     /* Areas */
     .bar-area:not(.empty) {
         &.module-backgrounds-connected .area-modules {
@@ -240,6 +231,12 @@
     &.window-vertical {
         .icon {
             margin: -0.5rem 0px;
+        }
+    }
+
+    &.no-labels {
+        .icon {
+            margin: 0px -0.5rem;
         }
     }
 }
