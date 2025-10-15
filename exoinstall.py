@@ -442,8 +442,7 @@ class ExoInstaller:
                         f"{self.Colors.RED}Failed to download the font.{self.Colors.ENDC}"
                     )
                 else:
-                    self.run_command(["mkdir", "~/.local/share/fonts"])
-                    result = self.run_command(["mkdir", "-p", "~/.local/share/fonts/material-symbols-icons"])
+                    result = self.run_command(["sudo", "mkdir", "-p", "/usr/share/fonts/material-symbols-icons"])
                     if result is None or (
                         hasattr(result, "returncode") and result.returncode != 0
                     ):
@@ -451,7 +450,7 @@ class ExoInstaller:
                             f"{self.Colors.RED}Failed to create the folder for the font.{self.Colors.ENDC}"
                         )
                     else:
-                        result = self.run_command(["mv", "MaterialSymbolsOutlined[FILL,GRAD,opsz,wght].ttf", "~/.local/share/fonts/material-symbols-icons"])
+                        result = self.run_command(["sudo", "mv", "MaterialSymbolsOutlined[FILL,GRAD,opsz,wght].ttf", "/usr/share/fonts/material-symbols-icons"])
                         if result is None or (
                             hasattr(result, "returncode") and result.returncode != 0
                         ):
