@@ -13,28 +13,28 @@
         }
     }
     &.gradient {
-        &.top {
+        &.top .bar-container {
             background-image: linear-gradient(
                 to bottom,
                 rgba(colors.$background, 0.8),
                 transparent
             );
         }
-        &.bottom {
+        &.bottom .bar-container {
             background-image: linear-gradient(
                 to top,
                 rgba(colors.$background, 0.8),
                 transparent
             );
         }
-        &.left {
+        &.left .bar-container {
             background-image: linear-gradient(
                 to right,
                 rgba(colors.$background, 0.8),
                 transparent
             );
         }
-        &.right {
+        &.right .bar-container {
             background-image: linear-gradient(
                 to left,
                 rgba(colors.$background, 0.8),
@@ -96,11 +96,11 @@
 
     /* Modifiers */
     &.floating:not(.full) {
-        padding: 5px;
-        &.top {padding-bottom: 0px}
-        &.left {padding-right: 0px}
-        &.right {padding-left: 0px}
-        &.bottom {padding-top: 0px}
+        .bar-container {padding: 5px;}
+        &.top .bar-container {padding-bottom: 0px}
+        &.left .bar-container {padding-right: 0px}
+        &.right .bar-container {padding-left: 0px}
+        &.bottom .bar-container {padding-top: 0px}
     }
 
     /* Areas */
@@ -239,4 +239,8 @@
             margin: 0px -0.5rem;
         }
     }
+}
+
+.background {
+    background-color: rgba(0, 0, 0, 0.1);
 }

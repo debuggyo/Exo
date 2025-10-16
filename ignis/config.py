@@ -82,37 +82,31 @@ NotificationPopup(0)
 utils.Poll(60000, lambda _: auto_dark())
 
 newbar = NewBar(
+    autohide=True,
     side="bottom",
-    background="areas",
+    background="gradient",
     start_modules=[
         Window(),
-        Window(),
-        Window(),
-        Window(),
+    ],
+    center_modules=[
         Clock(),
-        Clock(
-            military_time=True,
-        ),
-        Clock(
-            show_date=False,
-        ),
     ]
 )
-newbar2 = NewBar(
-    bar_id=1,
-    side="left",
-    background="gradient",
-    end_modules=[
-        Window(),
-        Clock(),
-        Clock(
-            military_time=True,
-        ),
-        Clock(
-            show_date=False,
-        ),
-    ]
-)
+# newbar2 = NewBar(
+#     bar_id=1,
+#     side="left",
+#     background="gradient",
+#     end_modules=[
+#         Window(),
+#         Clock(),
+#         Clock(
+#             military_time=True,
+#         ),
+#         Clock(
+#             show_date=False,
+#         ),
+#     ]
+# )
 
 # newbar.bar_options = {
 #     "side": "left",

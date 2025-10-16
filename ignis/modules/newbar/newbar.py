@@ -1,7 +1,8 @@
 from ignis import widgets
 from ignis.base_widget import BaseWidget
 from ignis.gobject import IgnisProperty
-from gi.repository import GObject
+from gi.repository import GObject, Gtk
+from ignis.services.niri import NiriService
 
 class BarSide(GObject.GEnum):
     TOP = 0
@@ -35,6 +36,8 @@ class Bar(widgets.Window, BaseWidget):
         self._floating: bool = False
         self._centered: bool = False
         self._background: str = "full"
+        self._autohide: bool = False
+        self._autohide_fullscreen: bool = False
         self._start_background: bool = True
         self._center_background: bool = True
         self._end_background: bool = True
@@ -44,15 +47,22 @@ class Bar(widgets.Window, BaseWidget):
         self._start_modules: list = []
         self._center_modules: list = []
         self._end_modules: list = []
-
+        self._hot_edge = None
+        self._motion_controller = None
+        self.niri = NiriService.get_default()
 
         BaseWidget.__init__(self, **kwargs)
+
         self._constructing = False
         self.rebuild()
 
     def rebuild(self):
         if getattr(self, "_constructing", False):
             return
+
+        if self._hot_edge:
+            self._hot_edge.destroy()
+            self._hot_edge = None
 
         for module in self.start_modules + self.center_modules + self.end_modules:
             if hasattr(module, "get_parent"):
@@ -121,22 +131,40 @@ class Bar(widgets.Window, BaseWidget):
             child=[end_modules_box],
         )
 
+        bar_size = {0: 40, 1: 35, 2: 30, 3: 25}.get(self.density, 30)
+        if self.vertical:
+            self.start_area.set_width_request(bar_size)
+            self.center_area.set_width_request(bar_size)
+            self.end_area.set_width_request(bar_size)
+        else:
+            self.start_area.set_height_request(bar_size)
+            self.center_area.set_height_request(bar_size)
+            self.end_area.set_height_request(bar_size)
+
         self.container = widgets.CenterBox(
             vertical=self.vertical,
             start_widget=self.start_area,
             center_widget=self.center_area,
             end_widget=self.end_area,
-            css_classes=["bar_container"],
+            css_classes=["bar-container"],
         )
 
-        self.set_child(self.container)
+        self.revealer = widgets.Revealer(
+            child=self.container,
+            transition_duration=300,
+            transition_type="none",
+        )
+        self.revealer.connect("notify::child-revealed", self._on_revealer_state_change)
+        self.set_child(self.revealer)
 
         self.set_monitor(self.monitor)
         self.set_namespace(f"Bar{self.monitor}{self.bar_id}")
         self.set_height_request(self.height)
         self.set_width_request(self.width)
         self.set_anchor(self.anchor)
-        self.set_exclusivity("exclusive")
+
+        if self._motion_controller:
+            self.remove_controller(self._motion_controller)
 
         if self.floating and self.background == "full":
             self.set_margin_top(5 if self.side != "bottom" else 0)
@@ -150,6 +178,80 @@ class Bar(widgets.Window, BaseWidget):
             self.set_margin_bottom(0)
 
         self.update_css_classes()
+
+        if self.autohide:
+            if self.niri and self.niri.is_available:
+                transition_map = {
+                    "top": "slide_down",
+                    "bottom": "slide_up",
+                    "left": "slide_right",
+                    "right": "slide_left",
+                }
+                self.revealer.set_transition_type(transition_map.get(self.side, "none"))
+
+                alignment_map = {
+                    "top": ("valign", "start"),
+                    "bottom": ("valign", "end"),
+                    "left": ("halign", "start"),
+                    "right": ("halign", "end"),
+                }
+                prop, align = alignment_map.get(self.side, (None, None))
+                if prop:
+                    self.container.set_property(prop, align)
+            else:
+                self.container.set_valign("fill")
+                self.container.set_halign("fill")
+
+            layer = "overlay" if self.autohide_fullscreen else "top"
+            self.set_layer(layer)
+            self.set_exclusivity("ignore")
+            self._motion_controller = Gtk.EventControllerMotion()
+            self._motion_controller.connect("leave", self._on_bar_leave)
+            self.add_controller(self._motion_controller)
+            self._create_hot_edge()
+            self.set_visible(False)
+        else:
+            self.set_layer("top")
+            self.set_exclusivity("exclusive")
+            self.container.set_valign("fill")
+            self.container.set_halign("fill")
+            self.revealer.set_reveal_child(True)
+            self.set_visible(True)
+
+    def _create_hot_edge(self):
+        self._hot_edge = widgets.Window(
+            namespace=f"ExoBarHotEdge{self.bar_id}",
+            monitor=self.monitor,
+            layer="overlay" if self.autohide_fullscreen else "top",
+            exclusivity="ignore",
+        )
+        anchor = [self.side, "left", "right"] if not self.vertical else [self.side, "top", "bottom"]
+        self._hot_edge.set_anchor(anchor)
+
+        if self.vertical:
+            self._hot_edge.set_width_request(2)
+            self._hot_edge.set_height_request(-1)
+        else:
+            self._hot_edge.set_height_request(2)
+            self._hot_edge.set_width_request(-1)
+
+        hot_edge_controller = Gtk.EventControllerMotion()
+        hot_edge_controller.connect("enter", self._on_hot_edge_enter)
+        self._hot_edge.add_controller(hot_edge_controller)
+        self._hot_edge.show()
+
+    def _on_hot_edge_enter(self, controller, x, y):
+        if self.autohide and not self.revealer.get_child_revealed():
+            self.set_visible(True)
+            self.revealer.set_reveal_child(True)
+
+    def _on_bar_leave(self, controller, *args):
+        if self.autohide and self.revealer.get_child_revealed():
+            self.revealer.set_reveal_child(False)
+
+    def _on_revealer_state_change(self, revealer, _):
+        if self.autohide and not revealer.get_child_revealed():
+            self.set_visible(False)
 
     def update_css_classes(self):
         classes = ["bar-window", self.side]
@@ -295,6 +397,30 @@ class Bar(widgets.Window, BaseWidget):
             return
         self._background = new_background
         self.rebuild()
+
+    @IgnisProperty
+    def autohide(self) -> bool:
+        return self._autohide
+
+    @autohide.setter
+    def autohide(self, value: bool):
+        if self._autohide == value:
+            return
+        self._autohide = value
+        self.rebuild()
+
+    @IgnisProperty
+    def autohide_fullscreen(self) -> bool:
+        return self._autohide_fullscreen
+
+    @autohide_fullscreen.setter
+    def autohide_fullscreen(self, value: bool):
+        if self._autohide_fullscreen == value:
+            return
+        self._autohide_fullscreen = value
+        if self.autohide:
+            self.rebuild()
+
 
     @IgnisProperty
     def start_background(self) -> bool:
