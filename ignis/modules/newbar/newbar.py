@@ -166,17 +166,6 @@ class Bar(widgets.Window, BaseWidget):
         if self._motion_controller:
             self.remove_controller(self._motion_controller)
 
-        if self.floating and self.background == "full":
-            self.set_margin_top(5 if self.side != "bottom" else 0)
-            self.set_margin_left(5 if self.side != "right" else 0)
-            self.set_margin_right(5 if self.side != "left" else 0)
-            self.set_margin_bottom(5 if self.side != "top" else 0)
-        else:
-            self.set_margin_top(0)
-            self.set_margin_left(0)
-            self.set_margin_right(0)
-            self.set_margin_bottom(0)
-
         self.update_css_classes()
 
         if self.autohide:

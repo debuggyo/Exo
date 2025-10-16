@@ -85,6 +85,12 @@ newbar = NewBar(
     autohide=True,
     side="bottom",
     background="gradient",
+    start_background=False,
+    center_background=False,
+    end_background=False,
+    start_module_bg="none",
+    center_module_bg="none",
+    end_module_bg="none",
     start_modules=[
         Window(),
     ],
