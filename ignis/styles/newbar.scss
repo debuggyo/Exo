@@ -106,11 +106,11 @@
     /* Areas */
     .bar-area:not(.empty) {
         &.module-backgrounds-connected .area-modules {
-            background-color: colors.$surface_container_high;
+            background-color: colors.$surface_container;
             border-radius: 20px;
         }
         &.module-backgrounds-separated .area-modules > * {
-            background-color: colors.$surface_container_high;
+            background-color: colors.$surface_container;
             border-radius: 8px;
             &:first-child {
                 border-top-left-radius: 20px;
@@ -121,7 +121,7 @@
                 border-bottom-right-radius: 20px;
             }
         }
-        .area-modules > * {
+        .bar-module:not(.exo-workspaces) {
             padding: 0px 1rem;
         }
     }
@@ -156,11 +156,15 @@
                     border-bottom-right-radius: 20px;
                 }
             }
-            .area-modules > * {
+            .bar-module:not(.exo-workspaces) {
                 padding: 1rem 0px;
             }
         }
     }
+}
+
+.hot-edge {
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 // Modules
@@ -241,6 +245,59 @@
     }
 }
 
-.background {
-    background-color: rgba(0, 0, 0, 0.1);
+.exo-workspaces {
+    padding: 2px;
+    .workspace {
+        border-radius: 20px;
+        padding: 0px;
+        min-height: 26px;
+        min-width: 26px;
+        font-weight: 500;
+        &:not(.empty) {
+            background-color: colors.$surface_container_high;
+        }
+        &.empty {
+            color: rgba(colors.$on_surface_variant, 0.8);
+        }
+        &.active {
+            background-color: colors.$primary;
+            color: colors.$on_primary;
+            font-weight: 700;
+        }
+        &.dots {
+            min-height: 6px;
+            min-width: 6px;
+            background-color: rgba(colors.$on_background, 0.5);
+            &.empty {
+                background-color: rgba(colors.$on_background, 0.3)
+            }
+            &.active {
+                min-height: 10px;
+                min-width: 20px;
+                background-color: colors.$on_background;
+            }
+        }
+    }
+    &.vertical .workspace.dots.active {
+        min-width: 10px;
+        min-height: 20px;
+    }
+    &.dots {
+        padding: 0px 1rem;
+        &.vertical {
+            padding: 1rem 0px;
+        }
+    }
+}
+.comfortable .workspace {
+    min-height: 26px;
+    min-width: 26px;
+}
+.compact .workspace {
+    min-height: 26px;
+    min-width: 26px;
+}
+.condensed .workspace {
+    min-height: 20px;
+    min-width: 20px;
 }

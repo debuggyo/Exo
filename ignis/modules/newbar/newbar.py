@@ -69,6 +69,7 @@ class Bar(widgets.Window, BaseWidget):
                 parent = module.get_parent()
                 if parent and hasattr(parent, "remove"):
                     parent.remove(module)
+            module.add_css_class("bar-module")
 
         self.vertical = self.side in ["left", "right"]
         self.anchor = [self.side]

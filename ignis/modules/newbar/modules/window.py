@@ -5,7 +5,6 @@ from ignis.services.niri import NiriService
 from ignis.services.hyprland import HyprlandService
 from ignis.services.applications import ApplicationsService
 from ignis.gobject import IgnisProperty
-from qutebrowser.components.caretcommands import selection_drop
 
 
 class Window(Gtk.Box, BaseWidget):

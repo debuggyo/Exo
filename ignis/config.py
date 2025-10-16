@@ -82,20 +82,21 @@ NotificationPopup(0)
 utils.Poll(60000, lambda _: auto_dark())
 
 newbar = NewBar(
-    autohide=True,
+    autohide=False,
     side="bottom",
-    background="gradient",
+    background="full",
     start_background=False,
     center_background=False,
     end_background=False,
     start_module_bg="none",
-    center_module_bg="none",
+    center_module_bg="separated",
     end_module_bg="none",
     start_modules=[
         Window(),
     ],
     center_modules=[
         Clock(),
+        Workspaces(workspace_style="impulse")
     ]
 )
 # newbar2 = NewBar(
