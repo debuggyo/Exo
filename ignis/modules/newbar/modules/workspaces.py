@@ -16,10 +16,12 @@ class Workspace(widgets.Button, BaseWidget):
     __gtype_name__ = "ExoWorkspace"
     __gproperties__ = {**BaseWidget.gproperties}
 
-    def __init__(self, index, **kwargs):
+    def __init__(self, **kwargs):
         widgets.Button.__init__(self, hexpand=False, vexpand=False)
-        self._index: int = index
+        self._index: int = 0
         self._workspace_style: WorkspaceStyle = WorkspaceStyle.IMPULSE
+        self._fixed_workspaces: bool = True
+        self._fixed_workspace_amount: int = 5
 
         self.niri = NiriService.get_default()
         self.hyprland = HyprlandService.get_default()
@@ -58,6 +60,16 @@ class Workspace(widgets.Button, BaseWidget):
             return
         self._workspace_style = value
         self._update_info()
+
+    @IgnisProperty
+    def index(self) -> int:
+        return self._index
+    
+    @index.setter
+    def index(self, value: int):
+        if self._index == value:
+            return
+        self._index = value
 
     def _update_info(self, *args):
         active = False

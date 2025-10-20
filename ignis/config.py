@@ -52,7 +52,7 @@ QuickCenter()
 # BarStyles.set_bar_instance(bar)
 # BarStyles._apply_css(bar.build(), bar_id=0)
 # BarStyles._apply_css(bar.build2(), bar_id=1)
-#
+
 # BarStyles.setFloating(user_settings.interface.bar.floating, bar_id=0)
 # BarStyles.setFloating(user_settings.interface.bar2.floating, bar_id=1)
 
@@ -83,20 +83,26 @@ utils.Poll(60000, lambda _: auto_dark())
 
 newbar = NewBar(
     autohide=False,
-    side="bottom",
-    background="full",
-    start_background=False,
-    center_background=False,
-    end_background=False,
+    autohide_fullscreen=True,
+    side="left",
+    floating=True,
+    centered=True,
+    background="areas",
+    density=1,
+    start_background=True,
+    center_background=True,
+    end_background=True,
     start_module_bg="none",
-    center_module_bg="separated",
+    center_module_bg="none",
     end_module_bg="none",
     start_modules=[
         Window(),
     ],
     center_modules=[
-        Clock(),
         Workspaces(workspace_style="impulse")
+    ],
+    end_modules=[
+        Clock()
     ]
 )
 # newbar2 = NewBar(

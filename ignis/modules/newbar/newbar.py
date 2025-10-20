@@ -214,6 +214,7 @@ class Bar(widgets.Window, BaseWidget):
             monitor=self.monitor,
             layer="overlay" if self.autohide_fullscreen else "top",
             exclusivity="ignore",
+            css_classes=["hot-edge"]
         )
         anchor = [self.side, "left", "right"] if not self.vertical else [self.side, "top", "bottom"]
         self._hot_edge.set_anchor(anchor)

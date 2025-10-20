@@ -10,6 +10,8 @@
 
         &.floating .bar-container {
             border-radius: 20px;
+            outline: 1px solid rgba(colors.$outline_variant, 0.5);
+            outline-offset: -1px;
         }
     }
     &.gradient {
@@ -47,6 +49,8 @@
     &.gradient {
         .bar-area.area-background {
             background-color: colors.$background;
+            outline: 1px solid rgba(colors.$outline_variant, 0.5);
+            outline-offset: -1px;
         }
 
         &.top {
@@ -125,6 +129,9 @@
             padding: 0px 1rem;
         }
     }
+    .center-area {
+        margin: 0px 1rem;
+    }
     &.cozy {
         .bar-area:not(.empty) {
             padding: 5px;
@@ -159,6 +166,9 @@
             .bar-module:not(.exo-workspaces) {
                 padding: 1rem 0px;
             }
+        }
+        .center-area {
+            margin: 1rem 0px;
         }
     }
 }
@@ -264,6 +274,9 @@
             color: colors.$on_primary;
             font-weight: 700;
         }
+        &:hover:not(.active) {
+            background-color: colors.$surface_container_highest;
+        }
         &.dots {
             min-height: 6px;
             min-width: 6px;
@@ -289,15 +302,11 @@
         }
     }
 }
-.comfortable .workspace {
-    min-height: 26px;
-    min-width: 26px;
-}
-.compact .workspace {
-    min-height: 26px;
-    min-width: 26px;
+.comfortable .workspace, .compact .workspace {
+    min-height: 27px;
+    min-width: 27px;
 }
 .condensed .workspace {
-    min-height: 20px;
-    min-width: 20px;
+    min-height: 21px;
+    min-width: 21px;
 }
