@@ -1,5 +1,14 @@
 @use "../colors.scss";
 
+@keyframes rotation {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}
+
 // Window
 .bar-window {
     color: colors.$on_background;
@@ -125,7 +134,7 @@
                 border-bottom-right-radius: 20px;
             }
         }
-        .bar-module:not(.exo-workspaces) {
+        .bar-module:not(.exo-workspaces):not(.exo-media) {
             padding: 0px 1rem;
         }
     }
@@ -163,7 +172,7 @@
                     border-bottom-right-radius: 20px;
                 }
             }
-            .bar-module:not(.exo-workspaces) {
+            .bar-module:not(.exo-workspaces):not(.exo-media) {
                 padding: 1rem 0px;
             }
         }
@@ -310,3 +319,37 @@
     min-height: 21px;
     min-width: 21px;
 }
+
+.exo-media {
+    padding: 0px 3px;
+    &:not(.placeholder) .icon {
+        border-radius: 20px;
+        &.playing {
+            animation: rotation 10s infinite linear;
+        }
+    }
+
+    .title {
+        font-weight: 500;
+        margin-bottom: -3px;
+    }
+
+    .artist {
+        font-weight: 400;
+        font-size: 8pt;
+        opacity: 0.8;
+    }
+
+    button {
+        padding: 0px;
+        min-width: 24px;
+        border-radius: 20px;
+        &:hover {
+            background-color: colors.$surface_container_highest;
+        }
+        &.play-pause-button {
+            background-color: colors.$secondary_container;
+        }
+    }
+}
+.vertical .exo-media {padding: 3px 0px;}

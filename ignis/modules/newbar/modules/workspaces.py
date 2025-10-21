@@ -20,8 +20,6 @@ class Workspace(widgets.Button, BaseWidget):
         widgets.Button.__init__(self, hexpand=False, vexpand=False)
         self._index: int = 0
         self._workspace_style: WorkspaceStyle = WorkspaceStyle.IMPULSE
-        self._fixed_workspaces: bool = True
-        self._fixed_workspace_amount: int = 5
 
         self.niri = NiriService.get_default()
         self.hyprland = HyprlandService.get_default()
@@ -149,6 +147,8 @@ class Workspaces(widgets.Box, BaseWidget):
         widgets.Box.__init__(self, spacing=2)
         self._workspace_style: WorkspaceStyle = WorkspaceStyle.IMPULSE
         self._vertical: bool = False
+        self._fixed_workspaces: bool = False
+        self._fixed_workspace_amount: int = 5
 
         self.niri = NiriService.get_default()
         self.hyprland = HyprlandService.get_default()
@@ -161,6 +161,7 @@ class Workspaces(widgets.Box, BaseWidget):
             self.niri.connect("notify::workspaces", self._update_workspaces)
         elif self.hyprland.is_available:
             self.hyprland.connect("notify::workspaces", self._update_workspaces)
+            self.hyprland.connect("notify::active-workspace", self._update_workspaces)
 
         self._update_workspaces()
 
@@ -184,21 +185,71 @@ class Workspaces(widgets.Box, BaseWidget):
         self._workspace_style = value
         self._update_workspaces()
 
+    @IgnisProperty(type=bool, default=False)
+    def fixed_workspaces(self) -> bool:
+        return self._fixed_workspaces
+
+    @fixed_workspaces.setter
+    def fixed_workspaces(self, value: bool):
+        if self._fixed_workspaces == value:
+            return
+        self._fixed_workspaces = value
+        self._update_workspaces()
+
+    @IgnisProperty(type=int, default=5)
+    def fixed_workspace_amount(self) -> int:
+        return self._fixed_workspace_amount
+
+    @fixed_workspace_amount.setter
+    def fixed_workspace_amount(self, value: int):
+        if self._fixed_workspace_amount == value:
+            return
+        self._fixed_workspace_amount = value
+        self._update_workspaces()
+
     def _update_workspaces(self, *args):
-        # Clear any existing workspace widgets
         while child := self.get_first_child():
             self.remove(child)
 
-        workspace_ids = []
+        all_workspaces_map = {}
         if self.niri.is_available:
-            workspace_ids = sorted([ws.idx for ws in self.niri.workspaces])
+            for ws in self.niri.workspaces:
+                all_workspaces_map[ws.id] = ws
         elif self.hyprland.is_available:
-            workspace_ids = sorted([ws.id for ws in self.hyprland.workspaces])
+            for ws in self.hyprland.workspaces:
+                all_workspaces_map[ws.id] = ws
         else:
             return
 
-        # Re-create widgets in the correct order
-        for i in workspace_ids:
+        workspace_ids_to_display = []
+
+        if self._fixed_workspaces and self._fixed_workspace_amount > 0:
+            active_workspace_id = None
+            if self.niri.is_available:
+                for ws in self.niri.workspaces:
+                    if ws.is_active:
+                        active_workspace_id = ws.id
+                        break
+            elif self.hyprland.is_available:
+                active_ws = self.hyprland.active_workspace
+                if active_ws:
+                    active_workspace_id = active_ws.id
+
+            if active_workspace_id is not None:
+                if self._fixed_workspace_amount == 1:
+                    page_base_id = active_workspace_id
+                else:
+                    page_base_id = ((active_workspace_id - 1) // self._fixed_workspace_amount) * self._fixed_workspace_amount + 1
+                
+                start_id = page_base_id
+                end_id = page_base_id + self._fixed_workspace_amount - 1
+                workspace_ids_to_display = range(start_id, end_id + 1)
+            else:
+                workspace_ids_to_display = range(1, self._fixed_workspace_amount + 1)
+        else:
+            workspace_ids_to_display = sorted(all_workspaces_map.keys())
+
+        for i in workspace_ids_to_display:
             new_workspace = Workspace(index=i, workspace_style=self._workspace_style)
             self.append(new_workspace)
 
