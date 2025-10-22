@@ -35,10 +35,6 @@ class Workspace(widgets.Button, BaseWidget):
             self.hyprland.connect("notify::active-workspace", self._update_info)
             self.hyprland.connect("notify::workspaces", self._update_info)
 
-        scroll_controller = Gtk.EventControllerScroll.new(Gtk.EventControllerScrollFlags.VERTICAL)
-        scroll_controller.connect("scroll", self.on_scroll)
-        self.add_controller(scroll_controller)
-
         self.container = Gtk.Box()
         self.icon = widgets.Icon(pixel_size=16, halign="center", valign="center", hexpand=True, vexpand=True)
         self.number = widgets.Label(halign="center", valign="center", hexpand=True, vexpand=True)
@@ -108,26 +104,6 @@ class Workspace(widgets.Button, BaseWidget):
             return
         self._bigger_active = value
         self._update_info()
-
-    def on_scroll(self, _, _dx, dy):
-        if self.niri.is_available:
-            l = [i.idx for i in self.niri.workspaces if i.is_active]
-            active_ws = l[0]
-            desktop = self.niri
-        elif self.hyprland.is_available:
-            active_ws = self.hyprland.active_workspace.id
-            desktop = self.hyprland
-        if desktop:
-            if dy > 0:
-                new_ws = active_ws + 1
-                if new_ws > len(desktop.workspaces):
-                    new_ws = len(desktop.workspaces)
-            else:
-                new_ws = active_ws - 1
-                if new_ws < 0:
-                    new_ws = 0
-            desktop.switch_to_workspace(new_ws)
-
 
     def _update_info(self, *args):
         active = False
@@ -225,7 +201,10 @@ class Workspaces(widgets.Box, BaseWidget):
 
         self.niri = NiriService.get_default()
         self.hyprland = HyprlandService.get_default()
-        BaseWidget.__init__(self, **kwargs)
+
+        scroll_controller = Gtk.EventControllerScroll.new(Gtk.EventControllerScrollFlags.VERTICAL)
+        scroll_controller.connect("scroll", self.on_scroll)
+        self.add_controller(scroll_controller)
 
         self.set_vertical(self._vertical)
         self.add_css_class("exo-workspaces")
@@ -238,6 +217,7 @@ class Workspaces(widgets.Box, BaseWidget):
             self.hyprland.connect("notify::active-workspace", self._update_workspaces)
             self.hyprland.connect("notify::windows", self._update_workspaces)
 
+        BaseWidget.__init__(self, **kwargs)
         self._update_workspaces()
 
     @IgnisProperty
@@ -325,6 +305,25 @@ class Workspaces(widgets.Box, BaseWidget):
             return
         self._fixed_workspace_amount = value
         self._update_workspaces()
+
+    def on_scroll(self, _, _dx, dy):
+        if self.niri.is_available:
+            l = [i.idx for i in self.niri.workspaces if i.is_active]
+            active_ws = l[0]
+            desktop = self.niri
+        elif self.hyprland.is_available:
+            active_ws = self.hyprland.active_workspace.id
+            desktop = self.hyprland
+        if desktop:
+            if dy > 0:
+                new_ws = active_ws + 1
+                if new_ws > len(desktop.workspaces) and desktop == self.niri:
+                    new_ws = len(desktop.workspaces)
+            else:
+                new_ws = active_ws - 1
+                if new_ws < 0:
+                    new_ws = 0
+            desktop.switch_to_workspace(new_ws)
 
     def _get_dummy_workspace(self, ws_id):
         class DummyWorkspace:
