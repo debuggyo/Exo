@@ -19,7 +19,7 @@ $square-radius: 12px;
     /* Base */
     transition-timing-function: cubic-bezier(0.3, 0, 0, 1);
     transition:
-        border-radius 50ms,
+        border-radius 100ms,
         background-color 200ms;
     label {
         font-weight: 400;
@@ -458,8 +458,9 @@ switch {
         padding: 2px 0px;
         border-radius: 8px;
         .m3-button-icon {
+            transition: 200ms;
             border-radius: 20rem;
-            padding: 2px 16px;
+            padding: 2px 8px;
             margin: 0px;
             margin-bottom: -5px;
             color: colors.$on_surface_variant;
@@ -480,6 +481,7 @@ switch {
         }
         &.selected {
             .m3-button-icon {
+                padding: 2px 16px;
                 background-color: colors.$secondary_container;
                 color: colors.$on_secondary_container;
                 font-variation-settings: "FILL" 1;

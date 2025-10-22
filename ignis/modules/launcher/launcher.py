@@ -262,7 +262,7 @@ class Launcher(widgets.Window):
             hexpand=True,
         )
 
-        self._clear_button = Button.button(
+        self._clear_button = Button(
             on_click=self.__clear_search,
             icon="close",
             visible=False,
@@ -272,7 +272,7 @@ class Launcher(widgets.Window):
             css_classes=["clear-button"],
         )
 
-        self._layout_button = Button.button(
+        self._layout_button = Button(
             on_click=self.__toggle_layout,
             icon="",
             visible=False,
@@ -367,7 +367,7 @@ class Launcher(widgets.Window):
             self._layout_button.get_parent().remove(self._layout_button)
 
         # Rebuild the button with the new icon
-        self._layout_button = Button.button(
+        self._layout_button = Button(
             on_click=self.__toggle_layout,
             icon=new_icon,
             size="xs",

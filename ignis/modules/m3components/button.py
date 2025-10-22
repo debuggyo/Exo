@@ -1,73 +1,127 @@
 from ignis import widgets
+from ignis.base_widget import BaseWidget
+from ignis.gobject import IgnisProperty
 
 
-class Button(widgets.Button):
-    def set_icon(self, icon: str):
-        child_box = self.get_child()
-        if not child_box:
-            return
+class Button(widgets.Button, BaseWidget):
+    __gtype_name__ = "M3Button"
+    __gproperties__ = {**BaseWidget.gproperties}
 
-        icon_label = child_box.get_first_child()
-        if icon_label and "m3-button-icon" in icon_label.get_css_classes():
-            icon_label.set_label(icon)
+    def __init__(self, **kwargs):
+        widgets.Button.__init__(self)
+        self._icon = ""
+        self._label = ""
+        self._type = "tonal"
+        self._size = "s"
+        self._shape = "round"
+        self._ialign = "center"
+        self._vertical = False
 
-    @staticmethod
-    def button(
-        icon: str = None,
-        label: str = None,
-        on_click=None,
-        type="tonal",
-        size="s",
-        shape="round",
-        css_classes: list = None,
-        ialign: str = "center",
-        vertical: bool = False,
-        **kwargs,
-    ):
-        if on_click is None:
-            on_click = lambda *_: None
+        self.button_icon = widgets.Label(label=self._icon, css_classes=["m3-button-icon"], halign="center", hexpand=False, visible=False)
+        self.button_label = widgets.Label(label=self._label, css_classes=["m3-button-label"], visible=False)
 
-        classes = ["m3-button", type, size, shape]
-        if css_classes:
-            classes.extend(css_classes)
+        gap = {"xs": 8, "s": 8, "m": 8, "l": 12, "xl": 16}.get(self._size, 8)
 
-        children = []
-        if icon:
-            children.append(
-                widgets.Label(
-                    label=icon,
-                    css_classes=["m3-button-icon"],
-                    halign="center",
-                    hexpand=False,
-                )
-            )
-            if not label:
-                classes.append("icon-only")
-        if label:
-            children.append(widgets.Label(label=label, css_classes=["m3-button-label"]))
-
-        gap = {"xs": 8, "s": 8, "m": 8, "l": 12, "xl": 16}.get(size, 8)
-
-        return Button(
-            css_classes=classes,
-            on_click=on_click,
-            child=widgets.Box(
-                vertical=vertical,
-                spacing=gap,
-                child=children,
-                halign=ialign,
-                valign="center",
-            ),
-            **kwargs,
+        self.container = widgets.Box(
+            vertical=self._vertical,
+            spacing=gap,
+            halign=self._ialign,
+            valign="center",
+            child=[self.button_icon, self.button_label]
         )
 
-    @staticmethod
-    def connected_group(child, **kwargs):
-        return widgets.Box(
-            vertical=False,
-            vexpand=False,
-            spacing=2,
-            css_classes=["connected-button-group"],
-            child=child,
-            **kwargs,
-        )
+        BaseWidget.__init__(self, **kwargs)
+        self.set_child(self.container)
+        self.update()
+
+
+    @IgnisProperty
+    def icon(self) -> str:
+        return self._icon
+
+    @icon.setter
+    def icon(self, value: str) -> None:
+        self._icon = value
+        self.button_icon.set_label(value)
+
+    @IgnisProperty
+    def label(self) -> str:
+        return self._label
+
+    @label.setter
+    def label(self, value: str) -> None:
+        self._label = value
+        self.button_label.set_label(value)
+
+    @IgnisProperty
+    def type(self) -> str:
+        return self._type
+
+    @type.setter
+    def type(self, value: str) -> None:
+        self._type = value
+        self.update()
+
+    @IgnisProperty
+    def size(self) -> str:
+        return self._size
+
+    @size.setter
+    def size(self, value: str) -> None:
+        self._size = value
+        self.update()
+
+    @IgnisProperty
+    def shape(self) -> str:
+        return self._shape
+
+    @shape.setter
+    def shape(self, value: str) -> None:
+        self._shape = value
+        self.update()
+
+    @IgnisProperty
+    def ialign(self) -> str:
+        return self._ialign
+
+    @ialign.setter
+    def ialign(self, value: str) -> None:
+        self._ialign = value
+        self.container.set_halign(value)
+
+    @IgnisProperty
+    def vertical(self) -> bool:
+        return self._vertical
+
+    @vertical.setter
+    def vertical(self, value: bool) -> None:
+        self._vertical = value
+        self.container.set_vertical(value)
+
+    def update(self):
+        classes = [
+            "elevated", "filled", "tonal", "outlined", "text",
+            "xs", "s", "m", "l", "xl",
+            "round", "square"
+        ]
+        for style in classes:
+            self.remove_css_class(style)
+
+        self.add_css_class("m3-button")
+        self.add_css_class(self._type)
+        self.add_css_class(self._size)
+        self.add_css_class(self._shape)
+
+        self.button_icon.set_visible(True if self._icon else False)
+        self.button_label.set_visible(True if self._label else False)
+
+class ConnectedButtonGroup(widgets.Box, BaseWidget):
+    __gtype_name__ = "M3ConnectedButtonGroup"
+    __gproperties__ = {**BaseWidget.gproperties}
+
+    def __init__(self, children, **kwargs):
+        widgets.Box.__init__(self, vertical=False, vexpand=False, spacing=2)
+        self.add_css_class("connected-button-group")
+        for child in children:
+            self.append(child)
+        BaseWidget.__init__(self, **kwargs)

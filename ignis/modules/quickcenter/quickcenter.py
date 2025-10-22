@@ -25,7 +25,7 @@ class QuickCenter(widgets.RevealerWindow):
             homogeneous=False,
             spacing=5,
             child=[
-                Button.button(
+                Button(
                     icon="power_settings_new",
                     halign="start",
                     hexpand=False,
@@ -34,7 +34,7 @@ class QuickCenter(widgets.RevealerWindow):
                     valign="center",
                     size="xs",
                 ),
-                Button.button(
+                Button(
                     icon="settings",
                     halign="start",
                     hexpand=False,
@@ -43,7 +43,7 @@ class QuickCenter(widgets.RevealerWindow):
                     valign="center",
                     size="xs",
                 ),
-                Button.button(
+                Button(
                     icon="clear_all",
                     label="Clear all",
                     halign="end",

@@ -1,5 +1,5 @@
 from ignis import widgets
-from modules.m3components import Button
+from modules.m3components import Button, ConnectedButtonGroup
 
 
 class CategoryLabel(widgets.Box):
@@ -65,7 +65,7 @@ def make_toggle_buttons(
             if on_any_click:
                 on_any_click()
 
-        btn = Button.button(
+        btn = Button(
             label=label,
             icon=icon,
             on_click=click_handler,
@@ -77,7 +77,7 @@ def make_toggle_buttons(
         buttons.append((btn, value))
 
     update_active()
-    return Button.connected_group(
+    return ConnectedButtonGroup(
         [b for b, _ in buttons],
         homogeneous=False,
         halign="start",
@@ -118,7 +118,7 @@ def make_independent_toggle_buttons(items, on_any_click=None, bar_id=None):
             if on_any_click:
                 on_any_click()
 
-        btn = Button.button(
+        btn = Button(
             label=label,
             icon=icon,
             on_click=click_handler,
@@ -131,7 +131,7 @@ def make_independent_toggle_buttons(items, on_any_click=None, bar_id=None):
 
     update_active()
 
-    return Button.connected_group(
+    return ConnectedButtonGroup(
         [b for b, _ in buttons],
         homogeneous=False,
         halign="start",

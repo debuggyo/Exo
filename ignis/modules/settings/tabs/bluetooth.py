@@ -45,7 +45,7 @@ class BluetoothTab(widgets.Box):
         self.append(self.device_category)
 
         self.scan_status_label = widgets.Label(label="")
-        self.scan_button = Button.button(
+        self.scan_button = Button(
             icon="bluetooth_searching",
             label="Scan for Devices",
             on_click=lambda x: asyncio.create_task(self.start_scan()),
@@ -65,7 +65,7 @@ class BluetoothTab(widgets.Box):
                 title="Open Bluetooth Settings",
                 description="Open the Bluetooth panel in the GNOME Settings application for advanced configuration.",
                 child=[
-                    Button.button(
+                    Button(
                         icon="barefoot",
                         label="Open Settings",
                         on_click=lambda x: self._open_gnome_settings(),

@@ -36,7 +36,7 @@ class NetworkTab(widgets.Box):
                         title="Open Network Settings",
                         description="Open the network panel in the GNOME Settings application for advanced configuration.",
                         child=[
-                            Button.button(
+                            Button(
                                 icon="barefoot",
                                 label="Open Settings",
                                 on_click=lambda x: self._open_gnome_settings(),
@@ -50,7 +50,7 @@ class NetworkTab(widgets.Box):
                         title="Refresh Network Status",
                         description="Manually refresh the status of all network connections.",
                         child=[
-                            Button.button(
+                            Button(
                                 icon="refresh",
                                 label="Refresh",
                                 on_click=lambda x: asyncio.create_task(

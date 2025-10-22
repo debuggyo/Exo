@@ -92,7 +92,7 @@ class NotificationsCategory(widgets.Box):
                 SettingsRow(
                     title="Send a Test Notification",
                     child=[
-                        Button.button(
+                        Button(
                             icon="notifications_unread",
                             label="Test Notification",
                             halign="start",

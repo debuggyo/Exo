@@ -1,5 +1,5 @@
 from ignis import widgets, utils
-from modules.m3components import Button, Slider
+from modules.m3components import Button, ConnectedButtonGroup, Slider
 from ignis.services.notifications import Notification, NotificationService
 from gi.repository import GLib
 
@@ -89,109 +89,109 @@ class M3Test(widgets.RegularWindow):
                         widgets.Label(
                             label="Label Only", css_classes=["settings-category-label"]
                         ),
-                        Button.button(label="Elevated", type="elevated"),
-                        Button.button(label="Filled", type="filled"),
-                        Button.button(label="Tonal", type="tonal"),
-                        Button.button(label="Outlined", type="outlined"),
-                        Button.button(label="Text", type="text"),
+                        Button(label="Elevated", type="elevated"),
+                        Button(label="Filled", type="filled"),
+                        Button(label="Tonal", type="tonal"),
+                        Button(label="Outlined", type="outlined"),
+                        Button(label="Text", type="text"),
                         # Icon + Label
                         widgets.Label(
                             label="Icon + Label",
                             css_classes=["settings-category-label"],
                         ),
-                        Button.button(icon="edit", label="Elevated", type="elevated"),
-                        Button.button(icon="edit", label="Filled", type="filled"),
-                        Button.button(icon="edit", label="Tonal", type="tonal"),
-                        Button.button(icon="edit", label="Outlined", type="outlined"),
-                        Button.button(icon="edit", label="Text", type="text"),
+                        Button(icon="edit", label="Elevated", type="elevated"),
+                        Button(icon="edit", label="Filled", type="filled"),
+                        Button(icon="edit", label="Tonal", type="tonal"),
+                        Button(icon="edit", label="Outlined", type="outlined"),
+                        Button(icon="edit", label="Text", type="text"),
                         # Icon Only
                         widgets.Label(
                             label="Icon Only", css_classes=["settings-category-label"]
                         ),
-                        Button.button(icon="edit", type="elevated"),
-                        Button.button(icon="edit", type="filled"),
-                        Button.button(icon="edit", type="tonal"),
-                        Button.button(icon="edit", type="outlined"),
-                        Button.button(icon="edit", type="text"),
+                        Button(icon="edit", type="elevated"),
+                        Button(icon="edit", type="filled"),
+                        Button(icon="edit", type="tonal"),
+                        Button(icon="edit", type="outlined"),
+                        Button(icon="edit", type="text"),
                         # Extra Small
                         widgets.Label(
                             label="Extra Small", css_classes=["settings-category-label"]
                         ),
-                        Button.button(
+                        Button(
                             icon="edit", label="Elevated", type="elevated", size="xs"
                         ),
-                        Button.button(
+                        Button(
                             icon="edit", label="Filled", type="filled", size="xs"
                         ),
-                        Button.button(
+                        Button(
                             icon="edit", label="Tonal", type="tonal", size="xs"
                         ),
-                        Button.button(
+                        Button(
                             icon="edit", label="Outlined", type="outlined", size="xs"
                         ),
-                        Button.button(
+                        Button(
                             icon="edit", label="Text", type="text", size="xs"
                         ),
                         # Small
                         widgets.Label(
                             label="Small", css_classes=["settings-category-label"]
                         ),
-                        Button.button(icon="edit", label="Elevated", type="elevated"),
-                        Button.button(icon="edit", label="Filled", type="filled"),
-                        Button.button(icon="edit", label="Tonal", type="tonal"),
-                        Button.button(icon="edit", label="Outlined", type="outlined"),
-                        Button.button(icon="edit", label="Text", type="text"),
+                        Button(icon="edit", label="Elevated", type="elevated"),
+                        Button(icon="edit", label="Filled", type="filled"),
+                        Button(icon="edit", label="Tonal", type="tonal"),
+                        Button(icon="edit", label="Outlined", type="outlined"),
+                        Button(icon="edit", label="Text", type="text"),
                         # Medium
                         widgets.Label(
                             label="Medium", css_classes=["settings-category-label"]
                         ),
-                        Button.button(
+                        Button(
                             icon="edit", label="Elevated", type="elevated", size="m"
                         ),
-                        Button.button(
+                        Button(
                             icon="edit", label="Filled", type="filled", size="m"
                         ),
-                        Button.button(
+                        Button(
                             icon="edit", label="Tonal", type="tonal", size="m"
                         ),
-                        Button.button(
+                        Button(
                             icon="edit", label="Outlined", type="outlined", size="m"
                         ),
-                        Button.button(icon="edit", label="Text", type="text", size="m"),
+                        Button(icon="edit", label="Text", type="text", size="m"),
                         # Large
                         widgets.Label(
                             label="Large", css_classes=["settings-category-label"]
                         ),
-                        Button.button(
+                        Button(
                             icon="edit", label="Elevated", type="elevated", size="l"
                         ),
-                        Button.button(
+                        Button(
                             icon="edit", label="Filled", type="filled", size="l"
                         ),
-                        Button.button(
+                        Button(
                             icon="edit", label="Tonal", type="tonal", size="l"
                         ),
-                        Button.button(
+                        Button(
                             icon="edit", label="Outlined", type="outlined", size="l"
                         ),
-                        Button.button(icon="edit", label="Text", type="text", size="l"),
+                        Button(icon="edit", label="Text", type="text", size="l"),
                         # Extra Large
                         widgets.Label(
                             label="Extra Large", css_classes=["settings-category-label"]
                         ),
-                        Button.button(
+                        Button(
                             icon="edit", label="Elevated", type="elevated", size="xl"
                         ),
-                        Button.button(
+                        Button(
                             icon="edit", label="Filled", type="filled", size="xl"
                         ),
-                        Button.button(
+                        Button(
                             icon="edit", label="Tonal", type="tonal", size="xl"
                         ),
-                        Button.button(
+                        Button(
                             icon="edit", label="Outlined", type="outlined", size="xl"
                         ),
-                        Button.button(
+                        Button(
                             icon="edit", label="Text", type="text", size="xl"
                         ),
                         # Connected Button Groups
@@ -199,24 +199,24 @@ class M3Test(widgets.RegularWindow):
                             label="Connected Button Groups",
                             css_classes=["settings-category-label"],
                         ),
-                        Button.connected_group(
-                            child=[
-                                Button.button(
+                        ConnectedButtonGroup(
+                            [
+                                Button(
                                     icon="counter_1", label="First", shape="square"
                                 ),
-                                Button.button(
+                                Button(
                                     icon="counter_2", label="Second", shape="square"
                                 ),
-                                Button.button(
+                                Button(
                                     icon="counter_3", label="Third", shape="square"
                                 ),
-                                Button.button(
+                                Button(
                                     icon="counter_4", label="Fourth", shape="square"
                                 ),
-                                Button.button(
+                                Button(
                                     icon="counter_5", label="Fifth", shape="square"
                                 ),
-                                Button.button(
+                                Button(
                                     icon="counter_6", label="Sixth", shape="square"
                                 ),
                             ]

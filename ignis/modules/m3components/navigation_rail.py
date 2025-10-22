@@ -12,7 +12,7 @@ class NavigationRail(widgets.Box):
         self.buttons = {}
 
         for key, (icon, label) in tabs.items():
-            btn = Button.button(
+            btn = Button(
                 icon=icon,
                 label=label,
                 ialign="center",

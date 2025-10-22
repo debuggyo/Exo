@@ -45,7 +45,7 @@ class ExoNotification(widgets.Box):
             self._body_label.set_single_line_mode(True)
 
         self._expand_button = (
-            Button.button(
+            Button(
                 css_classes=["notification-expand"],
                 icon="arrow_drop_down",
                 valign="start",
@@ -103,7 +103,7 @@ class ExoNotification(widgets.Box):
                                 widgets.Box(
                                     css_classes=["notification-actions-container"],
                                     child=[
-                                        Button.button(
+                                        Button(
                                             label=action.label,
                                             on_click=lambda x,
                                             action=action: action.invoke(),
@@ -122,7 +122,7 @@ class ExoNotification(widgets.Box):
                             vertical=True,
                             spacing=5,
                             child=[
-                                Button.button(
+                                Button(
                                     css_classes=["notification-close"],
                                     icon="close",
                                     valign="start" if not compact_popup else "center",

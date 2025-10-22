@@ -15,7 +15,7 @@ from ignis.app import IgnisApp
 
 class Settings(widgets.RegularWindow):
     def __init__(self):
-        self.reload_button = Button.button(
+        self.reload_button = Button(
             icon="restart_alt",
             type="tonal",
             visible=True,
