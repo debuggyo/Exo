@@ -20,6 +20,7 @@ class Workspace(widgets.Button, BaseWidget):
         widgets.Button.__init__(self, hexpand=False, vexpand=False)
         self._workspace = workspace
         self._workspace_style: WorkspaceStyle = WorkspaceStyle.IMPULSE
+        self._impulse_numbers: bool = False
 
         self.niri = NiriService.get_default()
         self.hyprland = HyprlandService.get_default()
@@ -56,6 +57,17 @@ class Workspace(widgets.Button, BaseWidget):
         if self._workspace_style == value:
             return
         self._workspace_style = value
+        self._update_info()
+
+    @IgnisProperty
+    def impulse_numbers(self) -> bool:
+        return self._impulse_numbers
+
+    @impulse_numbers.setter
+    def impulse_numbers(self, value: bool):
+        if self._impulse_numbers == value:
+            return
+        self._impulse_numbers = value
         self._update_info()
 
     def _update_info(self, *args):
@@ -120,7 +132,16 @@ class Workspace(widgets.Button, BaseWidget):
                 self.icon.set_image(icon_name)
                 self.icon.set_visible(True)
             else:
-                self.number.set_label("•")
+                if self._impulse_numbers:
+                    if self.niri.is_available or hasattr(self._workspace, "dummy"):
+                        label = str(self._workspace.idx)
+                        if self._workspace.name:
+                            label = self._workspace.name[0]
+                    else:
+                        label = str(self._workspace.id)
+                else:
+                    label = "•"
+                self.number.set_label(label)
                 self.number.set_visible(True)
             self.set_hexpand(True)
             self.set_vexpand(True)
@@ -145,6 +166,7 @@ class Workspaces(widgets.Box, BaseWidget):
     def __init__(self, **kwargs):
         widgets.Box.__init__(self, spacing=2)
         self._workspace_style: WorkspaceStyle = WorkspaceStyle.IMPULSE
+        self._impulse_numbers: bool = False
         self._vertical: bool = False
         self._fixed_workspaces: bool = False
         self._fixed_workspace_amount: int = 5
@@ -184,6 +206,17 @@ class Workspaces(widgets.Box, BaseWidget):
         if self._workspace_style == value:
             return
         self._workspace_style = value
+        self._update_workspaces()
+
+    @IgnisProperty
+    def impulse_numbers(self) -> bool:
+        return self._impulse_numbers
+
+    @impulse_numbers.setter
+    def impulse_numbers(self, value: bool):
+        if self._impulse_numbers == value:
+            return
+        self._impulse_numbers = value
         self._update_workspaces()
 
     @IgnisProperty(type=bool, default=False)
@@ -278,7 +311,7 @@ class Workspaces(widgets.Box, BaseWidget):
                 workspaces_to_display = sorted(workspaces, key=lambda ws: ws.id)
 
         for ws in workspaces_to_display:
-            new_workspace = Workspace(workspace=ws, workspace_style=self._workspace_style)
+            new_workspace = Workspace(workspace=ws, workspace_style=self._workspace_style, impulse_numbers=self._impulse_numbers)
             self.append(new_workspace)
 
         self.set_spacing(4 if self._workspace_style == WorkspaceStyle.DOTS else 2)

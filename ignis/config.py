@@ -103,129 +103,30 @@ newbar = NewBar(
         Workspaces(
             workspace_style="numbers",
             fixed_workspaces=True,
-            fixed_workspace_amount=10
+            fixed_workspace_amount=5
         )
     ],
     end_modules=[
         Clock()
     ]
 )
-# newbar2 = NewBar(
-#     bar_id=1,
-#     side="left",
-#     background="gradient",
-#     end_modules=[
-#         Window(),
-#         Clock(),
-#         Clock(
-#             military_time=True,
-#         ),
-#         Clock(
-#             show_date=False,
-#         ),
-#     ]
-# )
 
-# newbar.bar_options = {
-#     "side": "left",
-#     "floating": False,
-#     "density": 0,
-#     "background": "gradient",
-# }
-# newbar.modules = {
-#     "start": [
-#         {"ExampleLabel": {"label": "Start 1"}},
-#         {"ExampleLabel": {"label": "Start 2"}},
-#     ],
-#     "center": [
-#         {"ExampleLabel": {"label": "Gradient Background!"}},
-#     ],
-#     "end": [
-#         {"ExampleLabel": {"label": "End 1"}},
-#         {"ExampleLabel": {"label": "End 2"}},
-#     ],
-# }
-# newbar.area_options = {"center": {"module_backgrounds": "none"}}
-#
-# utils.Timeout(10000, newbar.rebuild)
-#
-# newbar2 = NewBar(
-#     bar_id=1,
-#     bar_options={
-#         "side": "bottom",
-#         "floating": False,
-#     },
-#     area_options={
-#         "start": {"module_backgrounds": "none"},
-#         "center": {"module_backgrounds": "connected"},
-#         "end": {"module_backgrounds": "separated"},
-#     },
-#     modules={
-#         "start": [
-#             {"ExampleLabel": {"label": "No Module Background"}},
-#         ],
-#         "center": [
-#             {"ExampleLabel": {"label": "Connected"}},
-#             {"ExampleLabel": {"label": "Module"}},
-#             {"ExampleLabel": {"label": "Backgrounds"}},
-#         ],
-#         "end": [
-#             {"ExampleLabel": {"label": "Separated"}},
-#             {"ExampleLabel": {"label": "Module"}},
-#             {"ExampleLabel": {"label": "Backgrounds"}},
-#         ],
-#     },
-# )
-#
-# newbar4 = NewBar(
-#     bar_id=3,
-#     bar_options={
-#         "side": "bottom",
-#         "floating": False,
-#         "centered": False,
-#         "background": "areas",
-#     },
-#     area_options={
-#         "start": {"module_backgrounds": "none", "area_background": False},
-#         "center": {"module_backgrounds": "none"},
-#         "end": {"module_backgrounds": True, "area_background": False},
-#     },
-#     modules={
-#         "start": [
-#             {"ExampleLabel": {"label": "This area should have no background"}},
-#         ],
-#         "center": [
-#             {"ExampleLabel": {"label": "This one should"}},
-#         ],
-#         "end": [
-#             {
-#                 "ExampleLabel": {
-#                     "label": "This one should only have a module background"
-#                 }
-#             },
-#         ],
-#     },
-# )
-#
-# newbar3 = NewBar(
-#     bar_id=2,
-#     bar_options={
-#         "side": "bottom",
-#         "floating": True,
-#         "centered": True,
-#     },
-#     area_options={
-#         "center": {"module_backgrounds": "none"},
-#     },
-#     modules={
-#         "start": [
-#             {"ExampleLabel": {"label": "Floating"}},
-#         ],
-#         "center": [
-#             {"ExampleLabel": {"label": "and"}},
-#         ],
-#         "end": [
-#             {"ExampleLabel": {"label": "Centered"}},
-#         ],
-#     },
-# )
+workspaces = NewBar(
+    bar_id=1,
+    centered=True,
+    start_modules=[
+        Workspaces(
+            workspace_style="impulse"
+        )
+    ],
+    center_modules=[
+        Workspaces(
+            workspace_style="numbers"
+        )
+    ],
+    end_modules=[
+        Workspaces(
+            workspace_style="dots"
+        )
+    ]
+)
