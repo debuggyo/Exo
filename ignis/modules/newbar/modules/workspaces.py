@@ -22,6 +22,7 @@ class Workspace(widgets.Button, BaseWidget):
         self._icons: bool = True
         self._names: bool = True
         self._numbers: bool = False
+        self._bigger_active: bool = False
 
         self.niri = NiriService.get_default()
         self.hyprland = HyprlandService.get_default()
@@ -95,6 +96,17 @@ class Workspace(widgets.Button, BaseWidget):
         if self._numbers == value:
             return
         self._numbers = value
+        self._update_info()
+
+    @IgnisProperty
+    def bigger_active(self) -> bool:
+        return self._bigger_active
+
+    @bigger_active.setter
+    def bigger_active(self, value: bool):
+        if self._bigger_active == value:
+            return
+        self._bigger_active = value
         self._update_info()
 
     def on_scroll(self, _, _dx, dy):
@@ -190,6 +202,11 @@ class Workspace(widgets.Button, BaseWidget):
         else:
             self.remove_css_class("empty")
 
+        if self._bigger_active:
+            self.add_css_class("bigger-active")
+        else:
+            self.remove_css_class("bigger-active")
+
 
 class Workspaces(widgets.Box, BaseWidget):
     __gtype_name__ = "ExoWorkspaces"
@@ -201,6 +218,7 @@ class Workspaces(widgets.Box, BaseWidget):
         self._icons: bool = True
         self._names: bool = True
         self._numbers: bool = False
+        self._bigger_active: bool = False
         self._vertical: bool = False
         self._fixed_workspaces: bool = False
         self._fixed_workspace_amount: int = 5
@@ -273,6 +291,17 @@ class Workspaces(widgets.Box, BaseWidget):
         if self._numbers == value:
             return
         self._numbers = value
+        self._update_workspaces()
+
+    @IgnisProperty
+    def bigger_active(self) -> bool:
+        return self._bigger_active
+
+    @bigger_active.setter
+    def bigger_active(self, value: bool):
+        if self._bigger_active == value:
+            return
+        self._bigger_active = value
         self._update_workspaces()
 
     @IgnisProperty(type=bool, default=False)
@@ -372,7 +401,8 @@ class Workspaces(widgets.Box, BaseWidget):
                 workspace_style=self._workspace_style,
                 icons=self._icons,
                 names=self._names,
-                numbers=self._numbers
+                numbers=self._numbers,
+                bigger_active=self._bigger_active
             )
             self.append(new_workspace)
 

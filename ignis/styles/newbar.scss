@@ -282,6 +282,10 @@
             background-color: colors.$primary;
             color: colors.$on_primary;
             font-weight: 700;
+            &.bigger-active {
+                min-width: 48px;
+                min-height: 26px;
+            }
         }
         &:hover:not(.active) {
             background-color: colors.$surface_container_highest;
@@ -300,9 +304,15 @@
             }
         }
     }
-    &.vertical .workspace.dots.active {
-        min-width: 10px;
-        min-height: 20px;
+    &.vertical {
+        .workspace.bigger-active.active {
+            min-width: 26px;
+            min-height: 48px;
+        }
+        .workspace.dots.active {
+            min-width: 10px;
+            min-height: 20px;
+        }
     }
     &.dots {
         padding: 0px 1rem;
@@ -311,13 +321,19 @@
         }
     }
 }
-.comfortable .workspace, .compact .workspace {
-    min-height: 27px;
-    min-width: 27px;
-}
-.condensed .workspace {
-    min-height: 21px;
-    min-width: 21px;
+.condensed {
+    .workspace {
+        min-height: 21px;
+        min-width: 21px;
+        &.active.bigger-active {
+            min-height: 21px;
+            min-width: 40px;
+        }
+    }
+    &.vertical .workspace.active.bigger-active {
+        min-height: 40px;
+        min-width: 21px;
+    }
 }
 
 .exo-media {
