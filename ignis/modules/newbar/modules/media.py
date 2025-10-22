@@ -17,8 +17,13 @@ class Media(Gtk.Box, BaseWidget):
         self._show_labels: bool = True
         self._show_controls: bool = True
         self._player: MprisPlayer = None
+        self._player_index: int = 0
 
         self.mpris = MprisService.get_default()
+
+        scroll_controller = Gtk.EventControllerScroll.new(Gtk.EventControllerScrollFlags.VERTICAL)
+        scroll_controller.connect("scroll", self.on_scroll)
+        self.add_controller(scroll_controller)
 
         self.icon = widgets.Icon(pixel_size=24, halign="center", valign="center", css_classes=["icon"], overflow=Gtk.Overflow.HIDDEN)
 
@@ -92,6 +97,26 @@ class Media(Gtk.Box, BaseWidget):
         self._show_controls = value
         self.update_layout()
 
+    def on_scroll(self, _, _dx, dy):
+        players = self.mpris.players
+        if len(players) < 2:
+            return
+
+        if dy > 0:
+            self._player_index = (self._player_index + 1) % len(players)
+        else:
+            self._player_index = (self._player_index - 1 + len(players)) % len(players)
+
+        new_player = players[self._player_index]
+        if new_player != self._player:
+            if self._player:
+                self._player.disconnect_by_func(self._update_info)
+            self._player = new_player
+            self._player.connect("notify::metadata", self._update_info)
+            self._player.connect("notify::playback-status", self._update_info)
+            self._player.connect("notify::art-url", self._update_info)
+            self._update_info()
+
     def play_pause(self):
         if self._player: self._player.play_pause()
 
@@ -103,17 +128,23 @@ class Media(Gtk.Box, BaseWidget):
 
     def _update_player(self, *args):
         players = self.mpris.players
-        new_player = players[-1] if players else None
 
-        if new_player != self._player:
+        if self._player not in players:
             if self._player:
                 self._player.disconnect_by_func(self._update_info)
-            self._player = new_player
-            if self._player:
+
+            if players:
+                if self._player_index >= len(players):
+                    self._player_index = 0
+                self._player = players[self._player_index]
                 self._player.connect("notify::metadata", self._update_info)
                 self._player.connect("notify::playback-status", self._update_info)
                 self._player.connect("notify::art-url", self._update_info)
-        
+            else:
+                self._player = None
+        elif players:
+            self._player_index = players.index(self._player)
+
         self._update_info()
 
     def _update_info(self, *args):
@@ -121,13 +152,23 @@ class Media(Gtk.Box, BaseWidget):
             self.remove_css_class("placeholder")
             self.icon.remove_css_class("playing")
             self.icon.remove_css_class("paused")
-            self.title_label.set_label(self._player.title or "Unknown Title")
-            self.artist_label.set_label(self._player.artist or "Unknown Artist")
+            title = self._player.title or "Unknown Title"
+            artist = self._player.artist or "Unknown Artist"
+            self.title_label.set_label(title)
+            self.artist_label.set_label(artist)
+
+            tooltip_text = f"{title} - {artist}"
+            self.icon.set_tooltip_text(tooltip_text)
+            self.labels_box.set_tooltip_text(tooltip_text)
 
             if self._player.art_url:
                 self.icon.set_image(self._player.art_url)
             else:
-                self.icon.set_image("audio-x-generic-symbolic")
+                image = utils.get_app_icon_name(self._player.desktop_entry)
+                if image:
+                    self.icon.set_image(image)
+                else:
+                    self.icon.set_image("audio-x-generic-symbolic")
 
             status = self._player.playback_status
             is_playing = status == "Playing"
@@ -139,13 +180,15 @@ class Media(Gtk.Box, BaseWidget):
             self.play_pause_button.set_sensitive(self._player.can_play or self._player.can_pause)
         else:
             self.add_css_class("placeholder")
-            self.title_label.set_label("No Music Playing")
-            self.artist_label.set_label("...")
+            self.title_label.set_label("No Media Playing")
+            self.artist_label.set_label("Play something!")
             self.icon.set_image("audio-x-generic-symbolic")
             self.play_pause_label.set_label("play_arrow")
             self.prev_button.set_sensitive(False)
             self.next_button.set_sensitive(False)
             self.play_pause_button.set_sensitive(False)
+            self.icon.set_tooltip_text(None)
+            self.labels_box.set_tooltip_text(None)
 
     def update_layout(self):
         self.set_orientation(Gtk.Orientation.VERTICAL if self._vertical else Gtk.Orientation.HORIZONTAL)

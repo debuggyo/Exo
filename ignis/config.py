@@ -16,6 +16,7 @@ from ignis.css_manager import CssInfoPath, CssManager
 from ignis import utils, widgets
 from scripts import BarStyles, Wallpaper, auto_dark
 from user_settings import user_settings
+from modules.bar.widgets import SystemInfoTray
 
 Wallpaper.generatePreviews()
 
@@ -48,13 +49,13 @@ if not user_settings.appearance.wallcolors.dark_mode:
     )
 
 QuickCenter()
-bar = Bar()
-BarStyles.set_bar_instance(bar)
-BarStyles._apply_css(bar.build(), bar_id=0)
-BarStyles._apply_css(bar.build2(), bar_id=1)
-
-BarStyles.setFloating(user_settings.interface.bar.floating, bar_id=0)
-BarStyles.setFloating(user_settings.interface.bar2.floating, bar_id=1)
+# bar = Bar()
+# BarStyles.set_bar_instance(bar)
+# BarStyles._apply_css(bar.build(), bar_id=0)
+# BarStyles._apply_css(bar.build2(), bar_id=1)
+# 
+# BarStyles.setFloating(user_settings.interface.bar.floating, bar_id=0)
+# BarStyles.setFloating(user_settings.interface.bar2.floating, bar_id=1)
 
 if not user_settings.appearance.wallcolors.wallpaper_path:
     default_wallpaper_path = os.path.expanduser("~/Pictures/Wallpapers/default.png")
@@ -101,9 +102,10 @@ newbar = NewBar(
     ],
     center_modules=[
         Workspaces(
-            workspace_style="numbers",
+            workspace_style="impulse",
             fixed_workspaces=True,
-            fixed_workspace_amount=5
+            fixed_workspace_amount=5,
+            names=False
         )
     ],
     end_modules=[
@@ -111,22 +113,35 @@ newbar = NewBar(
     ]
 )
 
-workspaces = NewBar(
-    bar_id=1,
-    centered=True,
-    start_modules=[
-        Workspaces(
-            workspace_style="impulse"
-        )
-    ],
-    center_modules=[
-        Workspaces(
-            workspace_style="numbers"
-        )
-    ],
-    end_modules=[
-        Workspaces(
-            workspace_style="dots"
-        )
-    ]
-)
+# workspaces = NewBar(
+#     bar_id=1,
+#     centered=True,
+#     start_modules=[
+#         Workspaces(
+#             workspace_style="impulse"
+#         ),
+#         Workspaces(
+#             numbers=True,
+#         ),
+#         Workspaces(
+#             numbers=True,
+#             names=False,
+#         )
+#     ],
+#     center_modules=[
+#         Workspaces(
+#             icons=False,
+#             numbers=True,
+#         ),
+#         Workspaces(
+#             icons=False,
+#             names=False,
+#             numbers=True,
+#         )
+#     ],
+#     end_modules=[
+#         Workspaces(
+#             workspace_style="dots"
+#         )
+#     ]
+# )

@@ -298,7 +298,7 @@ class Bar(widgets.Window, BaseWidget):
         return self._monitor
 
     @monitor.setter
-    def monitor(self, value: int) -> None:
+    def monitor(self, value: int):
         if self._monitor == value:
             return
         self._monitor = value
@@ -309,7 +309,7 @@ class Bar(widgets.Window, BaseWidget):
         return self._bar_id
 
     @bar_id.setter
-    def bar_id(self, value: int) -> None:
+    def bar_id(self, value: int):
         if self._bar_id == value:
             return
         self._bar_id = value
@@ -320,7 +320,7 @@ class Bar(widgets.Window, BaseWidget):
         return self._side
 
     @side.setter
-    def side(self, value: int) -> None:
+    def side(self, value):
         INT_TO_STR = {
             BarSide.TOP: "top",
             BarSide.BOTTOM: "bottom",
@@ -341,7 +341,7 @@ class Bar(widgets.Window, BaseWidget):
         return self._density
 
     @density.setter
-    def density(self, value: int) -> None:
+    def density(self, value: int):
         if self._density == value:
             return
         self._density = value
@@ -352,7 +352,7 @@ class Bar(widgets.Window, BaseWidget):
         return self._floating
 
     @floating.setter
-    def floating(self, value: bool) -> None:
+    def floating(self, value: bool):
         if self._floating == value:
             return
         self._floating = value
@@ -363,7 +363,7 @@ class Bar(widgets.Window, BaseWidget):
         return self._centered
 
     @centered.setter
-    def centered(self, value: bool) -> None:
+    def centered(self, value: bool):
         if self._centered == value:
             return
         self._centered = value
@@ -375,7 +375,7 @@ class Bar(widgets.Window, BaseWidget):
         return self._background
 
     @background.setter
-    def background(self, value: int):
+    def background(self, value):
         INT_TO_STR = {
             BarBackground.FULL: "full",
             BarBackground.AREAS: "areas",
@@ -451,7 +451,7 @@ class Bar(widgets.Window, BaseWidget):
         return self._start_module_bg
 
     @start_module_bg.setter
-    def start_module_bg(self, value: int):
+    def start_module_bg(self, value):
         INT_TO_STR = {
             ModuleBackground.SEPARATED: "separated",
             ModuleBackground.CONNECTED: "connected",
@@ -469,7 +469,7 @@ class Bar(widgets.Window, BaseWidget):
         return self._center_module_bg
 
     @center_module_bg.setter
-    def center_module_bg(self, value: int):
+    def center_module_bg(self, value):
         INT_TO_STR = {
             ModuleBackground.SEPARATED: "separated",
             ModuleBackground.CONNECTED: "connected",
@@ -487,7 +487,7 @@ class Bar(widgets.Window, BaseWidget):
         return self._end_module_bg
 
     @end_module_bg.setter
-    def end_module_bg(self, value: int):
+    def end_module_bg(self, value):
         INT_TO_STR = {
             ModuleBackground.SEPARATED: "separated",
             ModuleBackground.CONNECTED: "connected",
@@ -505,7 +505,7 @@ class Bar(widgets.Window, BaseWidget):
         return self._start_modules
 
     @start_modules.setter
-    def start_modules(self, value: list) -> None:
+    def start_modules(self, value: list):
         self._start_modules = value
         self.rebuild()
 
@@ -514,7 +514,7 @@ class Bar(widgets.Window, BaseWidget):
         return self._center_modules
 
     @center_modules.setter
-    def center_modules(self, value: list) -> None:
+    def center_modules(self, value: list):
         self._center_modules = value
         self.rebuild()
 
@@ -523,6 +523,6 @@ class Bar(widgets.Window, BaseWidget):
         return self._end_modules
 
     @end_modules.setter
-    def end_modules(self, value: list) -> None:
+    def end_modules(self, value: list):
         self._end_modules = value
         self.rebuild()
