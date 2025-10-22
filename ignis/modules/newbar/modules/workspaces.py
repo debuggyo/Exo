@@ -9,8 +9,7 @@ from ignis.services.hyprland import HyprlandService
 
 class WorkspaceStyle(GObject.GEnum):
     IMPULSE = 0
-    NUMBERS = 1
-    DOTS = 2
+    DOTS = 1
 
 class Workspace(widgets.Button, BaseWidget):
     __gtype_name__ = "ExoWorkspace"
@@ -20,7 +19,9 @@ class Workspace(widgets.Button, BaseWidget):
         widgets.Button.__init__(self, hexpand=False, vexpand=False)
         self._workspace = workspace
         self._workspace_style: WorkspaceStyle = WorkspaceStyle.IMPULSE
-        self._impulse_numbers: bool = False
+        self._icons: bool = True
+        self._names: bool = True
+        self._numbers: bool = False
 
         self.niri = NiriService.get_default()
         self.hyprland = HyprlandService.get_default()
@@ -60,14 +61,36 @@ class Workspace(widgets.Button, BaseWidget):
         self._update_info()
 
     @IgnisProperty
-    def impulse_numbers(self) -> bool:
-        return self._impulse_numbers
+    def icons(self) -> bool:
+        return self._icons
 
-    @impulse_numbers.setter
-    def impulse_numbers(self, value: bool):
-        if self._impulse_numbers == value:
+    @icons.setter
+    def icons(self, value: bool):
+        if self._icons == value:
             return
-        self._impulse_numbers = value
+        self._icons = value
+        self._update_info()
+
+    @IgnisProperty
+    def names(self) -> bool:
+        return self._names
+
+    @names.setter
+    def names(self, value: bool):
+        if self._names == value:
+            return
+        self._names = value
+        self._update_info()
+
+    @IgnisProperty
+    def numbers(self) -> bool:
+        return self._numbers
+
+    @numbers.setter
+    def numbers(self, value: bool):
+        if self._numbers == value:
+            return
+        self._numbers = value
         self._update_info()
 
     def _update_info(self, *args):
@@ -100,9 +123,8 @@ class Workspace(widgets.Button, BaseWidget):
         self.number.set_visible(False)
 
         style_map = {
-            WorkspaceStyle.DOTS: "dots",
-            WorkspaceStyle.NUMBERS: "numbers",
             WorkspaceStyle.IMPULSE: "impulse",
+            WorkspaceStyle.DOTS: "dots",
         }
         for s in style_map.values():
             self.remove_css_class(s)
@@ -114,33 +136,19 @@ class Workspace(widgets.Button, BaseWidget):
             self.set_vexpand(False)
             self.set_halign("center")
             self.set_valign("center")
-        elif self._workspace_style == WorkspaceStyle.NUMBERS:
-            if self.niri.is_available or hasattr(self._workspace, "dummy"):
-                label = str(self._workspace.idx)
-                if self._workspace.name:
-                    label = self._workspace.name[0]
-            else:
-                label = str(self._workspace.id)
-            self.number.set_label(label)
-            self.number.set_visible(True)
-            self.set_hexpand(True)
-            self.set_vexpand(True)
-            self.set_halign("fill")
-            self.set_valign("fill")
         elif self._workspace_style == WorkspaceStyle.IMPULSE:
-            if not empty:
+            if not empty and self._icons:
                 self.icon.set_image(icon_name)
                 self.icon.set_visible(True)
             else:
-                if self._impulse_numbers:
+                label = "•"
+                if self._numbers:
                     if self.niri.is_available or hasattr(self._workspace, "dummy"):
                         label = str(self._workspace.idx)
-                        if self._workspace.name:
-                            label = self._workspace.name[0]
                     else:
                         label = str(self._workspace.id)
-                else:
-                    label = "•"
+                if self._workspace.name and self._names:
+                    label = self._workspace.name[0]
                 self.number.set_label(label)
                 self.number.set_visible(True)
             self.set_hexpand(True)
@@ -166,7 +174,9 @@ class Workspaces(widgets.Box, BaseWidget):
     def __init__(self, **kwargs):
         widgets.Box.__init__(self, spacing=2)
         self._workspace_style: WorkspaceStyle = WorkspaceStyle.IMPULSE
-        self._impulse_numbers: bool = False
+        self._icons: bool = True
+        self._names: bool = True
+        self._numbers: bool = False
         self._vertical: bool = False
         self._fixed_workspaces: bool = False
         self._fixed_workspace_amount: int = 5
@@ -209,14 +219,36 @@ class Workspaces(widgets.Box, BaseWidget):
         self._update_workspaces()
 
     @IgnisProperty
-    def impulse_numbers(self) -> bool:
-        return self._impulse_numbers
+    def icons(self) -> bool:
+        return self._icons
 
-    @impulse_numbers.setter
-    def impulse_numbers(self, value: bool):
-        if self._impulse_numbers == value:
+    @icons.setter
+    def icons(self, value: bool):
+        if self._icons == value:
             return
-        self._impulse_numbers = value
+        self._icons = value
+        self._update_workspaces()
+
+    @IgnisProperty
+    def names(self) -> bool:
+        return self._names
+
+    @names.setter
+    def names(self, value: bool):
+        if self._names == value:
+            return
+        self._names = value
+        self._update_workspaces()
+
+    @IgnisProperty
+    def numbers(self) -> bool:
+        return self._numbers
+
+    @numbers.setter
+    def numbers(self, value: bool):
+        if self._numbers == value:
+            return
+        self._numbers = value
         self._update_workspaces()
 
     @IgnisProperty(type=bool, default=False)
@@ -311,13 +343,18 @@ class Workspaces(widgets.Box, BaseWidget):
                 workspaces_to_display = sorted(workspaces, key=lambda ws: ws.id)
 
         for ws in workspaces_to_display:
-            new_workspace = Workspace(workspace=ws, workspace_style=self._workspace_style, impulse_numbers=self._impulse_numbers)
+            new_workspace = Workspace(
+                workspace=ws,
+                workspace_style=self._workspace_style,
+                icons=self._icons,
+                names=self._names,
+                numbers=self._numbers
+            )
             self.append(new_workspace)
 
         self.set_spacing(4 if self._workspace_style == WorkspaceStyle.DOTS else 2)
         style_map = {
             WorkspaceStyle.DOTS: "dots",
-            WorkspaceStyle.NUMBERS: "numbers",
             WorkspaceStyle.IMPULSE: "impulse",
         }
         for s in style_map.values():
