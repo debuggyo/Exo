@@ -16,9 +16,9 @@ class Tray(widgets.Box, BaseWidget):
         self.bluetooth = BluetoothService.get_default()
         self.audio = AudioService.get_default()
 
-        self.network_icon = m3.Icon(size=16, visible=False)
-        self.bluetooth_icon = m3.Icon(size=16, visible=False)
-        self.audio_icon = m3.Icon(size=16, visible=False)
+        self.network_icon = m3.Icon(size=14, visible=False)
+        self.bluetooth_icon = m3.Icon(size=14, visible=False)
+        self.audio_icon = m3.Icon(size=14, visible=False)
 
         scroll_controller = Gtk.EventControllerScroll.new(Gtk.EventControllerScrollFlags.VERTICAL)
         scroll_controller.connect("scroll", self.audio_scroll)

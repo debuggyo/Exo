@@ -25,7 +25,7 @@ class Icon(Gtk.DrawingArea, BaseWidget):
         layout = self.create_pango_layout(self._icon)
 
         font_desc = Pango.FontDescription()
-        font_desc.set_size(self._size * Pango.SCALE)
+        font_desc.set_size((self._size - 1) * Pango.SCALE)
         layout.set_font_description(font_desc)
 
         layout_width, layout_height = layout.get_pixel_size()
