@@ -155,3 +155,4 @@ class Window(Gtk.Box, BaseWidget):
         self.icon.set_image(icon)
         self.title_label.set_label(title)
         self.app_id_label.set_label(app_id)
+        self.set_tooltip_markup(f"<b>{title}</b>\n{app_id}")

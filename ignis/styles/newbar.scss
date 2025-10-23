@@ -373,6 +373,7 @@
         padding: 0px;
         min-width: 24px;
         border-radius: 20px;
+        transition: 100ms;
         &:hover {
             background-color: colors.$surface_container_highest;
         }

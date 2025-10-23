@@ -16,7 +16,7 @@ class Workspace(widgets.Button, BaseWidget):
     __gproperties__ = {**BaseWidget.gproperties}
 
     def __init__(self, workspace, **kwargs):
-        widgets.Button.__init__(self, hexpand=False, vexpand=False)
+        widgets.Button.__init__(self, hexpand=False, vexpand=False, halign="center", valign="center")
         self._workspace = workspace
         self._workspace_style: WorkspaceStyle = WorkspaceStyle.IMPULSE
         self._icons: bool = True

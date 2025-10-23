@@ -83,14 +83,14 @@ class Bar(widgets.Window, BaseWidget):
             if hasattr(module, "density"):
                 module.density = self.density
 
-        bar_size_key = {0: 40, 1: 35, 2: 30, 3: 25}
+        bar_size_key = {0: 40, 1: 34, 2: 30, 3: 24}
         if self.vertical:
-            self.width = bar_size_key.get(self.density, 30)
+            self.width = bar_size_key.get(self.density, 40)
             if self.floating and self.background != "full":
                 self.width += 5
             self.height = -1
         else:
-            self.height = bar_size_key.get(self.density, 30)
+            self.height = bar_size_key.get(self.density, 40)
             if self.floating and self.background != "full":
                 self.height += 5
             self.width = -1
@@ -132,7 +132,7 @@ class Bar(widgets.Window, BaseWidget):
             child=[end_modules_box],
         )
 
-        bar_size = {0: 40, 1: 35, 2: 30, 3: 25}.get(self.density, 30)
+        bar_size = {0: 40, 1: 34, 2: 30, 3: 24}.get(self.density, 40)
         if self.vertical:
             self.start_area.set_width_request(bar_size)
             self.center_area.set_width_request(bar_size)

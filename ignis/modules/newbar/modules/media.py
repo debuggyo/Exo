@@ -37,7 +37,7 @@ class Media(Gtk.Box, BaseWidget):
         self.labels_box.append(self.title_label)
         self.labels_box.append(self.artist_label)
 
-        self.controls_box = Gtk.Box(spacing=4)
+        self.controls_box = Gtk.Box(spacing=4, halign="center", valign="center")
         self.prev_label = widgets.Label(label="skip_previous", css_classes=["m3-icon"])
         self.play_pause_label = widgets.Label(css_classes=["m3-icon"])
         self.next_label = widgets.Label(label="skip_next", css_classes=["m3-icon"])
@@ -157,9 +157,9 @@ class Media(Gtk.Box, BaseWidget):
             self.title_label.set_label(title)
             self.artist_label.set_label(artist)
 
-            tooltip_text = f"{title} - {artist}"
-            self.icon.set_tooltip_text(tooltip_text)
-            self.labels_box.set_tooltip_text(tooltip_text)
+            tooltip_text = f"<b>{title}</b>\n{artist}"
+            self.icon.set_tooltip_markup(tooltip_text)
+            self.labels_box.set_tooltip_markup(tooltip_text)
 
             if self._player.art_url:
                 self.icon.set_image(self._player.art_url)
