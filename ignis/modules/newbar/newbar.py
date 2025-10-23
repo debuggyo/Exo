@@ -53,6 +53,9 @@ class Bar(widgets.Window, BaseWidget):
 
         BaseWidget.__init__(self, **kwargs)
 
+        if self.niri.is_available:
+            self.niri.connect("notify::overview-opened", self.niri_overview_opened)
+
         self._constructing = False
         self.rebuild()
 
@@ -292,6 +295,18 @@ class Bar(widgets.Window, BaseWidget):
                 area.add_css_class("module-backgrounds-connected")
             elif modules_bg == "separated":
                 area.add_css_class("module-backgrounds-separated")
+
+    def niri_overview_opened(self, *args):
+        if self.niri.overview_opened:
+            self.add_css_class("niri-overview-opened")
+            if self._autohide:
+
+                self.set_visible(True)
+                self.revealer.set_reveal_child(True)
+        else:
+            self.remove_css_class("niri-overview-opened")
+            if self._autohide:
+                self.revealer.set_reveal_child(False)
 
     @IgnisProperty
     def monitor(self) -> int:

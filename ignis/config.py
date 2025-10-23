@@ -93,7 +93,7 @@ NotificationPopup(0)
 utils.Poll(60000, lambda _: auto_dark())
 
 newbar = NewBar(
-    autohide=True,
+    autohide=False,
     autohide_fullscreen=True,
     side="left",
     floating=True,
@@ -115,7 +115,9 @@ newbar = NewBar(
             workspace_style="impulse",
             fixed_workspaces=True,
             fixed_workspace_amount=5,
-            names=False
+            icons=True,
+            names=False,
+            bigger_active=True
         )
     ],
     end_modules=[
