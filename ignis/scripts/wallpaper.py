@@ -3,13 +3,16 @@ import asyncio
 import json
 from ignis import utils
 from user_settings import user_settings
+from .send_notification import send_notification
 from ignis.css_manager import CssManager, CssInfoPath
+from ignis.command_manager import CommandManager
 
 css_manager = CssManager.get_default()
-from .send_notification import send_notification
+command_manager = CommandManager.get_default()
 
 
 class Wallpaper:
+    @command_manager.command(name="set-wallpaper")
     def setWall(path):
         schemes = [
             "content",

@@ -226,7 +226,7 @@ class SystemInfoTray:
                 elif strength > 0:
                     self.wifi.set_label("network_wifi_1_bar")
                 else:
-                    self.wifi.set_label("network_wifi_0_bar")
+                    self.wifi.set_label("signal_wifi_0_bar")
             else:
                 self.wifi.set_label("signal_wifi_off")
         else:

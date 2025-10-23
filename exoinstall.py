@@ -349,6 +349,8 @@ class ExoInstaller:
                 "ninja-build",
                 "pkg-config",
                 "scdoc",
+                "nodejs-npm",
+                "python3-cairo-devel",
                 "libxkbcommon-devel",
                 "wayland-devel",
                 "libdisplay-info-devel",
