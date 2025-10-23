@@ -9,6 +9,15 @@
     }
 }
 
+@keyframes scale {
+    from {
+        transform: scale(0.8)
+    }
+    to {
+        transform: scale(1)
+    }
+}
+
 // Window
 .bar-window {
     color: colors.$on_background;
@@ -187,6 +196,8 @@
 }
 
 // Modules
+.bar-module {animation: 300ms scale}
+
 .exo-clock {
     .time {
         font-weight: 500;
@@ -286,6 +297,7 @@
                 min-width: 48px;
                 min-height: 26px;
             }
+            animation: 300ms scale;
         }
         &:hover:not(.active) {
             background-color: colors.$surface_container_highest;
@@ -366,6 +378,15 @@
         &.play-pause-button {
             background-color: colors.$secondary_container;
         }
+        &:active {
+            transform: scale(0.9);
+        }
     }
 }
 .vertical .exo-media {padding: 3px 0px;}
+
+.exo-tray {
+    .m3-icon {
+        animation: 300ms scale;
+    }
+}

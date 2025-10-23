@@ -7,7 +7,7 @@ class Icon(Gtk.DrawingArea, BaseWidget):
     __gtype_name__ = "M3Icon"
     __gproperties__ = {**BaseWidget.gproperties}
 
-    def __init__(self, icon, size: int = 16, **kwargs):
+    def __init__(self, icon: str = "question_mark", size: int = 16, **kwargs):
         Gtk.DrawingArea.__init__(self)
         BaseWidget.__init__(self, **kwargs)
         self._icon: str = icon

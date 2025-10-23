@@ -109,7 +109,8 @@ newbar = NewBar(
         )
     ],
     end_modules=[
-        Clock()
+        Clock(),
+        Tray()
     ]
 )
 
