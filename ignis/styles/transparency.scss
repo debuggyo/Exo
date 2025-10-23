@@ -1,0 +1,93 @@
+@use "../colors";
+
+.launcher-window {
+    background-color: rgba(colors.$surface_container, 0.7);
+    box-shadow: none;
+    .search-bar-container {
+        background-color: rgba(colors.$on_surface, 0.05);
+    }
+    .app-item {
+        &:hover,
+        &:focus {
+            background-color: rgba(colors.$on_surface, 0.05);
+        }
+    }
+}
+
+.powermenu {
+    background-color: rgba(colors.$surface_container, 0.7);
+    button {
+        &:hover {
+            background-color: rgba(colors.$on_surface, 0.05);
+        }
+        &:focus {
+            background-color: rgba(colors.$secondary_container, 0.5);
+        }
+    }
+}
+
+.osd {
+    background-color: rgba(colors.$surface_container, 0.7);
+}
+
+.notification-popup {
+    background-color: rgba(colors.$surface_container, 0.7);
+    .notification-icon,
+    .m3-button.notification-close,
+    .m3-button.notification-expand {
+        background-color: rgba(colors.$on_surface, 0.05);
+    }
+}
+
+.quick-center {
+    background-color: rgba(colors.$surface_container, 0.7);
+    box-shadow: none;
+    .notification {
+        background-color: rgba(colors.$on_surface, 0.05);
+        .notification-icon,
+        .m3-button.notification-close,
+        .m3-button.notification-expand {
+            background-color: rgba(colors.$on_surface, 0.05);
+        }
+    }
+    .m3-slider {
+        background-color: rgba(colors.$on_surface, 0.05);
+    }
+}
+
+tooltip {
+    background-color: rgba(colors.$surface_container, 0.9);
+}
+
+.bar-window {
+    &.full {
+        .bar-container {
+            background-color: rgba(colors.$background, 0.7);
+        }
+    }
+    &.areas,
+    &.gradient {
+        .bar-area.area-background {
+            background-color: rgba(colors.$background, 0.7);
+        }
+    }
+}
+
+.exo-workspaces {
+    .workspace {
+        &:not(.empty):not(.active) {
+            background-color: rgba(colors.$on_surface, 0.05);
+        }
+        &:hover:not(.active) {
+            background-color: rgba(colors.$on_surface, 0.1);
+        }
+    }
+}
+
+.exo-media {
+    button {
+        &:hover:not(.play-pause-button) {
+            background-color: rgba(colors.$on_surface, 0.05);
+        }
+    }
+}

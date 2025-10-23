@@ -47,6 +47,16 @@ if not user_settings.appearance.wallcolors.dark_mode:
             priority="user",
         )
     )
+if user_settings.appearance.wallcolors.transparency:
+    css_manager.apply_css(
+        CssInfoPath(
+            name="transparency",
+            path=os.path.join(utils.get_current_dir(), "styles/transparency.scss"),
+            compiler_function=lambda path: utils.sass_compile(path=path),
+            priority="user",
+        )
+    )
+
 
 QuickCenter()
 # bar = Bar()
@@ -83,11 +93,11 @@ NotificationPopup(0)
 utils.Poll(60000, lambda _: auto_dark())
 
 newbar = NewBar(
-    autohide=False,
+    autohide=True,
     autohide_fullscreen=True,
     side="left",
     floating=True,
-    centered=False,
+    centered=True,
     background="areas",
     density=1,
     start_background=True,

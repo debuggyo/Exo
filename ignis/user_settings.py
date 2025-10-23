@@ -19,6 +19,7 @@ class UserSettings(OptionsManager):
             wallpaper_path: str = ""
             color_scheme: str = "tonal_spot"
             dark_mode: bool = True
+            transparency: bool = False
 
             class AutoDark(OptionsGroup):
                 enabled: bool = False

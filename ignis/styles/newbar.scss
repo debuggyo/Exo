@@ -11,10 +11,10 @@
 
 @keyframes scale {
     from {
-        transform: scale(0.8)
+        transform: scale(0.8);
     }
     to {
-        transform: scale(1)
+        transform: scale(1);
     }
 }
 
@@ -24,7 +24,9 @@
 
     /* Backgrounds */
     &.full {
-        .bar-container {background-color: colors.$background;}
+        .bar-container {
+            background-color: colors.$background;
+        }
 
         &.floating .bar-container {
             border-radius: 20px;
@@ -67,8 +69,13 @@
     &.gradient {
         .bar-area.area-background {
             background-color: colors.$background;
-            outline: 1px solid rgba(colors.$outline_variant, 0.5);
-            outline-offset: -1px;
+        }
+
+        &.floating {
+            .bar-area.area-background {
+                outline: 1px solid rgba(colors.$outline_variant, 0.5);
+                outline-offset: -1px;
+            }
         }
 
         &.top {
@@ -112,17 +119,50 @@
             }
         }
         &.floating {
-            .bar-area {border-radius: 20px;}
+            .bar-area {
+                border-radius: 20px;
+            }
         }
     }
 
     /* Modifiers */
     &.floating {
-        .bar-container {margin: 5px;}
-        &.top .bar-container {margin-bottom: 0px}
-        &.left .bar-container {margin-right: 0px}
-        &.right .bar-container {margin-left: 0px}
-        &.bottom .bar-container {margin-top: 0px}
+        .bar-container {
+            margin: 5px;
+        }
+        &.top .bar-container {
+            margin-bottom: 0px;
+        }
+        &.left .bar-container {
+            margin-right: 0px;
+        }
+        &.right .bar-container {
+            margin-left: 0px;
+        }
+        &.bottom .bar-container {
+            margin-top: 0px;
+        }
+    }
+
+    &.centered {
+        &.full {
+            &.top {
+                border-bottom-left-radius: 20px;
+                border-bottom-right-radius: 20px;
+            }
+            &.bottom {
+                border-top-left-radius: 20px;
+                border-top-right-radius: 20px;
+            }
+            &.left {
+                border-top-right-radius: 20px;
+                border-bottom-right-radius: 20px;
+            }
+            &.right {
+                border-top-left-radius: 20px;
+                border-bottom-left-radius: 20px;
+            }
+        }
     }
 
     /* Areas */
@@ -196,7 +236,10 @@
 }
 
 // Modules
-.bar-module {animation: 300ms scale; border-radius: 20px;}
+.bar-module {
+    animation: 300ms scale;
+    border-radius: 20px;
+}
 
 .exo-clock {
     .time {
@@ -213,7 +256,8 @@
         }
     }
 
-    .date, .month {
+    .date,
+    .month {
         font-weight: 400;
         font-size: 8pt;
         opacity: 0.8;
@@ -311,7 +355,7 @@
             min-width: 6px;
             background-color: rgba(colors.$on_background, 0.5);
             &.empty {
-                background-color: rgba(colors.$on_background, 0.3)
+                background-color: rgba(colors.$on_background, 0.3);
             }
             &.active {
                 min-height: 10px;
@@ -380,16 +424,24 @@
         transition: 100ms;
         &:hover {
             background-color: colors.$surface_container_highest;
+            font-variation-settings: "FILL" 1;
         }
         &.play-pause-button {
             background-color: colors.$secondary_container;
+            &:hover {
+                background-color: colors.$secondary;
+                color: colors.$on_secondary;
+            }
         }
         &:active {
             transform: scale(0.9);
         }
     }
 }
-.vertical .exo-media {padding: 3px 0px; padding-top: 8px;}
+.vertical .exo-media {
+    padding: 3px 0px;
+    padding-top: 8px;
+}
 
 .exo-tray {
     transition: 300ms cubic-bezier(0.19, 1, 0.22, 1);
@@ -412,17 +464,27 @@
         }
         &.low {
             background-color: rgba(colors.$error, 0.5);
-            .fill {background-color: rgba(colors.$error, 0.7);}
+            .fill {
+                background-color: rgba(colors.$error, 0.7);
+            }
         }
         &.charging {
             background-color: rgba(lightgreen, 0.5);
-            .fill {background-color: rgba(lightgreen, 0.7);}
-            .status {font-variation-settings: "FILL" 1;}
+            .fill {
+                background-color: rgba(lightgreen, 0.7);
+            }
+            .status {
+                font-variation-settings: "FILL" 1;
+            }
         }
         &.full {
             font-size: 0.8rem;
         }
     }
-    &.vertical .battery {margin-bottom: calc(-1rem + 3px);}
-    &:not(.vertical) .battery {margin-right: calc(-1rem + 5px);}
+    &.vertical .battery {
+        margin-bottom: calc(-1rem + 3px);
+    }
+    &:not(.vertical) .battery {
+        margin-right: calc(-1rem + 5px);
+    }
 }

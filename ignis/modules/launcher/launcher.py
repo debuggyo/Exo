@@ -348,6 +348,7 @@ class Launcher(widgets.Window):
             layer="overlay",
             kb_mode="exclusive",
             anchor=["left", "right", "top", "bottom"],
+            exclusivity="ignore",
             default_width=600,
             setup=lambda self: self.connect(
                 "notify::visible", self.__on_visibility_change
