@@ -1,5 +1,6 @@
-from ignis import utils, widgets
+from ignis import widgets
 from ignis.gobject import IgnisProperty
+from ignis.window_manager import WindowManager
 from ignis.services.network import NetworkService
 from ignis.services.bluetooth import BluetoothService
 from ignis.services.audio import AudioService
@@ -155,6 +156,7 @@ class Tray(Gtk.Box, BaseWidget):
         self.network = NetworkService.get_default()
         self.bluetooth = BluetoothService.get_default()
         self.audio = AudioService.get_default()
+        self.window_manager = WindowManager.get_default()
 
         self.network_icon = m3.Icon(size=14, visible=False)
         self.bluetooth_icon = m3.Icon(size=14, visible=False)
@@ -164,6 +166,10 @@ class Tray(Gtk.Box, BaseWidget):
         scroll_controller = Gtk.EventControllerScroll.new(Gtk.EventControllerScrollFlags.VERTICAL)
         scroll_controller.connect("scroll", self.audio_scroll)
         self.audio_icon.add_controller(scroll_controller)
+
+        click_controller = Gtk.GestureClick.new()
+        click_controller.connect("pressed", self.on_click)
+        self.add_controller(click_controller)
 
         self.append(self.network_icon)
         self.append(self.bluetooth_icon)
@@ -255,3 +261,6 @@ class Tray(Gtk.Box, BaseWidget):
             new_volume = current_volume - (2 * dy)
             new_volume = max(0, min(100, new_volume))
             self.audio.speaker.volume = new_volume
+
+    def on_click(self, *args):
+        self.window_manager.toggle_window("QuickCenter")

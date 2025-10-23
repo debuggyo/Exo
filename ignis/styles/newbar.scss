@@ -196,7 +196,7 @@
 }
 
 // Modules
-.bar-module {animation: 300ms scale}
+.bar-module {animation: 300ms scale; border-radius: 20px;}
 
 .exo-clock {
     .time {
@@ -284,6 +284,9 @@
         min-width: 26px;
         font-weight: 500;
         transition: 150ms;
+        .icon {
+            animation: 300ms scale;
+        }
         &:not(.empty) {
             background-color: colors.$surface_container_high;
         }
@@ -351,6 +354,7 @@
 
 .exo-media {
     padding: 0px 3px;
+    padding-left: 8px;
     &:not(.placeholder) .icon {
         border-radius: 20px;
         &.playing {
@@ -385,9 +389,14 @@
         }
     }
 }
-.vertical .exo-media {padding: 3px 0px;}
+.vertical .exo-media {padding: 3px 0px; padding-top: 8px;}
 
 .exo-tray {
+    transition: 300ms cubic-bezier(0.19, 1, 0.22, 1);
+    &:hover {
+        background-color: colors.$secondary_container;
+    }
+
     .m3-icon {
         animation: 300ms scale;
     }

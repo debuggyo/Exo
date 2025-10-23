@@ -1,5 +1,14 @@
 @use "../colors";
 
+@keyframes fade {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
 $elevation-1: 0px 1px 2px rgba(colors.$shadow, 0.6);
 $elevation-2: 0px 1px 2px rgba(colors.$shadow, 0.6);
 $elevation-3: 0px 1px 3px rgba(colors.$shadow, 0.6);
@@ -551,6 +560,7 @@ tooltip {
     background-color: colors.$surface_container_high;
     border: 1px solid rgba(colors.$outline_variant, 0.5);
     padding: 0.6rem 1rem;
+    animation: 300ms fade;
 }
 
 /* Checkboxes */
