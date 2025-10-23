@@ -1,5 +1,5 @@
 from ignis import widgets, utils
-from modules.m3components import Button, ConnectedButtonGroup
+from modules.m3components import Button, ConnectedButtonGroup, Icon
 from ignis.services.notifications import Notification, NotificationService
 from gi.repository import GLib
 
@@ -85,6 +85,12 @@ class M3Test(widgets.RegularWindow):
                     spacing=10,
                     halign="center",
                     child=[
+                        Icon("edit", 64, hexpand=False, halign="center"),
+                        Icon("edit", 48, hexpand=False, halign="center"),
+                        Icon("edit", 32, hexpand=False, halign="center"),
+                        Icon("edit", 16, hexpand=False, halign="center"),
+                        Icon("edit", 8, hexpand=False, halign="center"),
+
                         # Label Only
                         widgets.Label(
                             label="Label Only", css_classes=["settings-category-label"]

@@ -42,11 +42,15 @@ class Settings(widgets.RegularWindow):
         }
 
         self.active_tab_label = widgets.Label(
-            label="", css_classes=["active-tab-label"]
+            label=self.tabs["quick"][1], css_classes=["active-tab-label"]
         )
 
-        rail = NavigationRail(self.tabs, on_select=self.switch_tab, default="quick")
-        rail.vexpand = True
+        rail = NavigationRail(
+            tabs=self.tabs,
+            selected_tab="quick",
+            vexpand=True,
+        )
+        rail.connect("notify::selected-tab", lambda nav, _: self.switch_tab(nav.selected_tab))
 
         rail.append(widgets.Box(vexpand=True))
         rail.append(self.reload_button)
@@ -92,6 +96,8 @@ class Settings(widgets.RegularWindow):
         )
 
     def switch_tab(self, key):
+        if not key:
+            return
         self.active_tab_label.label = self.tabs[key][1]
 
         if key == "quick":
