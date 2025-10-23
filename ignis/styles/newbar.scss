@@ -401,6 +401,10 @@
             border-radius: 0px;
             background-color: rgba(colors.$on_surface, 0.7);
         }
+        &.low {
+            background-color: rgba(colors.$error, 0.5);
+            .fill {background-color: rgba(colors.$error, 0.7);}
+        }
         &.charging {
             background-color: rgba(lightgreen, 0.5);
             .fill {background-color: rgba(lightgreen, 0.7);}
