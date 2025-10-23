@@ -283,6 +283,7 @@
         min-height: 26px;
         min-width: 26px;
         font-weight: 500;
+        transition: 150ms;
         &:not(.empty) {
             background-color: colors.$surface_container_high;
         }

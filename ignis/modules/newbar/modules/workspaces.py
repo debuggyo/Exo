@@ -338,9 +338,6 @@ class Workspaces(widgets.Box, BaseWidget):
         return DummyWorkspace(id=9999, idx=ws_id, name=None, is_active=False, is_urgent=False)
 
     def _update_workspaces(self, *args):
-        while child := self.get_first_child():
-            self.remove(child)
-
         all_workspaces_map = {}
         workspaces = []
         if self.niri.is_available:
@@ -394,16 +391,51 @@ class Workspaces(widgets.Box, BaseWidget):
             else:
                 workspaces_to_display = sorted(workspaces, key=lambda ws: ws.id)
 
+        existing_widgets = {}
+        child = self.get_first_child()
+        while child:
+            ws_id = child._workspace.idx if hasattr(child._workspace, "dummy") or self.niri.is_available else child._workspace.id
+            existing_widgets[ws_id] = child
+            child = child.get_next_sibling()
+
+        new_ws_ids = set()
         for ws in workspaces_to_display:
-            new_workspace = Workspace(
-                workspace=ws,
-                workspace_style=self._workspace_style,
-                icons=self._icons,
-                names=self._names,
-                numbers=self._numbers,
-                bigger_active=self._bigger_active
-            )
-            self.append(new_workspace)
+            ws_id = ws.idx if hasattr(ws, "dummy") or self.niri.is_available else ws.id
+            new_ws_ids.add(ws_id)
+
+            if ws_id in existing_widgets:
+                widget = existing_widgets[ws_id]
+                widget._workspace = ws
+                widget.workspace_style = self._workspace_style
+                widget.icons = self._icons
+                widget.names = self._names
+                widget.numbers = self._numbers
+                widget.bigger_active = self._bigger_active
+                widget._update_info()
+            else:
+                new_widget = Workspace(
+                    workspace=ws,
+                    workspace_style=self._workspace_style,
+                    icons=self._icons,
+                    names=self._names,
+                    numbers=self._numbers,
+                    bigger_active=self._bigger_active,
+                )
+                self.append(new_widget)
+                existing_widgets[ws_id] = new_widget
+
+        for ws_id, widget in list(existing_widgets.items()):
+            if ws_id not in new_ws_ids:
+                self.remove(widget)
+                del existing_widgets[ws_id]
+
+        sibling = None
+        for ws in workspaces_to_display:
+            ws_id = ws.idx if hasattr(ws, "dummy") or self.niri.is_available else ws.id
+            widget = existing_widgets.get(ws_id)
+            if widget:
+                self.reorder_child_after(widget, sibling)
+                sibling = widget
 
         self.set_spacing(4 if self._workspace_style == WorkspaceStyle.DOTS else 2)
         style_map = {
