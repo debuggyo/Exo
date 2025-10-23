@@ -1,5 +1,5 @@
 from ignis import widgets, utils
-from modules.m3components import Button, ConnectedButtonGroup, Slider
+from modules.m3components import Button, ConnectedButtonGroup
 from ignis.services.notifications import Notification, NotificationService
 from gi.repository import GLib
 
@@ -260,12 +260,6 @@ class M3Test(widgets.RegularWindow):
                             label="Radio Button 4",
                             halign="center",
                         ),
-                        # Sliders
-                        widgets.Label(
-                            label="Sliders", css_classes=["settings-category-label"]
-                        ),
-                        Slider.slider(0, 100, 10, icon="volume_up"),
-                        Slider.slider(0, 100, 10, icon="volume_up", sensitive=False),
                         # Notifications
                         # widgets.Box(
                         #     vertical=True,

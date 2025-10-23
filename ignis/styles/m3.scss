@@ -295,8 +295,6 @@ $square-radius: 12px;
 /* Connected Button Groups: https://m3.material.io/components/button-groups/specs */
 .connected-button-group {
     .m3-button {
-        transition: 200ms;
-
         &.xs {
             border-radius: 8px;
             min-width: 24px;
@@ -457,6 +455,7 @@ switch {
         background-color: transparent;
         padding: 2px 0px;
         border-radius: 8px;
+        min-width: 60px;
         .m3-button-icon {
             transition: 200ms;
             border-radius: 20rem;
