@@ -73,41 +73,41 @@
 
         &.top {
             &.centered .bar-area,
-            :not(.start-area) {
+            .bar-area:not(.start-area) {
                 border-bottom-left-radius: 20px;
             }
             &.centered .bar-area,
-            :not(.end-area) {
+            .bar-area:not(.end-area) {
                 border-bottom-right-radius: 20px;
             }
         }
         &.bottom {
             &.centered .bar-area,
-            :not(.start-area) {
+            .bar-area:not(.start-area) {
                 border-top-left-radius: 20px;
             }
             &.centered .bar-area,
-            :not(.end-area) {
+            .bar-area:not(.end-area) {
                 border-top-right-radius: 20px;
             }
         }
         &.left {
             &.centered .bar-area,
-            :not(.start-area) {
+            .bar-area:not(.start-area) {
                 border-top-right-radius: 20px;
             }
             &.centered .bar-area,
-            :not(.end-area) {
+            .bar-area:not(.end-area) {
                 border-bottom-right-radius: 20px;
             }
         }
         &.right {
             &.centered .bar-area,
-            :not(.start-area) {
+            .bar-area:not(.start-area) {
                 border-bottom-left-radius: 20px;
             }
             &.centered .bar-area,
-            :not(.end-area) {
+            .bar-area:not(.end-area) {
                 border-top-left-radius: 20px;
             }
         }
@@ -391,4 +391,25 @@
     .m3-icon {
         animation: 300ms scale;
     }
+
+    .battery {
+        border-radius: 20px;
+        background-color: rgba(colors.$on_surface, 0.5);
+        font-weight: 700;
+        color: colors.$surface;
+        .fill {
+            border-radius: 0px;
+            background-color: rgba(colors.$on_surface, 0.7);
+        }
+        &.charging {
+            background-color: rgba(lightgreen, 0.5);
+            .fill {background-color: rgba(lightgreen, 0.7);}
+            .status {font-variation-settings: "FILL" 1;}
+        }
+        &.full {
+            font-size: 0.8rem;
+        }
+    }
+    &.vertical .battery {margin-bottom: calc(-1rem + 3px);}
+    &:not(.vertical) .battery {margin-right: calc(-1rem + 5px);}
 }

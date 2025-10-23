@@ -49,13 +49,13 @@ if not user_settings.appearance.wallcolors.dark_mode:
     )
 
 QuickCenter()
-# bar = Bar()
-# BarStyles.set_bar_instance(bar)
-# BarStyles._apply_css(bar.build(), bar_id=0)
-# BarStyles._apply_css(bar.build2(), bar_id=1)
-# 
-# BarStyles.setFloating(user_settings.interface.bar.floating, bar_id=0)
-# BarStyles.setFloating(user_settings.interface.bar2.floating, bar_id=1)
+bar = Bar()
+BarStyles.set_bar_instance(bar)
+BarStyles._apply_css(bar.build(), bar_id=0)
+BarStyles._apply_css(bar.build2(), bar_id=1)
+
+BarStyles.setFloating(user_settings.interface.bar.floating, bar_id=0)
+BarStyles.setFloating(user_settings.interface.bar2.floating, bar_id=1)
 
 if not user_settings.appearance.wallcolors.wallpaper_path:
     default_wallpaper_path = os.path.expanduser("~/Pictures/Wallpapers/default.png")
@@ -85,9 +85,9 @@ utils.Poll(60000, lambda _: auto_dark())
 newbar = NewBar(
     autohide=False,
     autohide_fullscreen=True,
-    side="left",
+    side="bottom",
     floating=True,
-    centered=True,
+    centered=False,
     background="areas",
     density=1,
     start_background=True,
