@@ -8,6 +8,7 @@ from ignis.services.upower import UPowerService
 from ignis.services.system_tray import SystemTrayService
 from ignis.base_widget import BaseWidget
 from gi.repository import Gtk
+import asyncio
 import modules.m3components as m3
 
 class Battery(widgets.Box, BaseWidget):
@@ -147,6 +148,37 @@ class Battery(widgets.Box, BaseWidget):
         else:
             self.set_visible(False)
 
+class SystemTrayItem(widgets.EventBox, BaseWidget):
+    __gtype_name__ = "SystemTrayItem"
+    __gproperties__ = {**BaseWidget.gproperties}
+
+    menu = None
+    def __init__(self, item, **kwargs):
+        widgets.EventBox.__init__(self)
+        if item.menu:
+            menu = item.menu.copy()
+        else:
+            menu = None
+
+        self.set_child(
+            [
+                widgets.Icon(
+                    image=item.bind("icon"),
+                    pixel_size=16,
+                    css_classes=["tray-icon"],
+                ),
+                menu,
+            ]
+        )
+        self.set_tooltip_text(item.bind("tooltip"))
+        self.set_on_click(lambda _: asyncio.create_task(item.activate_async()))
+        self.set_on_right_click(lambda _: menu.popup() if menu else None)
+        self.set_css_classes(["tray-item"])
+        self.set_halign("center")
+        self.set_valign("center")
+
+        BaseWidget.__init__(self, **kwargs)
+
 class Tray(Gtk.Box, BaseWidget):
     __gtype_name__ = "ExoTray"
     __gproperties__ = {**BaseWidget.gproperties}
@@ -160,11 +192,12 @@ class Tray(Gtk.Box, BaseWidget):
         self.window_manager = WindowManager.get_default()
         self.system_tray = SystemTrayService.get_default()
 
-        self.tray_items = widgets.Box(vertical=self._vertical)
+        self.tray_items = widgets.Box(spacing=5)
+        self.container = Gtk.Box(spacing=10)
         self.network_icon = m3.Icon(size=14, visible=False)
         self.bluetooth_icon = m3.Icon(size=14, visible=False)
         self.audio_icon = m3.Icon(size=14, visible=False)
-        self.battery = Battery(vertical=self._vertical)
+        self.battery = Battery()
 
         scroll_controller = Gtk.EventControllerScroll.new(Gtk.EventControllerScrollFlags.VERTICAL)
         scroll_controller.connect("scroll", self.audio_scroll)
@@ -172,15 +205,14 @@ class Tray(Gtk.Box, BaseWidget):
 
         click_controller = Gtk.GestureClick.new()
         click_controller.connect("pressed", self.on_click)
-        self.network_icon.add_controller(click_controller)
-        self.bluetooth_icon.add_controller(click_controller)
-        self.audio_icon.add_controller(click_controller)
-        self.battery.add_controller(click_controller)
+        self.container.add_controller(click_controller)
 
-        self.append(self.network_icon)
-        self.append(self.bluetooth_icon)
-        self.append(self.audio_icon)
-        self.append(self.battery)
+        self.append(self.container)
+        self.container.append(self.tray_items)
+        self.container.append(self.network_icon)
+        self.container.append(self.bluetooth_icon)
+        self.container.append(self.audio_icon)
+        self.container.append(self.battery)
 
         self.network.wifi.connect("notify::is-connected", self.update_network_icon)
         self.network.ethernet.connect("notify::is-connected", self.update_network_icon)
@@ -208,7 +240,9 @@ class Tray(Gtk.Box, BaseWidget):
             return
         self._vertical = value
         self.set_orientation(Gtk.Orientation.VERTICAL if value else Gtk.Orientation.HORIZONTAL)
+        self.container.set_orientation(Gtk.Orientation.VERTICAL if value else Gtk.Orientation.HORIZONTAL)
         self.battery.set_vertical(value)
+        self.tray_items.set_vertical(value)
 
     def update_network_icon(self, *args):
         wifi = self.network.wifi
@@ -271,16 +305,10 @@ class Tray(Gtk.Box, BaseWidget):
             self.audio.speaker.volume = new_volume
 
     def update_tray_items(self, *args):
+        self.tray_items.set_child([])
         for item in self.system_tray.items:
             self.tray_items.append(
-                widgets.EventBox(
-                    on_click=lambda _: item.activate_async(),
-                    on_right_click=lambda _: item.context_menu_async(),
-                    child=[
-                        widgets.Icon(image=item.icon, pixel_size=16),
-                        item.menu if self.item_is_menu else None
-                    ]
-                )
+                SystemTrayItem(item)
             )
         self.tray_items.set_visible(True if self.tray_items else False)
 
