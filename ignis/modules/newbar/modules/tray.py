@@ -5,6 +5,7 @@ from ignis.services.network import NetworkService
 from ignis.services.bluetooth import BluetoothService
 from ignis.services.audio import AudioService
 from ignis.services.upower import UPowerService
+from ignis.services.system_tray import SystemTrayService
 from ignis.base_widget import BaseWidget
 from gi.repository import Gtk
 import modules.m3components as m3
@@ -157,7 +158,9 @@ class Tray(Gtk.Box, BaseWidget):
         self.bluetooth = BluetoothService.get_default()
         self.audio = AudioService.get_default()
         self.window_manager = WindowManager.get_default()
+        self.system_tray = SystemTrayService.get_default()
 
+        self.tray_items = widgets.Box(vertical=self._vertical)
         self.network_icon = m3.Icon(size=14, visible=False)
         self.bluetooth_icon = m3.Icon(size=14, visible=False)
         self.audio_icon = m3.Icon(size=14, visible=False)
@@ -169,7 +172,10 @@ class Tray(Gtk.Box, BaseWidget):
 
         click_controller = Gtk.GestureClick.new()
         click_controller.connect("pressed", self.on_click)
-        self.add_controller(click_controller)
+        self.network_icon.add_controller(click_controller)
+        self.bluetooth_icon.add_controller(click_controller)
+        self.audio_icon.add_controller(click_controller)
+        self.battery.add_controller(click_controller)
 
         self.append(self.network_icon)
         self.append(self.bluetooth_icon)
@@ -186,6 +192,8 @@ class Tray(Gtk.Box, BaseWidget):
         if self.audio.speaker:
             self.audio.speaker.connect("notify::volume", self.update_audio_icon)
             self.audio.speaker.connect("notify::is-muted", self.update_audio_icon)
+
+        self.system_tray.connect("notify::items", self.update_tray_items)
 
         self.add_css_class("exo-tray")
         BaseWidget.__init__(self, **kwargs)
@@ -261,6 +269,20 @@ class Tray(Gtk.Box, BaseWidget):
             new_volume = current_volume - (2 * dy)
             new_volume = max(0, min(100, new_volume))
             self.audio.speaker.volume = new_volume
+
+    def update_tray_items(self, *args):
+        for item in self.system_tray.items:
+            self.tray_items.append(
+                widgets.EventBox(
+                    on_click=lambda _: item.activate_async(),
+                    on_right_click=lambda _: item.context_menu_async(),
+                    child=[
+                        widgets.Icon(image=item.icon, pixel_size=16),
+                        item.menu if self.item_is_menu else None
+                    ]
+                )
+            )
+        self.tray_items.set_visible(True if self.tray_items else False)
 
     def on_click(self, *args):
         self.window_manager.toggle_window("QuickCenter")
