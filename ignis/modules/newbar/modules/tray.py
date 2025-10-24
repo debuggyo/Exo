@@ -250,6 +250,8 @@ class Tray(Gtk.Box, BaseWidget):
         if ethernet.is_connected:
             self.network_icon.set_visible(True)
             self.network_icon.set_icon("settings_ethernet")
+            tooltip = f"<b>{ethernet.devices[0].name}</b>"
+            self.network_icon.set_tooltip_markup(tooltip)
         elif wifi.enabled:
             self.network_icon.set_visible(True)
             if wifi.devices and wifi.devices[0].ap:
@@ -265,6 +267,8 @@ class Tray(Gtk.Box, BaseWidget):
                 else:
                     icon = "signal_wifi_0_bar"
                 self.network_icon.set_icon(icon)
+                tooltip = f"<b>{wifi.devices[0].ap.ssid}\nStrength:</b> {strength}"
+                self.network_icon.set_tooltip_markup(tooltip)
             else:
                 self.network_icon.set_icon("signal_wifi_off")
         else:
@@ -277,6 +281,9 @@ class Tray(Gtk.Box, BaseWidget):
             if self.bluetooth.powered:
                 if len(self.bluetooth.connected_devices) > 0:
                     self.bluetooth_icon.set_icon("bluetooth_connected")
+                    connected_names = [d.name for d in self.bluetooth.connected_devices]
+                    tooltip = f"<b>Connected Devices</b>\n" + '\n'.join(connected_names)
+                    self.network_icon.set_tooltip_markup(tooltip)
                 else:
                     self.bluetooth_icon.set_icon("bluetooth")
             else:
