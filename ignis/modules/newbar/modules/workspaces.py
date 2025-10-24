@@ -115,8 +115,12 @@ class Workspace(widgets.Button, BaseWidget):
             if ws:
                 active = ws.is_active
             windows_in_workspace = [w for w in self.niri.windows if w.workspace_id == self._workspace.id]
+            all_window_ids = {}
+            for w in self.niri.windows:
+                all_window_ids[w.id] = w
+            print(all_window_ids)
             if windows_in_workspace:
-                icon_name = utils.get_app_icon_name(windows_in_workspace[0].app_id) or icon_name
+                icon_name = utils.get_app_icon_name(all_window_ids[ws.active_window_id].app_id) or icon_name
         elif self.hyprland.is_available:
             updated_ws = next((w for w in self.hyprland.workspaces if w.id == self._workspace.id), None)
             if updated_ws:
