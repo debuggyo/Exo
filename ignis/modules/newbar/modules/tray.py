@@ -225,6 +225,7 @@ class Tray(Gtk.Box, BaseWidget):
             self.audio.speaker.connect("notify::volume", self.update_audio_icon)
             self.audio.speaker.connect("notify::is-muted", self.update_audio_icon)
 
+        self.update_tray_items()
         self.system_tray.connect("notify::items", self.update_tray_items)
 
         self.add_css_class("exo-tray")
@@ -317,7 +318,7 @@ class Tray(Gtk.Box, BaseWidget):
             self.tray_items.append(
                 SystemTrayItem(item)
             )
-        self.tray_items.set_visible(True if self.tray_items else False)
+        self.tray_items.set_visible(True if self.tray_items.child else False)
 
     def on_click(self, *args):
         self.window_manager.toggle_window("QuickCenter")
