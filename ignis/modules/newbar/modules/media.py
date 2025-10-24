@@ -1,10 +1,12 @@
 import gi
-gi.require_version('Gtk', '4.0')
+
+gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk, Pango
 from ignis.base_widget import BaseWidget
 from ignis.gobject import IgnisProperty
 from ignis import widgets, utils
 from ignis.services.mpris import MprisService, MprisPlayer
+
 
 class Media(Gtk.Box, BaseWidget):
     __gtype_name__ = "ExoMedia"
@@ -16,23 +18,43 @@ class Media(Gtk.Box, BaseWidget):
         self._density: int = 0
         self._show_labels: bool = True
         self._show_controls: bool = True
+        self._show_artwork: bool = True
+        self._show_when_no_player: bool = True
         self._player: MprisPlayer = None
         self._player_index: int = 0
 
         self.mpris = MprisService.get_default()
 
-        scroll_controller = Gtk.EventControllerScroll.new(Gtk.EventControllerScrollFlags.VERTICAL)
+        scroll_controller = Gtk.EventControllerScroll.new(
+            Gtk.EventControllerScrollFlags.VERTICAL
+        )
         scroll_controller.connect("scroll", self.on_scroll)
         self.add_controller(scroll_controller)
 
-        self.icon = widgets.Icon(pixel_size=24, halign="center", valign="center", css_classes=["icon"], overflow=Gtk.Overflow.HIDDEN)
+        self.icon = widgets.Icon(
+            pixel_size=24,
+            halign="center",
+            valign="center",
+            css_classes=["icon"],
+            overflow=Gtk.Overflow.HIDDEN,
+        )
 
-        self.labels_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, valign=Gtk.Align.CENTER)
+        self.labels_box = Gtk.Box(
+            orientation=Gtk.Orientation.VERTICAL, valign=Gtk.Align.CENTER
+        )
         self.title_label = Gtk.Label(
-            halign=Gtk.Align.START, xalign=0, ellipsize=Pango.EllipsizeMode.END, max_width_chars=20, width_chars=20,
+            halign=Gtk.Align.START,
+            xalign=0,
+            ellipsize=Pango.EllipsizeMode.END,
+            max_width_chars=20,
+            width_chars=20,
         )
         self.artist_label = Gtk.Label(
-            halign=Gtk.Align.START, xalign=0, ellipsize=Pango.EllipsizeMode.END, max_width_chars=24, width_chars=20,
+            halign=Gtk.Align.START,
+            xalign=0,
+            ellipsize=Pango.EllipsizeMode.END,
+            max_width_chars=24,
+            width_chars=20,
         )
         self.labels_box.append(self.title_label)
         self.labels_box.append(self.artist_label)
@@ -41,9 +63,31 @@ class Media(Gtk.Box, BaseWidget):
         self.prev_label = widgets.Label(label="skip_previous", css_classes=["m3-icon"])
         self.play_pause_label = widgets.Label(css_classes=["m3-icon"])
         self.next_label = widgets.Label(label="skip_next", css_classes=["m3-icon"])
-        self.prev_button = widgets.Button(child=self.prev_label, on_click=lambda _: self.prev(), halign="center", hexpand=False, valign="center", vexpand=False)
-        self.play_pause_button = widgets.Button(child=self.play_pause_label, on_click=lambda _: self.play_pause(), css_classes=["play-pause-button"], halign="center", hexpand=False, valign="center", vexpand=False)
-        self.next_button = widgets.Button(child=self.next_label, on_click=lambda _: self.next(), halign="center", hexpand=False, valign="center", vexpand=False)
+        self.prev_button = widgets.Button(
+            child=self.prev_label,
+            on_click=lambda _: self.prev(),
+            halign="center",
+            hexpand=False,
+            valign="center",
+            vexpand=False,
+        )
+        self.play_pause_button = widgets.Button(
+            child=self.play_pause_label,
+            on_click=lambda _: self.play_pause(),
+            css_classes=["play-pause-button"],
+            halign="center",
+            hexpand=False,
+            valign="center",
+            vexpand=False,
+        )
+        self.next_button = widgets.Button(
+            child=self.next_label,
+            on_click=lambda _: self.next(),
+            halign="center",
+            hexpand=False,
+            valign="center",
+            vexpand=False,
+        )
         self.controls_box.append(self.prev_button)
         self.controls_box.append(self.play_pause_button)
         self.controls_box.append(self.next_button)
@@ -66,7 +110,8 @@ class Media(Gtk.Box, BaseWidget):
         self.update_layout()
 
     @IgnisProperty
-    def vertical(self) -> bool: return self._vertical
+    def vertical(self) -> bool:
+        return self._vertical
 
     @vertical.setter
     def vertical(self, value: bool):
@@ -74,7 +119,8 @@ class Media(Gtk.Box, BaseWidget):
         self.update_layout()
 
     @IgnisProperty
-    def density(self) -> int: return self._density
+    def density(self) -> int:
+        return self._density
 
     @density.setter
     def density(self, value: int):
@@ -82,7 +128,8 @@ class Media(Gtk.Box, BaseWidget):
         self.update_layout()
 
     @IgnisProperty
-    def show_labels(self) -> bool: return self._show_labels
+    def show_labels(self) -> bool:
+        return self._show_labels
 
     @show_labels.setter
     def show_labels(self, value: bool):
@@ -90,11 +137,30 @@ class Media(Gtk.Box, BaseWidget):
         self.update_layout()
 
     @IgnisProperty
-    def show_controls(self) -> bool: return self._show_controls
+    def show_controls(self) -> bool:
+        return self._show_controls
 
     @show_controls.setter
     def show_controls(self, value: bool):
         self._show_controls = value
+        self.update_layout()
+
+    @IgnisProperty
+    def show_artwork(self) -> bool:
+        return self._show_artwork
+
+    @show_artwork.setter
+    def show_artwork(self, value: bool):
+        self._show_artwork = value
+        self.update_layout()
+
+    @IgnisProperty
+    def show_when_no_player(self) -> bool:
+        return self._show_when_no_player
+
+    @show_when_no_player.setter
+    def show_when_no_player(self, value: bool):
+        self._show_when_no_player = value
         self.update_layout()
 
     def on_scroll(self, _, _dx, dy):
@@ -118,13 +184,16 @@ class Media(Gtk.Box, BaseWidget):
             self._update_info()
 
     def play_pause(self):
-        if self._player: self._player.play_pause()
+        if self._player:
+            self._player.play_pause()
 
     def next(self):
-        if self._player: self._player.next()
+        if self._player:
+            self._player.next()
 
     def prev(self):
-        if self._player: self._player.previous()
+        if self._player:
+            self._player.previous()
 
     def _update_player(self, *args):
         players = self.mpris.players
@@ -149,6 +218,7 @@ class Media(Gtk.Box, BaseWidget):
 
     def _update_info(self, *args):
         if self._player:
+            self.set_visible(True)
             self.remove_css_class("placeholder")
             self.icon.remove_css_class("playing")
             self.icon.remove_css_class("paused")
@@ -177,7 +247,9 @@ class Media(Gtk.Box, BaseWidget):
 
             self.prev_button.set_sensitive(self._player.can_go_previous)
             self.next_button.set_sensitive(self._player.can_go_next)
-            self.play_pause_button.set_sensitive(self._player.can_play or self._player.can_pause)
+            self.play_pause_button.set_sensitive(
+                self._player.can_play or self._player.can_pause
+            )
         else:
             self.add_css_class("placeholder")
             self.title_label.set_label("No Media Playing")
@@ -189,9 +261,13 @@ class Media(Gtk.Box, BaseWidget):
             self.play_pause_button.set_sensitive(False)
             self.icon.set_tooltip_text(None)
             self.labels_box.set_tooltip_text(None)
+            self.set_visible(True if self._show_when_no_player else False)
 
     def update_layout(self):
-        self.set_orientation(Gtk.Orientation.VERTICAL if self._vertical else Gtk.Orientation.HORIZONTAL)
+        self.set_orientation(
+            Gtk.Orientation.VERTICAL if self._vertical else Gtk.Orientation.HORIZONTAL
+        )
+        self.icon.set_visible(self._show_artwork)
         self.labels_box.set_visible(self._show_labels and not self._vertical)
         self.controls_box.set_visible(self._show_controls)
 
@@ -206,4 +282,8 @@ class Media(Gtk.Box, BaseWidget):
             self.icon.set_pixel_size(24)
             self.set_spacing(8)
 
-        self.controls_box.set_orientation(Gtk.Orientation.VERTICAL if self._vertical else Gtk.Orientation.HORIZONTAL)
+        self.controls_box.set_orientation(
+            Gtk.Orientation.VERTICAL if self._vertical else Gtk.Orientation.HORIZONTAL
+        )
+
+        self._update_info()

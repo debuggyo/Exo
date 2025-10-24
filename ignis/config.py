@@ -42,7 +42,9 @@ if not user_settings.appearance.wallcolors.dark_mode:
     css_manager.apply_css(
         CssInfoPath(
             name="lightthemeoverrides",
-            path=os.path.join(utils.get_current_dir(), "styles/lightthemeoverrides.scss"),
+            path=os.path.join(
+                utils.get_current_dir(), "styles/lightthemeoverrides.scss"
+            ),
             compiler_function=lambda path: utils.sass_compile(path=path),
             priority="user",
         )
@@ -95,21 +97,18 @@ utils.Poll(60000, lambda _: auto_dark())
 newbar = NewBar(
     autohide=False,
     autohide_fullscreen=True,
-    side="left",
+    side="bottom",
     floating=True,
-    centered=True,
-    background="areas",
-    density=1,
+    centered=False,
+    background="none",
+    density=0,
     start_background=True,
     center_background=True,
     end_background=True,
     start_module_bg="none",
     center_module_bg="none",
     end_module_bg="none",
-    start_modules=[
-        Window(),
-        Media()
-    ],
+    start_modules=[Window(), Media(show_when_no_player=False)],
     center_modules=[
         Workspaces(
             workspace_style="impulse",
@@ -117,13 +116,10 @@ newbar = NewBar(
             fixed_workspace_amount=5,
             icons=True,
             names=False,
-            bigger_active=True
-        )
+            bigger_active=True,
+        ),
     ],
-    end_modules=[
-        Clock(),
-        Tray()
-    ]
+    end_modules=[Clock(), Tray()],
 )
 
 # workspaces = NewBar(

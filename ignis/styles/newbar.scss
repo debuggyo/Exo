@@ -22,6 +22,10 @@
 .bar-window {
     color: colors.$on_background;
 
+    .bar-container {
+        animation: 300ms scale;
+    }
+
     /* Backgrounds */
     &.full {
         .bar-container {
@@ -393,6 +397,12 @@
     &.vertical .workspace.active.bigger-active {
         min-height: 40px;
         min-width: 21px;
+    }
+}
+.bar-area:not(.area-background):not(.module-backgrounds-connected):not(.module-backgrounds-separated),
+.none {
+    .workspace:not(.empty):not(.active) {
+        background-color: rgba(colors.$on_surface, 0.2);
     }
 }
 
