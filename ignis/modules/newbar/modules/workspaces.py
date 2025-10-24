@@ -126,6 +126,7 @@ class Workspace(widgets.Button, BaseWidget):
             self.set_tooltip_markup(tooltip)
 
         elif self.hyprland.is_available:
+            ws = self._workspace
             updated_ws = next((w for w in self.hyprland.workspaces if w.id == self._workspace.id), None)
             if updated_ws:
                 self._workspace = updated_ws
@@ -136,6 +137,10 @@ class Workspace(widgets.Button, BaseWidget):
             windows_in_workspace = self.hyprland.get_windows_on_workspace(self._workspace.id)
             if windows_in_workspace:
                 icon_name = utils.get_app_icon_name(windows_in_workspace[0].class_name) or icon_name
+            ws_name = f"{ws.name if ws.name else ws.idx}"
+            titles_in_workspace = [w.title for w in windows_in_workspace] or ["No windows"]
+            tooltip = f"<b>{ws_name}</b>\n" + '\n'.join(titles_in_workspace)
+            self.set_tooltip_markup(tooltip)
 
         empty = not windows_in_workspace
 
