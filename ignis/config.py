@@ -16,7 +16,6 @@ from ignis.css_manager import CssInfoPath, CssManager
 from ignis import utils, widgets
 from scripts import BarStyles, Wallpaper, auto_dark
 from user_settings import user_settings
-from modules.bar.widgets import SystemInfoTray
 
 Wallpaper.generatePreviews()
 
@@ -100,7 +99,7 @@ newbar = NewBar(
     side="bottom",
     floating=True,
     centered=False,
-    background="none",
+    background="full",
     density=0,
     start_background=True,
     center_background=True,
@@ -119,7 +118,7 @@ newbar = NewBar(
             bigger_active=True,
         ),
     ],
-    end_modules=[Clock(), Tray()],
+    end_modules=[Layout(), Clock(), Tray()],
 )
 
 # workspaces = NewBar(

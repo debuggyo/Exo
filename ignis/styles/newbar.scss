@@ -498,3 +498,18 @@
         margin-right: calc(-1rem + 5px);
     }
 }
+
+.exo-layout {
+    .window {
+        background-color: colors.$surface_container_high;
+        border-radius: 3px;
+        margin: 1px;
+        min-width: 0px;
+        min-height: 0px;
+        transition: 100ms;
+        &.active {
+            background-color: colors.$primary;
+            color: colors.$on_primary;
+        }
+    }
+}
