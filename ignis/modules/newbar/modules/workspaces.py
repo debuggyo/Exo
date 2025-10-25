@@ -3,7 +3,7 @@ gi.require_version('Gtk', '4.0')
 from gi.repository import GObject, Gtk
 from ignis.base_widget import BaseWidget
 from ignis.gobject import IgnisProperty
-from ignis import widgets, utils
+from ignis import widgets
 from ignis.services.niri import NiriService
 from ignis.services.hyprland import HyprlandService
 from modules.shared_modules import AppIcon
@@ -31,6 +31,8 @@ class Workspace(widgets.Button, BaseWidget):
         if self.niri.is_available:
             self.on_click = lambda _: self.niri.switch_to_workspace(self._workspace.idx)
             self.niri.connect("notify::workspaces", self._update_info)
+            if not hasattr(self._workspace, "dummy"):
+                self._workspace.connect("destroyed", self._on_workspace_destroyed)
         elif self.hyprland.is_available:
             self.on_click = lambda _: self.hyprland.switch_to_workspace(self._workspace.id)
             self.hyprland.connect("notify::active-workspace", self._update_info)
@@ -50,6 +52,11 @@ class Workspace(widgets.Button, BaseWidget):
 
         BaseWidget.__init__(self, **kwargs)
         self._update_info()
+
+    def _on_workspace_destroyed(self, *args):
+        parent = self.get_parent()
+        if parent:
+            parent._update_workspaces()
 
     @IgnisProperty(type=WorkspaceStyle, default=WorkspaceStyle.IMPULSE)
     def workspace_style(self) -> WorkspaceStyle:
@@ -407,11 +414,17 @@ class Workspaces(widgets.Box, BaseWidget):
                 workspaces_to_display = sorted(workspaces, key=lambda ws: ws.id)
 
         existing_widgets = {}
+        existing_ws_ids = set()
         child = self.get_first_child()
         while child:
+            next_child = child.get_next_sibling()
             ws_id = child._workspace.idx if hasattr(child._workspace, "dummy") or self.niri.is_available else child._workspace.id
-            existing_widgets[ws_id] = child
-            child = child.get_next_sibling()
+            if ws_id in existing_ws_ids:
+                self.remove(child)
+            else:
+                existing_ws_ids.add(ws_id)
+                existing_widgets[ws_id] = child
+            child = next_child
 
         new_ws_ids = set()
         for ws in workspaces_to_display:
