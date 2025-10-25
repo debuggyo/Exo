@@ -3,6 +3,7 @@ from ignis.services.niri import NiriService, NiriWorkspace, NiriWindow
 from ignis.services.hyprland import HyprlandService, HyprlandWindow
 from ignis.services.applications import ApplicationsService
 from user_settings import user_settings
+from modules.shared_modules import AppIcon
 
 SERVICE = None
 if NiriService.get_default().is_available:
@@ -127,26 +128,7 @@ class WorkspaceButton(widgets.Button):
             elif isinstance(window, HyprlandWindow):
                 app_id = window.class_name
 
-            icon_name = None
-            if app_id:
-                icon_name = utils.get_app_icon_name(app_id)
-
-            if not icon_name:
-                app_id = None
-                if isinstance(SERVICE, NiriService):
-                    app_id = window.app_id
-                elif isinstance(SERVICE, HyprlandService):
-                    app_id = window.class_name
-
-                if app_id:
-                    for app in APPLICATIONS.apps:
-                        if self._is_same_app(app.id, app_id):
-                            icon_name = app.icon if app.icon else None
-
-            if not icon_name:
-                icon_name = "application-x-executable-symbolic"
-
-            icon_widget = widgets.Icon(icon_name=icon_name, pixel_size=16)
+            icon_widget = AppIcon(app_id=app_id, name=window.title, pixel_size=16)
             self._icons_box.append(icon_widget)
 
         self._main_content_box.queue_resize()

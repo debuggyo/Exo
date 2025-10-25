@@ -3,7 +3,7 @@ from ignis.services.niri import NiriService
 from ignis.services.hyprland import HyprlandService
 from ignis.services.applications import ApplicationsService
 from user_settings import user_settings
-
+from modules.shared_modules import AppIcon
 
 class WindowInfo:
     def __init__(self):
@@ -11,7 +11,7 @@ class WindowInfo:
         self.hyprland = HyprlandService.get_default()
         self.applications = ApplicationsService.get_default()
 
-        self.icon = widgets.Icon(pixel_size=16)
+        self.icon = AppIcon(pixel_size=16)
         self.title_label = widgets.Label(
             css_classes=["title"],
             halign="start",
@@ -59,32 +59,15 @@ class WindowInfo:
         if self.niri.is_available:
             self.title = self.niri.active_window.title or "Empty Workspace"
             self.app_id = self.niri.active_window.app_id or "Desktop"
-            icon_name = utils.get_app_icon_name(self.app_id)
-            icon_path = icon_name if icon_name else None
         elif self.hyprland.is_available:
             self.title = self.hyprland.active_window.title or "Empty Workspace"
             self.app_id = self.hyprland.active_window.class_name or "Desktop"
-            icon_name = utils.get_app_icon_name(self.app_id)
-            icon_path = icon_name if icon_name else None
 
         self.title_label.set_label(self.title)
         self.appid_label.set_label(self.app_id)
 
-        if icon_path:
-            self.icon.set_image(icon_path)
-        else:
-            icon_path = FALLBACK_ICON
-            app_id = None
-            if self.niri.is_available:
-                app_id = self.niri.active_window.app_id
-            elif self.hyprland.is_available:
-                app_id = self.hyprland.active_window.class_name
-
-            if app_id:
-                for app in self.applications.apps:
-                    if self._is_same_app(app.id, app_id):
-                        icon_path = app.icon if app.icon else FALLBACK_ICON
-            self.icon.set_image(icon_path)
+        self.icon.set_app_id(self.app_id)
+        self.icon.set_name(self.title)
         self.icon.set_visible(True)
 
     def update_layout(self):
