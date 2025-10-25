@@ -5,7 +5,7 @@ from ignis.services.niri import NiriService
 from ignis.services.hyprland import HyprlandService
 from ignis.services.applications import ApplicationsService
 from ignis.gobject import IgnisProperty
-
+from modules.shared_modules import AppIcon
 
 class Window(Gtk.Box, BaseWidget):
     __gtype_name__ = "ExoWindow"
@@ -24,7 +24,7 @@ class Window(Gtk.Box, BaseWidget):
         self.hyprland = HyprlandService.get_default()
         self.applications = ApplicationsService.get_default()
 
-        self.icon = widgets.Icon(image="application-x-executable-symbolic", pixel_size=16, halign="center", valign="center", hexpand="center", vexpand="center")
+        self.icon = AppIcon(pixel_size=16, halign="center", valign="center", hexpand="center", vexpand="center")
         self.info = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         self.title_label = Gtk.Label(
             label="Empty",
@@ -142,17 +142,15 @@ class Window(Gtk.Box, BaseWidget):
         if self.niri.is_available:
             title = self.niri.active_window.title or "Empty"
             app_id = self.niri.active_window.app_id or "niri"
-            icon = utils.get_app_icon_name(app_id) or "application-x-executable-symbolic"
         elif self.hyprland.is_available:
             title = self.hyprland.active_window.title or "Empty"
             app_id = self.hyprland.active_window.class_name or "hyprland"
-            icon = utils.get_app_icon_name(app_id) or "application-x-executable-symbolic"
         else:
             title = "Title"
             app_id = "AppID"
-            icon = "application-x-executable-symbolic"
 
-        self.icon.set_image(icon)
+        self.icon.set_app_id(app_id)
+        self.icon.set_name(title)
         self.title_label.set_label(title)
         self.app_id_label.set_label(app_id)
         self.set_tooltip_markup(f"<b>{title}</b>\n{app_id}")

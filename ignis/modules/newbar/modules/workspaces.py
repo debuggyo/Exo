@@ -6,6 +6,7 @@ from ignis.gobject import IgnisProperty
 from ignis import widgets, utils
 from ignis.services.niri import NiriService
 from ignis.services.hyprland import HyprlandService
+from modules.shared_modules import AppIcon
 
 class WorkspaceStyle(GObject.GEnum):
     IMPULSE = 0
@@ -36,7 +37,7 @@ class Workspace(widgets.Button, BaseWidget):
             self.hyprland.connect("notify::workspaces", self._update_info)
 
         self.container = Gtk.Box()
-        self.icon = widgets.Icon(pixel_size=16, halign="center", valign="center", hexpand=True, vexpand=True)
+        self.icon = AppIcon(pixel_size=16, halign="center", valign="center", hexpand=True, vexpand=True)
         self.number = widgets.Label(halign="center", valign="center", hexpand=True, vexpand=True)
 
         self.container.append(self.icon)
@@ -119,7 +120,7 @@ class Workspace(widgets.Button, BaseWidget):
             for w in self.niri.windows:
                 all_window_ids[w.id] = w
             if windows_in_workspace:
-                icon_name = utils.get_app_icon_name(all_window_ids[ws.active_window_id].app_id) or icon_name
+                app = all_window_ids[ws.active_window_id].app_id
             ws_name = f"{ws.name} - {ws.idx}" if ws.name else f"Workspace {ws.idx}"
             titles_in_workspace = [w.title for w in windows_in_workspace] or ["No windows"]
             tooltip = f"<b>{ws_name}</b>\n" + '\n'.join(titles_in_workspace)
@@ -136,7 +137,7 @@ class Workspace(widgets.Button, BaseWidget):
                 active = active_ws.id == self._workspace.id
             windows_in_workspace = self.hyprland.get_windows_on_workspace(self._workspace.id)
             if windows_in_workspace:
-                icon_name = utils.get_app_icon_name(windows_in_workspace[0].class_name) or icon_name
+                app = windows_in_workspace[0].class_name
             ws_name = f"{ws.name if ws.name else ws.idx}"
             titles_in_workspace = [w.title for w in windows_in_workspace] or ["No windows"]
             tooltip = f"<b>{ws_name}</b>\n" + '\n'.join(titles_in_workspace)
@@ -163,7 +164,8 @@ class Workspace(widgets.Button, BaseWidget):
             self.set_valign("center")
         elif self._workspace_style == WorkspaceStyle.IMPULSE:
             if not empty and self._icons:
-                self.icon.set_image(icon_name)
+                self.icon.set_app_id(app)
+                self.icon.set_name(windows_in_workspace[0].title)
                 self.icon.set_visible(True)
             else:
                 label = "•"
