@@ -102,7 +102,8 @@ class Button(widgets.Button, BaseWidget):
         classes = [
             "elevated", "filled", "tonal", "outlined", "text",
             "xs", "s", "m", "l", "xl",
-            "round", "square"
+            "round", "square",
+            "icon-only"
         ]
         for style in classes:
             self.remove_css_class(style)
@@ -111,6 +112,8 @@ class Button(widgets.Button, BaseWidget):
         self.add_css_class(self._type)
         self.add_css_class(self._size)
         self.add_css_class(self._shape)
+        if self._icon and not self._label:
+            self.add_css_class("icon-only")
 
         self.button_icon.set_visible(True if self._icon else False)
         self.button_label.set_visible(True if self._label else False)
