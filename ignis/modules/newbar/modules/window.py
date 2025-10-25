@@ -18,6 +18,7 @@ class Window(Gtk.Box, BaseWidget):
         self._show_app_id: bool = True
         self._show_title: bool = True
         self._show_icon: bool = True
+        self._show_on_empty: bool = False
         self._fixed_width: bool = True
 
         self.niri = NiriService.get_default()
@@ -140,17 +141,23 @@ class Window(Gtk.Box, BaseWidget):
 
     def update_info(self, *args):
         if self.niri.is_available:
-            title = self.niri.active_window.title or "Empty"
+            for w in self.niri.workspaces:
+                if w.is_active:
+                    active_workspace = w
+            empty = len([w for w in self.niri.windows if w.workspace_id == active_workspace.id]) == 0
+            title = self.niri.active_window.title or active_workspace.name or f"Workspace {active_workspace.idx}"
             app_id = self.niri.active_window.app_id or "niri"
         elif self.hyprland.is_available:
-            title = self.hyprland.active_window.title or "Empty"
+            empty = len([w for w in self.hyprland.windows if w.workspace_id == self.hyprland.active_workspace.id]) == 0
+            title = self.hyprland.active_window.title or f"Workspace {self.hyprland.active_workspace.id}"
             app_id = self.hyprland.active_window.class_name or "hyprland"
         else:
             title = "Title"
             app_id = "AppID"
 
+        self.set_visible(True if self._show_on_empty else not empty)
         self.icon.set_app_id(app_id)
-        self.icon.set_name(title)
+        self.icon.set_name(title if title != active_workspace.name else None)
         self.title_label.set_label(title)
         self.app_id_label.set_label(app_id)
         self.set_tooltip_markup(f"<b>{title}</b>\n{app_id}")

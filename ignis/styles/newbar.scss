@@ -513,3 +513,9 @@
         }
     }
 }
+.bar-area:not(.area-background):not(.module-backgrounds-connected):not(.module-backgrounds-separated),
+.none {
+    .window:not(.active) {
+        background-color: rgba(colors.$on_surface, 0.2);
+    }
+}

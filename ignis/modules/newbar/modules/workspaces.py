@@ -128,6 +128,7 @@ class Workspace(widgets.Button, BaseWidget):
                 all_window_ids[w.id] = w
             if windows_in_workspace:
                 app = all_window_ids[ws.active_window_id].app_id
+                name = all_window_ids[ws.active_window_id].title
             ws_name = f"{ws.name} - {ws.idx}" if ws.name else f"Workspace {ws.idx}"
             titles_in_workspace = [w.title for w in windows_in_workspace] or ["No windows"]
             tooltip = f"<b>{ws_name}</b>\n" + '\n'.join(titles_in_workspace)
@@ -145,6 +146,7 @@ class Workspace(widgets.Button, BaseWidget):
             windows_in_workspace = self.hyprland.get_windows_on_workspace(self._workspace.id)
             if windows_in_workspace:
                 app = windows_in_workspace[0].class_name
+                name = windows_in_workspace[0].title
             ws_name = f"{ws.name if ws.name else ws.idx}"
             titles_in_workspace = [w.title for w in windows_in_workspace] or ["No windows"]
             tooltip = f"<b>{ws_name}</b>\n" + '\n'.join(titles_in_workspace)
@@ -172,7 +174,7 @@ class Workspace(widgets.Button, BaseWidget):
         elif self._workspace_style == WorkspaceStyle.IMPULSE:
             if not empty and self._icons:
                 self.icon.set_app_id(app)
-                self.icon.set_name(windows_in_workspace[0].title)
+                self.icon.set_name(name)
                 self.icon.set_visible(True)
             else:
                 label = "•"
