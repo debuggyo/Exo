@@ -5,6 +5,7 @@ from .media import Media
 from .tray import Tray
 from .layout import Layout
 from .recording_indicator import RecordingIndicator
+from .launcher import LauncherButton
 
 __all__ = [
     "Clock",
@@ -13,5 +14,6 @@ __all__ = [
     "Media",
     "Tray",
     "Layout",
-    "RecordingIndicator"
+    "RecordingIndicator",
+    "LauncherButton"
 ]

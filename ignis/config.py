@@ -99,15 +99,15 @@ newbar = NewBar(
     side="left",
     floating=True,
     centered=False,
-    background="none",
-    density=0,
+    background="areas",
+    density=1,
     start_background=True,
     center_background=True,
     end_background=True,
     start_module_bg="none",
     center_module_bg="none",
     end_module_bg="none",
-    start_modules=[Window(), Media(show_when_no_player=False)],
+    start_modules=[LauncherButton(), Window(), Media(show_when_no_player=False)],
     center_modules=[
         Workspaces(
             workspace_style="impulse",

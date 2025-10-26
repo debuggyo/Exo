@@ -20,7 +20,7 @@ class RecordingIndicator(widgets.EventBox, BaseWidget):
     __gproperties__ = {**BaseWidget.gproperties}
 
     def __init__(self, **kwargs):
-        widgets.EventBox.__init__(self, spacing=8)
+        widgets.EventBox.__init__(self, spacing=0)
         self._vertical: bool = False
         self._show_time: bool = True
         self._show_always: bool = False
@@ -64,6 +64,7 @@ class RecordingIndicator(widgets.EventBox, BaseWidget):
         self.set_orientation(orientation)
         transition = Gtk.RevealerTransitionType.SLIDE_DOWN if value else Gtk.RevealerTransitionType.SLIDE_LEFT
         self.revealer.set_transition_type(transition)
+        self._update_timer()
 
     @IgnisProperty
     def show_time(self) -> bool:
