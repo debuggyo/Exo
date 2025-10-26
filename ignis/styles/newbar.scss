@@ -399,7 +399,9 @@
         min-width: 21px;
     }
 }
-.bar-area:not(.area-background):not(.module-backgrounds-connected):not(.module-backgrounds-separated),
+.bar-area:not(.area-background):not(.module-backgrounds-connected):not(
+        .module-backgrounds-separated
+    ),
 .none {
     .workspace:not(.empty):not(.active) {
         background-color: rgba(colors.$on_surface, 0.2);
@@ -502,7 +504,7 @@
 .exo-layout {
     .window {
         background-color: colors.$surface_container_high;
-        border-radius: 3px;
+        border-radius: 5px;
         margin: 1px;
         min-width: 0px;
         min-height: 0px;
@@ -513,9 +515,22 @@
         }
     }
 }
-.bar-area:not(.area-background):not(.module-backgrounds-connected):not(.module-backgrounds-separated),
+.bar-area:not(.area-background):not(.module-backgrounds-connected):not(
+        .module-backgrounds-separated
+    ),
 .none {
     .window:not(.active) {
         background-color: rgba(colors.$on_surface, 0.2);
+    }
+}
+
+.exo-recording-indicator {
+    &.recording-active {
+        background-color: colors.$error_container;
+        color: colors.$on_error_container;
+    }
+    &.paused {
+        background-color: colors.$secondary_container;
+        color: colors.$on_secondary_container;
     }
 }

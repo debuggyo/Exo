@@ -99,7 +99,7 @@ newbar = NewBar(
     side="left",
     floating=True,
     centered=False,
-    background="full",
+    background="none",
     density=0,
     start_background=True,
     center_background=True,
@@ -118,7 +118,7 @@ newbar = NewBar(
             bigger_active=True,
         ),
     ],
-    end_modules=[Layout(), Clock(), Tray()],
+    end_modules=[Layout(show_on_single=False), RecordingIndicator(show_always=True), Clock(), Tray()],
 )
 
 # workspaces = NewBar(
