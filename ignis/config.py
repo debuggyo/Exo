@@ -96,10 +96,10 @@ utils.Poll(60000, lambda _: auto_dark())
 newbar = NewBar(
     autohide=False,
     autohide_fullscreen=True,
-    side="bottom",
+    side="left",
     floating=True,
     centered=False,
-    background="none",
+    background="full",
     density=0,
     start_background=True,
     center_background=True,

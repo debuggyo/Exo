@@ -89,6 +89,7 @@ class Clock(Gtk.Box, BaseWidget):
     def update_layout(self):
         two_line = True if self._density == 0 else False
 
+        self.set_visible(False)
         self.set_orientation(Gtk.Orientation.VERTICAL if self._vertical or two_line else Gtk.Orientation.HORIZONTAL)
         self.date_label.set_visible(True if self._show_date else False)
         self.date_separator.set_visible(True if self._vertical and self._show_date else False)
@@ -132,6 +133,7 @@ class Clock(Gtk.Box, BaseWidget):
             time_format = "%H:%M" if self._military_time else "%I:%M %p"
             date_format = "%a %d %b" if not self._month_before_day else "%a %b %d"
 
+        self.set_visible(True)
         self.time_label.set_label(now.strftime(time_format))
         if self._show_date:
             self.date_label.set_label(now.strftime(date_format))

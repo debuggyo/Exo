@@ -12,7 +12,7 @@ class Window(Gtk.Box, BaseWidget):
     __gproperties__ = {**BaseWidget.gproperties}
 
     def __init__(self, **kwargs):
-        Gtk.Box.__init__(self, spacing=8)
+        Gtk.Box.__init__(self, spacing=8, visible=False)
         self._vertical: bool = False
         self._density: int = 0
         self._show_app_id: bool = True
@@ -119,10 +119,20 @@ class Window(Gtk.Box, BaseWidget):
         self._fixed_width = value
         self.update_layout()
 
+    @IgnisProperty
+    def show_on_empty(self) -> bool:
+        return self._show_on_empty
+
+    @show_on_empty.setter
+    def show_on_empty(self, value: bool) -> None:
+        self._show_on_empty = value
+        self.update_layout()
+
     def update_layout(self):
         info_visible = not self._vertical and (self._show_title or self._show_app_id)
         app_id_visible = self._show_app_id and self._density == 0
 
+        self.set_visible(False)
         self.info.set_visible(info_visible)
         self.icon.set_visible(True if self._show_icon or self._vertical else False)
         self.title_label.set_visible(True if self._show_title else False)

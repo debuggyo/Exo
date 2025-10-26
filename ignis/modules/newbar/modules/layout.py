@@ -55,23 +55,23 @@ class LayoutWindow(widgets.EventBox, BaseWidget):
             self.icon.set_visible(False)
 
 
-class Layout(widgets.Box, BaseWidget):
+class Layout(Gtk.Box, BaseWidget):
     __gtype_name__ = "ExoLayout"
     __gproperties__ = {**BaseWidget.gproperties}
 
     def __init__(self, **kwargs):
-        widgets.Box.__init__(self, visible=False)
+        Gtk.Box.__init__(self, visible=False)
         self._vertical: bool = False
-        self._show_on_single: bool = False
+        self._show_on_single: bool = True
         self._show_icons: bool = True
         self.niri = NiriService.get_default()
         self.hyprland = HyprlandService.get_default()
 
         self.add_css_class("exo-layout")
-        self.get_layout()
+        self.update_layout()
 
-        self.niri.connect("notify::workspaces", self.get_layout)
-        self.niri.connect("notify::windows", self.get_layout)
+        self.niri.connect("notify::workspaces", self.update_layout)
+        self.niri.connect("notify::windows", self.update_layout)
 
         BaseWidget.__init__(self, **kwargs)
 
@@ -84,6 +84,7 @@ class Layout(widgets.Box, BaseWidget):
         if value == self._vertical:
             return
         self._vertical = value
+        self.update_layout()
 
     @IgnisProperty
     def show_on_single(self) -> bool:
@@ -94,7 +95,7 @@ class Layout(widgets.Box, BaseWidget):
         if value == self._show_on_single:
             return
         self._show_on_single = value
-        self.get_layout()
+        self.update_layout()
 
     @IgnisProperty
     def show_icons(self) -> bool:
@@ -105,10 +106,15 @@ class Layout(widgets.Box, BaseWidget):
         if value == self._show_icons:
             return
         self._show_icons = value
-        self.get_layout()
+        self.update_layout()
 
-    def get_layout(self, *args):
-        self.set_child([])
+    def update_layout(self, *args):
+        self.set_visible(False)
+        while True:
+            child = self.get_first_child()
+            if not child:
+                break
+            self.remove(child)
         if self.niri.is_available:
             for i in self.niri.workspaces:
                 if i.is_active:
@@ -139,6 +145,7 @@ class Layout(widgets.Box, BaseWidget):
                     column_box.append(window_box)
                 self.append(column_box)
 
+            if not self._vertical:
                 if len(windows_in_workspaces) == 0 or len(windows_in_workspaces) == 1 and not self._show_on_single:
                     self.set_visible(False)
                 else:
