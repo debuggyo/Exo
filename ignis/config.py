@@ -107,7 +107,7 @@ newbar = NewBar(
     start_module_bg="none",
     center_module_bg="none",
     end_module_bg="none",
-    start_modules=[LauncherButton(), Window(), Media(show_when_no_player=False)],
+    start_modules=[Window(), Media(show_when_no_player=False)],
     center_modules=[
         Workspaces(
             workspace_style="impulse",

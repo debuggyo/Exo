@@ -1,5 +1,10 @@
 @use "../colors";
 
+@keyframes scale {
+    from { transform: scale(0.8); }
+    to { transform: scale(1); }
+}
+
 .notification,
 .notification-popup {
     background-color: colors.$surface_container;
@@ -76,4 +81,8 @@
     .notification-popup {
         border: 1px solid rgba(colors.$outline_variant, 0.5);
     }
+}
+
+.notification-popup {
+    animation: 800ms scale;
 }

@@ -149,7 +149,7 @@ $outer-radii: (
             // Set background/radius for all standard modules
             .bar-module {
                 background-color: colors.$surface_container;
-                border-radius: $radius-large;
+                border-radius: $radius-small;
             }
 
             // Fix for tray background transparency (high specificity)
@@ -165,7 +165,7 @@ $outer-radii: (
             // Horizontal Corner Logic
             .bar-module, .exo-tray, .exo-recording-indicator:not(.recording-active):not(.paused) {
 
-                border-radius: $radius-large;
+                border-radius: $radius-small;
 
                 &:first-child { // Left radius
                     border-top-left-radius: $radius-large;
@@ -178,7 +178,7 @@ $outer-radii: (
             }
         }
 
-        .bar-module:not(.exo-workspaces):not(.exo-media):not(.exo-launcher-button) {
+        .bar-module:not(.exo-workspaces):not(.exo-media):not(.exo-launcher-button):not(.exo-action) {
             padding: 0px $radius-module-padding;
         }
     }
@@ -225,7 +225,7 @@ $outer-radii: (
                 }
             }
 
-            .bar-module:not(.exo-workspaces):not(.exo-media):not(.exo-launcher-button) { padding: $radius-module-padding 0px; }
+            .bar-module:not(.exo-workspaces):not(.exo-media):not(.exo-launcher-button):not(.exo-action) { padding: $radius-module-padding 0px; }
         }
         .center-area { margin: $radius-module-padding 0px; }
     }
@@ -457,7 +457,7 @@ $outer-radii: (
     &.vertical { label { margin-top: 8px; } }
 }
 
-.exo-launcher-button {
+.exo-launcher-button, .exo-action {
     padding: 0px 0.5rem;
     &.vertical {padding: 0.5rem 0px;}
     transition: 300ms;
@@ -466,3 +466,5 @@ $outer-radii: (
         color: colors.$on_secondary_container
     }
 }
+
+.exo-action.has-label {padding: 0px 1rem;}

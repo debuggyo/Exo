@@ -6,6 +6,7 @@ from .tray import Tray
 from .layout import Layout
 from .recording_indicator import RecordingIndicator
 from .launcher import LauncherButton
+from .action import Action
 
 __all__ = [
     "Clock",
@@ -15,5 +16,6 @@ __all__ = [
     "Tray",
     "Layout",
     "RecordingIndicator",
-    "LauncherButton"
+    "LauncherButton",
+    "Action"
 ]
