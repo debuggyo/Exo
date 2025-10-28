@@ -281,6 +281,7 @@
 .clock {
     padding: 0px 10px;
     min-height: 0px;
+    font-feature-settings: "tnum";
 
     .time {
         font-weight: 500;
@@ -373,6 +374,7 @@
     padding: 0px 10px;
 
     font-weight: 400;
+    font-feature-settings: "tnum";
 
     &.recording-active {
         background: colors.$error_container;
