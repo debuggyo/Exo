@@ -53,29 +53,44 @@ class Bar(widgets.Window, BaseWidget):
         self.niri = NiriService.get_default()
 
         # Creating the rows before initializing the base widget
-        self.floating_switch = settings.SwitchRow(icon_name="page_header", title="Floating")
-        self.centered_switch = settings.SwitchRow(icon_name="collapse_content", title="Centered")
-        self.autohide_switch = settings.SwitchRow(icon_name="shelf_auto_hide", title="Autohide")
-        self.autohide_fullscreen_switch = settings.SwitchRow(icon_name="aspect_ratio", title="Autohide Fullscreen", description="Allows the bar to reveal when in a fullscreen window.")
+        self.modifiers_settings_row = settings.MultiSelectRow(
+            icon_name="style",
+            title="Modifiers",
+            items=[
+                ("Floating", lambda: self._floating, lambda v: setattr(self, "floating", v), "page_header"),
+                ("Centered", lambda: self._centered, lambda v: setattr(self, "centered", v), "collapse_content"),
+            ]
+        )
         self.side_settings_row = settings.SingleSelectRow(
             icon_name="toolbar",
             title="Side",
             items=[
-                ("Top", "top"),
-                ("Bottom", "bottom"),
-                ("Left", "left"),
-                ("Right", "right"),
+                ("Top", "top", "align_vertical_top"),
+                ("Bottom", "bottom", "align_vertical_bottom"),
+                ("Left", "left", "align_horizontal_left"),
+                ("Right", "right", "align_horizontal_right"),
             ]
         )
+        self.density_settings_row = settings.SingleSelectRow(
+            icon_name="view_compact",
+            title="Density",
+            items=[
+                ("Cozy", 0, "density_large"),
+                ("Comfortable", 1, "density_medium"),
+                ("Compact", 2, "density_small"),
+                ("Condensed", 3, "format_align_justify"),
+            ]
+        )
+        self.autohide_switch = settings.SwitchRow(icon_name="shelf_auto_hide", title="Autohide")
+        self.autohide_fullscreen_switch = settings.SwitchRow(icon_name="aspect_ratio", title="Autohide Fullscreen", description="Allows the bar to reveal when in a fullscreen window.")
 
         BaseWidget.__init__(self, **kwargs)
 
         # Binding the options after initializing so it doesn't set the options to their defaults
-        self.floating_switch.bind_option(self, "floating")
-        self.centered_switch.bind_option(self, "centered")
+        self.side_settings_row.bind_option(self, "side")
+        self.density_settings_row.bind_option(self, "density")
         self.autohide_switch.bind_option(self, "autohide")
         self.autohide_fullscreen_switch.bind_option(self, "autohide_fullscreen")
-        self.side_settings_row.bind_option(self, "side")
 
         self.options = settings.Window(
             title=f"Bar {self.bar_id+1}",
@@ -83,8 +98,8 @@ class Bar(widgets.Window, BaseWidget):
             anchor=[self._side],
             content=[
                 self.side_settings_row,
-                self.floating_switch,
-                self.centered_switch,
+                self.density_settings_row,
+                self.modifiers_settings_row,
                 self.autohide_switch,
                 self.autohide_fullscreen_switch
             ]
