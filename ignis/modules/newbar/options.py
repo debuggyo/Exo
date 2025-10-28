@@ -1,4 +1,6 @@
-### Bar
+#######
+# Bar #
+#######
 monitor: int = 0
 
 ## Appearance
@@ -24,14 +26,18 @@ autohide: bool = False
 autohide_fullscreen: bool = False
 
 
-### Clock
+###########
+# Modules #
+###########
+
+### Clock - Clock()
 ## Displays the current time and optionally date
 show_date: bool = True
 month_before_day: bool = True
 military_time: bool = True
 
 
-### Window
+### Window - Window()
 ## Displays the icon/title/id of the active window
 show_icon: bool = True
 show_title: bool = True             # horizontal only
@@ -40,7 +46,7 @@ show_on_empty: bool = False
 fixed_width: bool = True            # horizontal only
 
 
-### Workspaces
+### Workspaces - Workspaces()
 ## Displays your workspaces and shows the active one
 workspace_style: str = "impulse"    # ["impulse", "dots"]
 icons: bool = True                  # impulse only
@@ -51,7 +57,7 @@ fixed_workspaces: bool = True
 fixed_workspace_amount: int = 5
 
 
-### Media
+### Media - Media()
 ## Displays the currently playing media with controls
 show_labels: bool = True
 show_controls: bool = True
@@ -59,24 +65,24 @@ show_artwork: bool = True
 show_when_no_player: bool = True
 
 
-### Layout
+### Layout - Layout()
 ## Displays an overview of windows in the active workspace (Niri only)
 show_on_single: bool = True
 show_icons: bool = True
 
 
-### Recording Indicator
+### Recording Indicator - RecordingIndicator()
 ## Displays the status of Exo's built-in recorder
 show_time: bool = True
 show_always: bool = False
 
 
-### Launcher
+### Launcher - LauncherButton()
 ## A button that will open the launcher when clicked
 icon_name: str = "apps"
 
 
-### Action
+### Action - Action()
 ## A button that can be used to run quick commands
 icon_name: str = "apps"
 left_click: str = ""
