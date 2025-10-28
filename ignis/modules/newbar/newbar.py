@@ -95,7 +95,6 @@ class Bar(widgets.Window, BaseWidget):
         self.options = settings.Window(
             title=f"Bar {self.bar_id+1}",
             visible=False,
-            anchor=[self._side],
             content=[
                 self.side_settings_row,
                 self.density_settings_row,
@@ -105,10 +104,8 @@ class Bar(widgets.Window, BaseWidget):
             ]
         )
 
-
         if self.niri.is_available:
             self.niri.connect("notify::overview-opened", self.niri_overview_opened)
-
 
         click_controller = Gtk.GestureClick.new()
         click_controller.set_button(3)
@@ -609,5 +606,15 @@ class Bar(widgets.Window, BaseWidget):
         self._end_modules = value
         self.rebuild()
 
-    def open_options(self, *args):
+    def open_options(self, gesture, n_press, x, y):
+        target = self.pick(x, y, Gtk.PickFlags.DEFAULT)
+
+        widget = target
+        while widget:
+            if "bar-module" in widget.get_css_classes():
+                # Click was on a module, so we do nothing.
+                return
+            widget = widget.get_parent()
+
+        # If the loop completes, no module was clicked.
         self.options.set_visible(True)

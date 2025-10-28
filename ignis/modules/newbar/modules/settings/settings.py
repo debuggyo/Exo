@@ -384,7 +384,7 @@ class Window(widgets.Window, BaseWidget):
 
         self._build_content()
 
-        actual_settings_content_box = widgets.Box(
+        self.actual_settings_content_box = widgets.Box(
             vertical=True,
             spacing=0,
             hexpand=False,
@@ -393,8 +393,8 @@ class Window(widgets.Window, BaseWidget):
             css_classes=["settings-window-content"],
             child=[self.container],
         )
-        actual_settings_content_box.set_width_request(800)
-        actual_settings_content_box.set_height_request(600)
+        self.actual_settings_content_box.set_width_request(800)
+        self.actual_settings_content_box.set_height_request(600)
 
         background_close_button = widgets.Button(
             vexpand=True,
@@ -405,7 +405,7 @@ class Window(widgets.Window, BaseWidget):
 
         main_overlay = widgets.Overlay(
             child=background_close_button,
-            overlays=[actual_settings_content_box],
+            overlays=[self.actual_settings_content_box],
             css_classes=["popup-close"],
         )
 

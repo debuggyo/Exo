@@ -6,6 +6,7 @@ from ignis.services.hyprland import HyprlandService
 from ignis.services.applications import ApplicationsService
 from ignis.gobject import IgnisProperty
 from modules.shared_modules import AppIcon
+import modules.newbar.modules.settings as Settings
 
 class Window(Gtk.Box, BaseWidget):
     __gtype_name__ = "ExoWindow"
@@ -57,13 +58,38 @@ class Window(Gtk.Box, BaseWidget):
         self.add_css_class("exo-window")
         self.set_overflow(Gtk.Overflow.HIDDEN)
 
-        self.update_layout()
         if self.niri.is_available:
             self.niri.active_window.connect("notify::title", self.update_info)
         elif self.hyprland.is_available:
             self.hyprland.active_window.connect("notify::title", self.update_info)
 
+        self.vertical_label = Settings.Row(title="Bar is vertical", description="Options have no effect on a vertical bar.")
+        self.icon_switch = Settings.SwitchRow(icon_name="photo", title="Show Icon")
+        self.title_switch = Settings.SwitchRow(icon_name="title", title="Show Title")
+        self.app_id_switch = Settings.SwitchRow(icon_name="code", title="Show App ID")
+
+        self.update_layout()
         BaseWidget.__init__(self, **kwargs)
+
+        self.icon_switch.bind_option(self, "show_icon")
+        self.title_switch.bind_option(self, "show_title")
+        self.app_id_switch.bind_option(self, "show_app_id")
+
+        self.options = Settings.Window(
+            title="Window Module",
+            visible=False,
+            content=[
+                self.vertical_label,
+                self.icon_switch,
+                self.title_switch,
+                self.app_id_switch,
+            ]
+        )
+
+        click_controller = Gtk.GestureClick.new()
+        click_controller.set_button(3)
+        click_controller.connect("pressed", self.open_options)
+        self.add_controller(click_controller)
 
     @IgnisProperty
     def vertical(self) -> bool:
@@ -129,7 +155,10 @@ class Window(Gtk.Box, BaseWidget):
         self.update_layout()
 
     def update_layout(self):
-        info_visible = not self._vertical and (self._show_title or self._show_app_id)
+        if self._density == 0:
+            info_visible = not self._vertical and (self._show_title or self._show_app_id)
+        else:
+            info_visible = not self._vertical and self._show_title
         app_id_visible = self._show_app_id and self._density == 0
 
         self.info.set_visible(info_visible)
@@ -147,6 +176,36 @@ class Window(Gtk.Box, BaseWidget):
             self.add_css_class("no-labels")
         else:
             self.remove_css_class("no-labels")
+
+        # Options
+        self.vertical_label.set_visible(self._vertical)
+        self.app_id_switch.set_sensitive(not (self._density > 0))
+        is_density_high = self._density > 0
+        self.app_id_switch.set_sensitive(not is_density_high)
+        if is_density_high:
+            true_count_of_two = sum([self._show_icon, self._show_title])
+            disable_last_remaining = (true_count_of_two == 1)
+            self.icon_switch.set_sensitive(True)
+            self.title_switch.set_sensitive(True)
+            if disable_last_remaining:
+                if self._show_icon:
+                    self.icon_switch.set_sensitive(False)
+                elif self._show_title:
+                    self.title_switch.set_sensitive(False)
+        else:
+            display_options = [
+                (self._show_icon, self.icon_switch),
+                (self._show_title, self.title_switch),
+                (self._show_app_id, self.app_id_switch),
+            ]
+            true_count_of_three = sum(1 for is_visible, _ in display_options if is_visible)
+            disable_last_remaining = (true_count_of_three == 1)
+            self.icon_switch.set_sensitive(True)
+            self.title_switch.set_sensitive(True)
+            self.app_id_switch.set_sensitive(True)
+            for is_visible, switch in display_options:
+                if disable_last_remaining and is_visible:
+                    switch.set_sensitive(False)
 
     def update_info(self, *args):
         if self.niri.is_available:
@@ -170,3 +229,6 @@ class Window(Gtk.Box, BaseWidget):
         self.title_label.set_label(title)
         self.app_id_label.set_label(app_id)
         self.set_tooltip_markup(f"<b>{title}</b>\n{app_id}")
+
+    def open_options(self, *args):
+        self.options.set_visible(True)

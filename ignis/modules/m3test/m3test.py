@@ -322,7 +322,7 @@ class M3Test(widgets.RegularWindow):
             ),
         )
 
-        utils.Poll(1000, self.print_test_variables)
+        # utils.Poll(1000, self.print_test_variables)
 
     def print_test_variables(self, *args):
         print(f"Var 1: {self.test_variable}, Var 2: {self.test_variable_2}")
