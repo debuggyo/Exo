@@ -15,6 +15,75 @@
     }
 
     &.switch-row {
+        switch {
+            all: unset;
+            opacity: 1;
+            background-color: colors.$surface_container_highest;
+            box-shadow: inset 0px 0px 0px 2px colors.$outline;
+            min-width: 52px;
+            border-radius: 2rem;
+            outline-offset: 2px;
+            padding: 0px;
+            slider {
+                min-width: 16px;
+                min-height: 16px;
+                margin: 8px;
+                margin-right: 2px;
+                background-color: colors.$outline;
+                box-shadow: none;
+                border-radius: 50rem;
+            }
+
+            &:checked {
+                box-shadow: none;
+                background-color: colors.$primary;
+                min-width: 52px;
+                slider {
+                    min-width: 24px;
+                    min-height: 24px;
+                    margin: 4px;
+                    margin-left: -2px;
+                    background-color: colors.$on_primary;
+                }
+            }
+
+            &:active {
+                slider {
+                    min-width: 26px;
+                    min-height: 26px;
+                    margin: 3px;
+                    margin-right: -3px;
+                }
+
+                &:checked slider {
+                    margin-right: 3px;
+                    margin-left: -3px;
+                }
+            }
+
+            &:hover {
+                &:not(:checked) {
+                    background-color: mix(
+                        colors.$surface_container_highest,
+                        colors.$on_surface,
+                        $weight: 90%,
+                        $method: hsl
+                    );
+                }
+
+                slider {
+                    outline: 10px solid rgba(colors.$outline, 0.2);
+                }
+
+                &:checked slider {
+                    outline-width: 7px;
+                }
+
+                &:active slider {
+                    outline-width: 5px;
+                }
+            }
+        }
         &:hover {
             background-color: colors.$surface_container_highest;
         }

@@ -222,7 +222,7 @@ class SwitchRow(Row):
         self._option = False
         self._option_target = None
         self._option_property = None
-        self.switch = widgets.Switch(active=self._option, vexpand=False, valign="center")
+        self.switch = widgets.Switch(active=self._option, vexpand=False, valign="center", sensitive=False)
         Row.__init__(self, **kwargs)
 
         self.set_child(self.switch)
