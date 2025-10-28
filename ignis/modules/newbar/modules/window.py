@@ -132,7 +132,6 @@ class Window(Gtk.Box, BaseWidget):
         info_visible = not self._vertical and (self._show_title or self._show_app_id)
         app_id_visible = self._show_app_id and self._density == 0
 
-        self.set_visible(False)
         self.info.set_visible(info_visible)
         self.icon.set_visible(True if self._show_icon or self._vertical else False)
         self.title_label.set_visible(True if self._show_title else False)

@@ -91,3 +91,18 @@ tooltip {
         }
     }
 }
+
+.settings-window {
+    background-color: rgba(colors.$surface_container, 0.5);
+    scrolledwindow viewport {
+        background-color: rgba(colors.$background, 0.5);
+    }
+
+    .settings-category {
+        background-color: rgba(colors.$on_surface, 0.05);
+    }
+}
+
+.row-button:hover {
+    background-color: rgba(colors.$on_surface, 0.05);
+}

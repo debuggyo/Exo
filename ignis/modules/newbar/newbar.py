@@ -3,6 +3,7 @@ from ignis.base_widget import BaseWidget
 from ignis.gobject import IgnisProperty
 from gi.repository import GObject, Gtk
 from ignis.services.niri import NiriService
+import modules.newbar.modules.settings as settings
 
 class BarSide(GObject.GEnum):
     TOP = 0
@@ -51,10 +52,53 @@ class Bar(widgets.Window, BaseWidget):
         self._motion_controller = None
         self.niri = NiriService.get_default()
 
+        # Creating the rows before initializing the base widget
+        self.floating_switch = settings.SwitchRow(icon_name="page_header", title="Floating")
+        self.centered_switch = settings.SwitchRow(icon_name="collapse_content", title="Centered")
+        self.autohide_switch = settings.SwitchRow(icon_name="shelf_auto_hide", title="Autohide")
+        self.autohide_fullscreen_switch = settings.SwitchRow(icon_name="aspect_ratio", title="Autohide Fullscreen", description="Allows the bar to reveal when in a fullscreen window.")
+        self.side_settings_row = settings.SingleSelectRow(
+            icon_name="toolbar",
+            title="Side",
+            items=[
+                ("Top", "top"),
+                ("Bottom", "bottom"),
+                ("Left", "left"),
+                ("Right", "right"),
+            ]
+        )
+
         BaseWidget.__init__(self, **kwargs)
+
+        # Binding the options after initializing so it doesn't set the options to their defaults
+        self.floating_switch.bind_option(self, "floating")
+        self.centered_switch.bind_option(self, "centered")
+        self.autohide_switch.bind_option(self, "autohide")
+        self.autohide_fullscreen_switch.bind_option(self, "autohide_fullscreen")
+        self.side_settings_row.bind_option(self, "side")
+
+        self.options = settings.Window(
+            title=f"Bar {self.bar_id+1}",
+            visible=False,
+            anchor=[self._side],
+            content=[
+                self.side_settings_row,
+                self.floating_switch,
+                self.centered_switch,
+                self.autohide_switch,
+                self.autohide_fullscreen_switch
+            ]
+        )
+
 
         if self.niri.is_available:
             self.niri.connect("notify::overview-opened", self.niri_overview_opened)
+
+
+        click_controller = Gtk.GestureClick.new()
+        click_controller.set_button(3)
+        click_controller.connect("pressed", self.open_options)
+        self.add_controller(click_controller)
 
         self._constructing = False
         self.rebuild()
@@ -351,6 +395,14 @@ class Bar(widgets.Window, BaseWidget):
         self.set_anchor(None)
         self.rebuild()
 
+        icon_key = {
+            BarSide.TOP: "toolbar",
+            BarSide.BOTTOM: "dock_to_bottom",
+            BarSide.LEFT: "dock_to_right",
+            BarSide.RIGHT: "dock_to_left",
+        }
+        self.side_settings_row.set_icon_name(icon_key[value])
+
     @IgnisProperty(type=int, minimum=0, maximum=3, default=0)
     def density(self) -> int:
         return self._density
@@ -541,3 +593,6 @@ class Bar(widgets.Window, BaseWidget):
     def end_modules(self, value: list):
         self._end_modules = value
         self.rebuild()
+
+    def open_options(self, *args):
+        self.options.set_visible(True)

@@ -2,6 +2,7 @@ from ignis import widgets, utils
 from modules.m3components import Button, ConnectedButtonGroup, Icon
 from ignis.services.notifications import Notification, NotificationService
 from gi.repository import GLib
+import modules.newbar.modules.settings as Settings
 
 notifications = NotificationService.get_default()
 
@@ -72,12 +73,52 @@ class NotificationList(widgets.Box):
 
 class M3Test(widgets.RegularWindow):
     def __init__(self) -> None:
+        self.test_variable = False
+        self.test_variable_2 = True
+        self.test_single_select = "two"
+        self.test_multi_select_1 = False
+        self.test_multi_select_2 = True
+        self.test_multi_select_3 = False
+
+        switch_row_1 = Settings.SwitchRow(
+            title="Test Variable 1",
+            description="This controls the first variable.",
+        )
+        switch_row_1.bind_option(self, "test_variable")
+
+        switch_row_2 = Settings.SwitchRow(
+            title="Test Variable 2",
+            description="This controls the second variable.",
+        )
+        switch_row_2.bind_option(self, "test_variable_2")
+
+        single_select_row = Settings.SingleSelectRow(
+            title="Single Select",
+            description="Choose one option.",
+            items=[
+                ("One", "one"),
+                ("Two", "two"),
+                ("Three", "three"),
+            ],
+        )
+        single_select_row.bind_option(self, "test_single_select")
+
+        multi_select_row = Settings.MultiSelectRow(
+            title="Multi Select",
+            description="Choose multiple options.",
+            items=[
+                ("Option 1", lambda: self.test_multi_select_1, lambda v: setattr(self, "test_multi_select_1", v)),
+                ("Option 2", lambda: self.test_multi_select_2, lambda v: setattr(self, "test_multi_select_2", v)),
+                ("Option 3", lambda: self.test_multi_select_3, lambda v: setattr(self, "test_multi_select_3", v)),
+            ],
+        )
+
         super().__init__(
             css_classes=["m3-testing-window"],
             hide_on_close=True,
-            visible=False,
             title="Material 3 Testing Window",
             namespace="M3Test",
+            visible=False,
             child=widgets.Scroll(
                 child=widgets.Box(
                     style="padding: 20px;",
@@ -85,6 +126,16 @@ class M3Test(widgets.RegularWindow):
                     spacing=10,
                     halign="center",
                     child=[
+                        switch_row_1,
+                        switch_row_2,
+                        single_select_row,
+                        multi_select_row,
+                        Settings.Row(
+                            title="Hello There!",
+                            description="AAAAAAAAAAAA",
+                            child=Button(icon="edit", label="Hello")
+                        ),
+
                         Icon("edit", 64, hexpand=False, halign="center"),
                         Icon("edit", 48, hexpand=False, halign="center"),
                         Icon("edit", 32, hexpand=False, halign="center"),
@@ -266,42 +317,14 @@ class M3Test(widgets.RegularWindow):
                             label="Radio Button 4",
                             halign="center",
                         ),
-                        # Notifications
-                        # widgets.Box(
-                        #     vertical=True,
-                        #     vexpand=True,
-                        #     css_classes=["notification-center"],
-                        #     child=[
-                        #         widgets.Box(
-                        #             css_classes=["notification-center-header", "rec-unset"],
-                        #             child=[
-                        #                 widgets.Label(
-                        #                     label=notifications.bind(
-                        #                         "notifications", lambda value: str(len(value))
-                        #                     ),
-                        #                     css_classes=["notification-count"],
-                        #                 ),
-                        #                 widgets.Label(
-                        #                     label="notifications",
-                        #                     css_classes=["notification-header-label"],
-                        #                 ),
-                        #                 widgets.Button(
-                        #                     child=widgets.Label(label="Clear all"),
-                        #                     halign="end",
-                        #                     hexpand=True,
-                        #                     on_click=lambda x: notifications.clear_all(),
-                        #                     css_classes=["notification-clear-all"],
-                        #                 ),
-                        #             ],
-                        #         ),
-                        #         widgets.Scroll(
-                        #             height_request=600,
-                        #             child=NotificationList(),
-                        #             vexpand=True,
-                        #         ),
-                        #     ],
-                        # )
                     ],
                 )
             ),
         )
+
+        utils.Poll(1000, self.print_test_variables)
+
+    def print_test_variables(self, *args):
+        print(f"Var 1: {self.test_variable}, Var 2: {self.test_variable_2}")
+        print(f"Single Select: {self.test_single_select}")
+        print(f"Multi Select: 1: {self.test_multi_select_1}, 2: {self.test_multi_select_2}, 3: {self.test_multi_select_3}")

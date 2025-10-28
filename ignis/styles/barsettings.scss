@@ -1,0 +1,37 @@
+@use "../colors.scss";
+
+.exo-settings-row {
+    min-height: 40px;
+    padding: 0.3rem 1rem;
+    border-radius: 16px;
+    transition: 100ms;
+
+    .title {
+        font-weight: 400;
+    }
+    .description {
+        color: colors.$on_surface_variant;
+        opacity: 0.8;
+    }
+
+    &.switch-row {
+        &:hover {
+            background-color: colors.$surface_container_highest;
+        }
+    }
+}
+
+.exo-options-window {
+    background-color: colors.$surface_container;
+    border: 1px solid rgba(colors.$outline_variant, 0.5);
+    border-radius: 20px;
+    padding: 5px;
+    min-width: 800px;
+    min-height: 600px;
+    .options-window-title-bar {
+        padding: 2px 1rem;
+        .options-window-title {
+            font-weight: 600;
+        }
+    }
+}

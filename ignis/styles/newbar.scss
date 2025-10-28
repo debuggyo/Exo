@@ -96,10 +96,10 @@ $outer-radii: (
     &.areas, &.gradient {
         .bar-area.area-background {
             background-color: colors.$background;
-            &.floating {
-                outline: 1px solid rgba(colors.$outline_variant, 0.5);
-                outline-offset: -1px;
-            }
+        }
+        &.floating .bar-area.area-background {
+            outline: 1px solid rgba(colors.$outline_variant, 0.5);
+            outline-offset: -1px;
         }
 
         @each $density, $r in $outer-radii {

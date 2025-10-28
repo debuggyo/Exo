@@ -72,12 +72,16 @@ def make_toggle_buttons(
         buttons.append((btn, value))
 
     update_active()
-    return m3.ConnectedButtonGroup(
+    
+    button_group = m3.ConnectedButtonGroup(
         [b for b, _ in buttons],
         homogeneous=False,
         halign="start",
         hexpand=False,
     )
+    button_group.buttons = buttons
+    button_group.update_active = update_active
+    return button_group
 
 
 def make_independent_toggle_buttons(items, on_any_click=None, bar_id=None):
@@ -126,12 +130,15 @@ def make_independent_toggle_buttons(items, on_any_click=None, bar_id=None):
 
     update_active()
 
-    return m3.ConnectedButtonGroup(
+    button_group = m3.ConnectedButtonGroup(
         [b for b, _ in buttons],
         homogeneous=False,
         halign="start",
         hexpand=False,
     )
+    button_group.buttons = buttons
+    button_group.update_active = update_active
+    return button_group
 
 
 class SettingsRow(widgets.Box):
