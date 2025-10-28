@@ -18,7 +18,7 @@ class Window(Gtk.Box, BaseWidget):
         self._show_app_id: bool = True
         self._show_title: bool = True
         self._show_icon: bool = True
-        self._show_on_empty: bool = False
+        self._show_on_empty: bool = True
         self._fixed_width: bool = True
 
         self.niri = NiriService.get_default()
