@@ -53,15 +53,6 @@ class Bar(widgets.Window, BaseWidget):
         self.niri = NiriService.get_default()
 
         # Creating the rows before initializing the base widget
-        self.modifiers_settings_row = settings.MultiSelectRow(
-            icon_name="style",
-            title="Modifiers",
-            description="Extra modifiers, you can select multiple.",
-            items=[
-                ("Floating", lambda: self._floating, lambda v: setattr(self, "floating", v), "page_header"),
-                ("Centered", lambda: self._centered, lambda v: setattr(self, "centered", v), "collapse_content"),
-            ]
-        )
         self.side_settings_row = settings.SingleSelectRow(
             icon_name="toolbar",
             title="Side",
@@ -82,6 +73,35 @@ class Bar(widgets.Window, BaseWidget):
                 ("Condensed", 3, "format_align_justify"),
             ]
         )
+        self.background_settings_row = settings.SingleSelectRow(
+            icon_name="texture",
+            title="Bar Backgrounds",
+            items=[
+                ("Full", "full", "fit_width"),
+                ("Areas", "areas", "more_horiz"),
+                ("Gradient", "gradient", "gradient"),
+                ("", "none", "block"),
+            ]
+        )
+        self.area_backgrounds_settings_row = settings.MultiSelectRow(
+            icon_name="more_horiz",
+            title="Area Backgrounds",
+            visible=False,
+            items=[
+                ("Start", lambda: self._start_background, lambda v: setattr(self, "start_background", v)),
+                ("Center", lambda: self._center_background, lambda v: setattr(self, "center_background", v)),
+                ("End", lambda: self._end_background, lambda v: setattr(self, "end_background", v)),
+            ]
+        )
+        self.modifiers_settings_row = settings.MultiSelectRow(
+            icon_name="style",
+            title="Modifiers",
+            description="Extra modifiers, you can select multiple.",
+            items=[
+                ("Floating", lambda: self._floating, lambda v: setattr(self, "floating", v), "page_header"),
+                ("Centered", lambda: self._centered, lambda v: setattr(self, "centered", v), "collapse_content"),
+            ]
+        )
         self.autohide_switch = settings.SwitchRow(icon_name="shelf_auto_hide", title="Autohide")
         self.autohide_fullscreen_switch = settings.SwitchRow(icon_name="aspect_ratio", title="Autohide Fullscreen", description="Allows the bar to reveal when in a fullscreen window.")
 
@@ -90,6 +110,7 @@ class Bar(widgets.Window, BaseWidget):
         # Binding the options after initializing so it doesn't set the options to their defaults
         self.side_settings_row.bind_option(self, "side")
         self.density_settings_row.bind_option(self, "density")
+        self.background_settings_row.bind_option(self, "background")
         self.autohide_switch.bind_option(self, "autohide")
         self.autohide_fullscreen_switch.bind_option(self, "autohide_fullscreen")
 
@@ -100,6 +121,9 @@ class Bar(widgets.Window, BaseWidget):
                 self.side_settings_row,
                 widgets.Separator(),
                 self.density_settings_row,
+                widgets.Separator(),
+                self.background_settings_row,
+                self.area_backgrounds_settings_row,
                 widgets.Separator(),
                 self.modifiers_settings_row,
                 widgets.Separator(),
@@ -472,6 +496,8 @@ class Bar(widgets.Window, BaseWidget):
             return
         self._background = new_background
         self.rebuild()
+
+        self.area_backgrounds_settings_row.set_visible(True if value in [BarBackground.AREAS, BarBackground.GRADIENT] else False)
 
     @IgnisProperty
     def autohide(self) -> bool:
