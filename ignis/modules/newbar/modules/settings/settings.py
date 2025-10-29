@@ -405,7 +405,7 @@ class Window(widgets.Window, BaseWidget):
             css_classes=["popup-close"],
         )
 
-        namespace = f"{kwargs.get("title", "").replace(" ", "")}SettingsWindow"
+        namespace = kwargs.get("namespace", f'{kwargs.get("title", "").replace(" ", "")}SettingsWindow')
 
         widgets.Window.__init__(
             self,

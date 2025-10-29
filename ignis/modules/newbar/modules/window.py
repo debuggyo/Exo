@@ -77,6 +77,7 @@ class Window(Gtk.Box, BaseWidget):
 
         self.options = Settings.Window(
             title="Window Module",
+            namespace=f"WindowModuleOptions-{id(self)}",
             visible=False,
             content=[
                 self.vertical_label,
