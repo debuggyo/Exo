@@ -56,6 +56,7 @@ class Bar(widgets.Window, BaseWidget):
         self.modifiers_settings_row = settings.MultiSelectRow(
             icon_name="style",
             title="Modifiers",
+            description="Extra modifiers, you can select multiple.",
             items=[
                 ("Floating", lambda: self._floating, lambda v: setattr(self, "floating", v), "page_header"),
                 ("Centered", lambda: self._centered, lambda v: setattr(self, "centered", v), "collapse_content"),
@@ -97,9 +98,13 @@ class Bar(widgets.Window, BaseWidget):
             visible=False,
             content=[
                 self.side_settings_row,
+                widgets.Separator(),
                 self.density_settings_row,
+                widgets.Separator(),
                 self.modifiers_settings_row,
+                widgets.Separator(),
                 self.autohide_switch,
+                widgets.Separator(),
                 self.autohide_fullscreen_switch
             ]
         )

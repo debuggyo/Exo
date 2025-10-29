@@ -80,8 +80,11 @@ class Window(Gtk.Box, BaseWidget):
             visible=False,
             content=[
                 self.vertical_label,
+                widgets.Separator(),
                 self.icon_switch,
+                widgets.Separator(),
                 self.title_switch,
+                widgets.Separator(),
                 self.app_id_switch,
             ]
         )

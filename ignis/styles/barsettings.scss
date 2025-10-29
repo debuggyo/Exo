@@ -1,8 +1,8 @@
 @use "../colors.scss";
 
 .exo-settings-row {
-    min-height: 40px;
-    padding: 0.3rem 1rem;
+    min-height: 32px;
+    padding: 0.5rem 1rem;
     border-radius: 16px;
     transition: 100ms;
 
@@ -24,7 +24,9 @@
             border-radius: 2rem;
             outline-offset: 2px;
             padding: 0px;
+            transition: 300ms;
             slider {
+                transition: 100ms;
                 min-width: 16px;
                 min-height: 16px;
                 margin: 8px;
@@ -83,6 +85,7 @@
                     outline-width: 5px;
                 }
             }
+            transform: scale(0.8);
         }
         &:hover {
             background-color: colors.$surface_container_highest;
@@ -91,16 +94,24 @@
 }
 
 .exo-options-window {
-    background-color: colors.$surface_container;
+    background-color: colors.$background;
     border: 1px solid rgba(colors.$outline_variant, 0.5);
     border-radius: 20px;
-    padding: 5px;
+    padding: 8px;
     min-width: 800px;
     min-height: 600px;
     .options-window-title-bar {
-        padding: 2px 1rem;
+        padding: 1rem 1rem;
+        padding-top: 0.5rem;
         .options-window-title {
+            font-size: 1.2rem;
             font-weight: 600;
         }
+    }
+    separator {margin: 0px 1rem;}
+    .scrollable {
+        background-color: colors.$surface_container;
+        border-radius: 12px;
+        padding: 8px;
     }
 }

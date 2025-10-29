@@ -357,9 +357,6 @@ class Window(widgets.Window, BaseWidget):
     def __init__(self, **kwargs):
         self.title_label = Gtk.Label(label=self.title, halign=Gtk.Align.START)
         self.title_label.add_css_class("options-window-title")
-        self.close_button = m3.Button(
-            icon="close", on_click=self.close, halign="end", size="xs", type="text", hexpand=True
-        )
         self.title_bar = Gtk.Box(
             orientation=Gtk.Orientation.HORIZONTAL,
             spacing=5,
@@ -368,9 +365,8 @@ class Window(widgets.Window, BaseWidget):
         )
         self.title_bar.add_css_class("options-window-title-bar")
         self.title_bar.append(self.title_label)
-        self.title_bar.append(self.close_button)
 
-        self.scrollable_content = widgets.Box(vertical=True, spacing=5)
+        self.scrollable_content = widgets.Box(vertical=True, spacing=0, css_classes=["scrollable"])
         scrolled_window = widgets.Scroll(
             child=self.scrollable_content,
             vexpand=True,
@@ -378,7 +374,7 @@ class Window(widgets.Window, BaseWidget):
 
         self.container = widgets.Box(
             vertical=True,
-            child=[self.title_bar, widgets.Separator(), scrolled_window],
+            child=[self.title_bar, scrolled_window],
         )
         self.container.add_css_class("exo-options-window")
 
