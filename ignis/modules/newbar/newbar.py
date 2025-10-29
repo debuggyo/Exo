@@ -97,10 +97,7 @@ class Bar(widgets.Window, BaseWidget):
             icon_name="style",
             title="Modifiers",
             description="Extra modifiers, you can select multiple.",
-            items=[
-                ("Floating", lambda: self._floating, lambda v: setattr(self, "floating", v), "page_header"),
-                ("Centered", lambda: self._centered, lambda v: setattr(self, "centered", v), "collapse_content"),
-            ]
+            items=[]
         )
         self.autohide_switch = settings.SwitchRow(icon_name="shelf_auto_hide", title="Autohide")
         self.autohide_fullscreen_switch = settings.SwitchRow(icon_name="aspect_ratio", title="Autohide Fullscreen", description="Allows the bar to reveal when in a fullscreen window.")
@@ -111,6 +108,10 @@ class Bar(widgets.Window, BaseWidget):
         self.side_settings_row.bind_option(self, "side")
         self.density_settings_row.bind_option(self, "density")
         self.background_settings_row.bind_option(self, "background")
+        self.modifiers_settings_row.set_items([
+            ("Floating", lambda: self._floating, lambda v: setattr(self, "floating", v), "page_header"),
+            ("Centered", lambda: self._centered, lambda v: setattr(self, "centered", v), "collapse_content"),
+        ])
         self.autohide_switch.bind_option(self, "autohide")
         self.autohide_fullscreen_switch.bind_option(self, "autohide_fullscreen")
 
