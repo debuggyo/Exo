@@ -350,6 +350,100 @@ class MultiSelectRow(Row):
         self.set_child(self.buttons)
 
 
+class SpinButtonRow(Row):
+    __gtype_name__ = "SpinButtonRow"
+    __gproperties__ = {**BaseWidget.gproperties}
+
+    def __init__(self, **kwargs):
+        self._option = 0.0
+        self._option_target = None
+        self._option_property = None
+        self._min = 0.0
+        self._max = 100.0
+        self._step = 1.0
+
+        self.spinbutton = Gtk.SpinButton(vexpand=False, valign="center")
+        Row.__init__(self, **kwargs)
+
+        self.set_child(self.spinbutton)
+        self.spinbutton.connect("value-changed", self._on_spinbutton_changed)
+        self.add_css_class("spinbutton-row")
+        self._update_spinbutton_properties()
+
+    def _update_spinbutton_properties(self):
+        self.spinbutton.set_range(self.min, self.max)
+        self.spinbutton.set_increments(self.step, self.step * 10)
+        self.spinbutton.set_value(self.option)
+
+
+    def bind_option(self, target_object, property_name: str):
+        """Binds the spinbutton's option to a property on a target object."""
+        self._option_target = target_object
+        self._option_property = property_name
+
+        initial_value = getattr(target_object, property_name, 0.0)
+        if initial_value is None:
+            initial_value = 0.0
+        self.option = initial_value
+
+        self.connect("notify::option", self._update_bound_property)
+
+    def _update_bound_property(self, *args):
+        """Handler to update the bound property."""
+        if self._option_target and self._option_property:
+            current_value = getattr(self._option_target, self._option_property)
+            if current_value != self.option:
+                setattr(self._option_target, self._option_property, self.option)
+
+    @IgnisProperty
+    def option(self) -> float:
+        return self._option
+
+    @option.setter
+    def option(self, value: float) -> None:
+        if value is None:
+            value = 0.0
+        value = float(value)
+        if self._option == value:
+            return
+        self._option = value
+        self.spinbutton.set_value(value)
+        self.notify("option")
+
+    def _on_spinbutton_changed(self, spinbutton):
+        self.option = spinbutton.get_value()
+
+    @IgnisProperty
+    def min(self) -> float:
+        return self._min
+
+    @min.setter
+    def min(self, value: float):
+        self._min = float(value)
+        if hasattr(self, "spinbutton"):
+            self.spinbutton.set_range(self._min, self._max)
+
+    @IgnisProperty
+    def max(self) -> float:
+        return self._max
+
+    @max.setter
+    def max(self, value: float):
+        self._max = float(value)
+        if hasattr(self, "spinbutton"):
+            self.spinbutton.set_range(self._min, self._max)
+
+    @IgnisProperty
+    def step(self) -> float:
+        return self._step
+
+    @step.setter
+    def step(self, value: float):
+        self._step = float(value)
+        if hasattr(self, "spinbutton"):
+            self.spinbutton.set_increments(self._step, self._step * 10)
+
+
 class Window(widgets.Window, BaseWidget):
     __gtype_name__ = "SettingsWindow"
     __gproperties__ = {**BaseWidget.gproperties}

@@ -1,4 +1,4 @@
-from ignis import widgets
+from ignis import widgets, utils
 from ignis.base_widget import BaseWidget
 from ignis.gobject import IgnisProperty
 from gi.repository import GObject, Gtk
@@ -31,7 +31,6 @@ class Bar(widgets.Window, BaseWidget):
         self._bar_id: int = kwargs.get("bar_id", 0)
         unique_namespace = f"ExoBar{self.bar_id}"
         widgets.Window.__init__(self, namespace=unique_namespace)
-        self._monitor: int = 0
         self._side: str = "top"
         self._density: int = 0
         self._floating: bool = False
@@ -101,6 +100,13 @@ class Bar(widgets.Window, BaseWidget):
         )
         self.autohide_switch = settings.SwitchRow(icon_name="shelf_auto_hide", title="Autohide")
         self.autohide_fullscreen_switch = settings.SwitchRow(icon_name="aspect_ratio", title="Autohide Fullscreen", description="Allows the bar to reveal when in a fullscreen window.")
+        self.monitor_settings_row = settings.SpinButtonRow(
+            icon_name="monitor",
+            title="Monitor",
+            min=0.0,
+            max=0.0,
+            step=0.0
+        )
 
         BaseWidget.__init__(self, **kwargs)
 
@@ -114,6 +120,8 @@ class Bar(widgets.Window, BaseWidget):
         ])
         self.autohide_switch.bind_option(self, "autohide")
         self.autohide_fullscreen_switch.bind_option(self, "autohide_fullscreen")
+        self.monitor_settings_row.bind_option(self, "monitor")
+        self.monitor_settings_row.set_max((utils.get_n_monitors() - 1))
 
         self.options = settings.Window(
             title=f"Bar {self.bar_id+1}",
@@ -130,7 +138,9 @@ class Bar(widgets.Window, BaseWidget):
                 widgets.Separator(),
                 self.autohide_switch,
                 widgets.Separator(),
-                self.autohide_fullscreen_switch
+                self.autohide_fullscreen_switch,
+                widgets.Separator(),
+                self.monitor_settings_row,
             ]
         )
 
@@ -141,6 +151,8 @@ class Bar(widgets.Window, BaseWidget):
         click_controller.set_button(3)
         click_controller.connect("pressed", self.open_options)
         self.add_controller(click_controller)
+
+        self.connect("notify::monitor", self.rebuild)
 
         self._constructing = False
         self.rebuild()
@@ -247,7 +259,6 @@ class Bar(widgets.Window, BaseWidget):
         self.revealer.connect("notify::child-revealed", self._on_revealer_state_change)
         self.set_child(self.revealer)
 
-        self.set_monitor(self.monitor)
         self.set_namespace(f"Bar{self.monitor}{self.bar_id}")
         self.set_height_request(self.height)
         self.set_width_request(self.width)
@@ -393,17 +404,6 @@ class Bar(widgets.Window, BaseWidget):
             self.remove_css_class("niri-overview-opened")
             if self._autohide:
                 self.revealer.set_reveal_child(False)
-
-    @IgnisProperty
-    def monitor(self) -> int:
-        return self._monitor
-
-    @monitor.setter
-    def monitor(self, value: int):
-        if self._monitor == value:
-            return
-        self._monitor = value
-        self.rebuild()
 
     @IgnisProperty
     def bar_id(self) -> int:

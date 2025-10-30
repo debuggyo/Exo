@@ -79,6 +79,7 @@ class M3Test(widgets.RegularWindow):
         self.test_multi_select_1 = False
         self.test_multi_select_2 = True
         self.test_multi_select_3 = False
+        self.test_spinbutton = 10.0
 
         switch_row_1 = Settings.SwitchRow(
             title="Test Variable 1",
@@ -113,6 +114,15 @@ class M3Test(widgets.RegularWindow):
             ],
         )
 
+        spinbutton_row = Settings.SpinButtonRow(
+            title="SpinButton",
+            description="Choose a number.",
+            min=0,
+            max=20,
+            step=1,
+        )
+        spinbutton_row.bind_option(self, "test_spinbutton")
+
         super().__init__(
             css_classes=["m3-testing-window"],
             hide_on_close=True,
@@ -130,6 +140,7 @@ class M3Test(widgets.RegularWindow):
                         switch_row_2,
                         single_select_row,
                         multi_select_row,
+                        spinbutton_row,
                         Settings.Row(
                             title="Hello There!",
                             description="AAAAAAAAAAAA",
@@ -328,3 +339,4 @@ class M3Test(widgets.RegularWindow):
         print(f"Var 1: {self.test_variable}, Var 2: {self.test_variable_2}")
         print(f"Single Select: {self.test_single_select}")
         print(f"Multi Select: 1: {self.test_multi_select_1}, 2: {self.test_multi_select_2}, 3: {self.test_multi_select_3}")
+        print(f"SpinButton: {self.test_spinbutton}")
