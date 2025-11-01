@@ -3,7 +3,7 @@ from ignis.base_widget import BaseWidget
 from ignis.gobject import IgnisProperty
 from gi.repository import GObject, Gtk
 from ignis.services.niri import NiriService
-import modules.newbar.modules.options as settings
+import modules.newbar.modules.settings as settings
 
 class BarSide(GObject.GEnum):
     TOP = 0
