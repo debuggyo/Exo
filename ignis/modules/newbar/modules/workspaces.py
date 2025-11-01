@@ -7,6 +7,7 @@ from ignis import widgets
 from ignis.services.niri import NiriService
 from ignis.services.hyprland import HyprlandService
 from modules.shared_modules import AppIcon
+import modules.newbar.modules.settings as settings
 
 class WorkspaceStyle(GObject.GEnum):
     IMPULSE = 0
@@ -241,8 +242,64 @@ class Workspaces(widgets.Box, BaseWidget):
             self.hyprland.connect("notify::active-workspace", self._update_workspaces)
             self.hyprland.connect("notify::windows", self._update_workspaces)
 
+        self.style_settings_row = settings.SingleSelectRow(
+            icon_name="palette",
+            title="Workspace Style",
+            items=[
+                ("Impulse", WorkspaceStyle.IMPULSE, "radio_button_checked"),
+                ("Dots", WorkspaceStyle.DOTS, "hdr_strong")
+            ]
+        )
+        self.icons_settings_row = settings.SwitchRow(icon_name="photo", title="Show Icons")
+        self.names_settings_row = settings.SwitchRow(icon_name="title", title="Show Names")
+        self.numbers_settings_row = settings.SwitchRow(icon_name="numbers", title="Show Numbers")
+        self.bigger_active_row = settings.SwitchRow(icon_name="expand_content", title="Bigger Active Workspace")
+        self.impulse_separator = widgets.Separator()
+        self.fixed_workspaces_row = settings.SwitchRow(icon_name="anchor", title="Fixed Workspaces", description="Always show an exact number of workspaces.")
+        self.fixed_workspace_amount_row = settings.SpinButtonRow(
+            icon_name="numbers",
+            title="Fixed Workspace Amount",
+            min=1.0,
+            max=20.0,
+            step=1.0,
+        )
+
         BaseWidget.__init__(self, **kwargs)
+
+        self.style_settings_row.bind_option(self, "workspace_style")
+        self.icons_settings_row.bind_option(self, "icons")
+        self.names_settings_row.bind_option(self, "names")
+        self.numbers_settings_row.bind_option(self, "numbers")
+        self.bigger_active_row.bind_option(self, "bigger_active")
+        self.fixed_workspaces_row.bind_option(self, "fixed_workspaces")
+        self.fixed_workspace_amount_row.bind_option(self, "fixed_workspace_amount")
+
+        self.options = settings.Window(
+            title="Workspaces",
+            namespace=f"WorkspacesModuleOptions-{id(self)}",
+            visible=False,
+            content=[
+                self.style_settings_row,
+                self.impulse_separator,
+                self.icons_settings_row,
+                self.impulse_separator,
+                self.names_settings_row,
+                self.impulse_separator,
+                self.numbers_settings_row,
+                self.impulse_separator,
+                self.bigger_active_row,
+                widgets.Separator(),
+                self.fixed_workspaces_row,
+                self.fixed_workspace_amount_row
+            ]
+        )
+
         self._update_workspaces()
+
+        click_controller = Gtk.GestureClick.new()
+        click_controller.set_button(3)
+        click_controller.connect("pressed", self.open_options)
+        self.add_controller(click_controller)
 
     @IgnisProperty
     def vertical(self) -> bool:
@@ -262,6 +319,17 @@ class Workspaces(widgets.Box, BaseWidget):
         if self._workspace_style == value:
             return
         self._workspace_style = value
+
+        show_impulse_rows = False
+        if value == WorkspaceStyle.IMPULSE:
+            show_impulse_rows = True
+
+        self.icons_settings_row.set_visible(show_impulse_rows)
+        self.names_settings_row.set_visible(show_impulse_rows)
+        self.numbers_settings_row.set_visible(show_impulse_rows)
+        self.bigger_active_row.set_visible(show_impulse_rows)
+        self.impulse_separator.set_visible(show_impulse_rows)
+
         self._update_workspaces()
 
     @IgnisProperty
@@ -317,6 +385,7 @@ class Workspaces(widgets.Box, BaseWidget):
         if self._fixed_workspaces == value:
             return
         self._fixed_workspaces = value
+        self.fixed_workspace_amount_row.set_visible(value)
         self._update_workspaces()
 
     @IgnisProperty(type=int, default=5)
@@ -476,3 +545,6 @@ class Workspaces(widgets.Box, BaseWidget):
             self.remove_css_class(s)
         if self._workspace_style in style_map:
             self.add_css_class(style_map[self._workspace_style])
+
+    def open_options(self, *args):
+        self.options.set_visible(True)
