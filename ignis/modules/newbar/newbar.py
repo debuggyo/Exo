@@ -86,11 +86,7 @@ class Bar(widgets.Window, BaseWidget):
             icon_name="more_horiz",
             title="Area Backgrounds",
             visible=False,
-            items=[
-                ("Start", lambda: self._start_background, lambda v: setattr(self, "start_background", v)),
-                ("Center", lambda: self._center_background, lambda v: setattr(self, "center_background", v)),
-                ("End", lambda: self._end_background, lambda v: setattr(self, "end_background", v)),
-            ]
+            items=[]
         )
         self.modifiers_settings_row = settings.MultiSelectRow(
             icon_name="style",
@@ -114,6 +110,11 @@ class Bar(widgets.Window, BaseWidget):
         self.side_settings_row.bind_option(self, "side")
         self.density_settings_row.bind_option(self, "density")
         self.background_settings_row.bind_option(self, "background")
+        self.area_backgrounds_settings_row.set_items([
+            ("Start", lambda: self._start_background, lambda v: setattr(self, "start_background", v)),
+            ("Center", lambda: self._center_background, lambda v: setattr(self, "center_background", v)),
+            ("End", lambda: self._end_background, lambda v: setattr(self, "end_background", v)),
+        ])
         self.modifiers_settings_row.set_items([
             ("Floating", lambda: self._floating, lambda v: setattr(self, "floating", v), "page_header"),
             ("Centered", lambda: self._centered, lambda v: setattr(self, "centered", v), "collapse_content"),
