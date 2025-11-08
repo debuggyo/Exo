@@ -417,6 +417,14 @@ class ExtraBarCategory(widgets.Box):
                 ),
                 widgets.Separator(),
                 SwitchRow(
+                    title="Show Media Player When Nothing Playing",
+                    description="Toggle Media Player When Nothing Playing",
+                    active=self.options.show_when_no_player,
+                    on_change=lambda x,
+                    active: self.options.set_show_when_no_player(active),
+                ),
+                widgets.Separator(),
+                SwitchRow(
                     title="Fixed Workspaces",
                     description="Show a specific amount of workspaces",
                     active=self.options.fixed_workspaces_enabled,

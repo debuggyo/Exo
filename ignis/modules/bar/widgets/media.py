@@ -264,10 +264,10 @@ class Media(Gtk.Box, BaseWidget):
             self.set_visible(True if self._show_when_no_player else False)
         if user_settings.interface.modules.visibility.media == False:
             self.set_visible(user_settings.interface.modules.visibility.media)
-        elif self.show_when_no_player == False:
+        elif user_settings.interface.modules.options.show_when_no_player == False:
             bar = user_settings.interface.bar if user_settings.interface.modules.bar_id.media == 0 else user_settings.interface.bar2
             self.set_vertical(bar.vertical)
-            return
+            self.show_when_no_player = False
         else:
             bar = user_settings.interface.bar if user_settings.interface.modules.bar_id.media == 0 else user_settings.interface.bar2
             self.set_vertical(bar.vertical)

@@ -71,6 +71,7 @@ class UserSettings(OptionsManager):
                 workspaces_style: str = "numbers"
                 fixed_workspaces_enabled: bool = True
                 fixed_workspaces_amount: int = 5
+                show_when_no_player: bool = True
 
             location = Locations()
             visibility = Visibility()
