@@ -9,7 +9,7 @@ from ignis.services.mpris import MprisService, MprisPlayer
 
 
 class Media(Gtk.Box, BaseWidget):
-    __gtype_name__ = "LuminaMedia"
+    __gtype_name__ = "ExoMedia"
     __gproperties__ = {**BaseWidget.gproperties}
 
     def __init__(self, **kwargs):
@@ -262,9 +262,16 @@ class Media(Gtk.Box, BaseWidget):
             self.icon.set_tooltip_text(None)
             self.labels_box.set_tooltip_text(None)
             self.set_visible(True if self._show_when_no_player else False)
-        bar = user_settings.interface.bar if user_settings.interface.modules.bar_id.media == 0 else user_settings.interface.bar2
-        self.set_vertical(bar.vertical)
-        self.set_visible(user_settings.interface.modules.visibility.media)
+        if user_settings.interface.modules.visibility.media == False:
+            self.set_visible(user_settings.interface.modules.visibility.media)
+        elif self.show_when_no_player == False:
+            bar = user_settings.interface.bar if user_settings.interface.modules.bar_id.media == 0 else user_settings.interface.bar2
+            self.set_vertical(bar.vertical)
+            return
+        else:
+            bar = user_settings.interface.bar if user_settings.interface.modules.bar_id.media == 0 else user_settings.interface.bar2
+            self.set_vertical(bar.vertical)
+            self.set_visible(user_settings.interface.modules.visibility.media)
 
     def update_layout(self):
         self.set_orientation(
