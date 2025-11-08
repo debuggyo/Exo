@@ -1,5 +1,19 @@
 @use "../colors.scss";
 
+// --- Configuration Variables ---
+$radius-large: 15px;
+$radius-small: 8px;
+$radius-module-padding: 1rem;
+
+// Outer Radius Map
+$outer-radii: (
+    cozy: 20px,
+    comfortable: 17.5px,
+    compact: 15px,
+    condensed: 12.5px
+);
+
+
 @keyframes rotation {
     from {
         transform: rotate(0deg);
@@ -7,6 +21,15 @@
     to {
         transform: rotate(359deg);
     }
+}
+
+@keyframes scale {
+    from { transform: scale(0.88); }
+    to { transform: scale(1); }
+}
+@keyframes re-scale{
+    from { transform: scale(1); }
+    to { transform: scale(0.85); }
 }
 
 .bar {
@@ -296,62 +319,36 @@
     }
 }
 
-// Time & Date
+// Media
 .media {
-    padding: 0px 5px;
-    padding-right: 10px;
-    min-height: 0px;
+    padding: 0px 3px;
+    padding-left: 8px;
 
-    .icon_container {
-        border-radius: 20px;
-        min-width: 16px;
-        margin: 0px;
+    &:not(.placeholder) .icon {
+        border-radius: $radius-large;
+        &.playing { animation: rotation 10s infinite linear; }
     }
 
-    box:not(.is-paused) .icon_container {
-        animation: rotation 10s infinite linear;
-    }
+    .title { font-weight: 500; margin-bottom: -3px; }
+    .artist { font-weight: 400; font-size: 8pt; opacity: 0.8; }
 
-    .overlay-bg {
-        margin: 0px;
-        border-radius: 20px;
-        background: rgba(0, 0, 0, 0.5);
-        opacity: 0;
+    button {
+        padding: 0px;
+        min-width: 24px;
+        border-radius: $radius-large;
         transition: 100ms;
-    }
-
-    .overlay-icon {
-        opacity: 0;
-        transition: 100ms;
-    }
-
-    .title {
-        font-weight: 500;
-        margin-bottom: -3px;
-    }
-
-    .artist {
-        font-weight: 400;
-        font-size: 8pt;
-        opacity: 0.8;
-    }
-
-    .is-paused {
-        .overlay-bg,
-        .overlay-icon {
-            opacity: 0.8;
+        &:hover {
+            background-color: colors.$surface_container_highest;
+            font-variation-settings: "FILL" 1;
         }
-    }
-
-    &:hover {
-        .overlay-bg,
-        .overlay-icon {
-            opacity: 1;
+        &.play-pause-button {
+            background-color: colors.$secondary_container;
+            &:hover {
+                background-color: colors.$secondary;
+                color: colors.$on_secondary;
+            }
         }
-
-        &:active .overlay-icon {
-            transform: scale(1.2);
-        }
+        &:active { transform: scale(0.9); }
     }
 }
 
@@ -589,7 +586,8 @@
     }
 
     .media {
-        padding: 5px 0px;
+        padding: 3px 0px;
+        padding-top: 8px;
     }
 
     .winfo {

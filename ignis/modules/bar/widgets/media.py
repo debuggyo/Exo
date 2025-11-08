@@ -1,219 +1,293 @@
+import gi
+from user_settings import user_settings
+gi.require_version("Gtk", "4.0")
+from gi.repository import Gtk, Pango
+from ignis.base_widget import BaseWidget
+from ignis.gobject import IgnisProperty
 from ignis import widgets, utils
 from ignis.services.mpris import MprisService, MprisPlayer
-from user_settings import user_settings
-from gi.repository import Gtk
-
-mpris = MprisService.get_default()
 
 
-class Player(widgets.Box):
-    def update_labels_and_icon(self):
-        self.title_label.set_label(str(self.player.title))
-        self.artist_label.set_label(str(self.player.artist))
+class Media(Gtk.Box, BaseWidget):
+    __gtype_name__ = "LuminaMedia"
+    __gproperties__ = {**BaseWidget.gproperties}
 
-        if self.player.art_url:
-            self.icon.set_image(self.player.art_url)
-        else:
-            self.icon.set_image("audio-volume-high")
+    def __init__(self, **kwargs):
+        Gtk.Box.__init__(self, spacing=8)
+        self._vertical: bool = False
+        self._density: int = 0
+        self._show_labels: bool = True
+        self._show_controls: bool = True
+        self._show_artwork: bool = True
+        self._show_when_no_player: bool = True
+        self._player: MprisPlayer = None
+        self._player_index: int = 0
 
-        self.update_tooltip()
+        self.mpris = MprisService.get_default()
 
-    def update_tooltip(self):
-        if not self._show_labels:
-            tooltip_text = f"{self.player.title}\nby {self.player.artist}"
-            if self.get_parent():
-                self.get_parent().set_tooltip_text(tooltip_text)
-        else:
-            if self.get_parent():
-                self.get_parent().set_tooltip_text("")
-
-    def update_layout(self):
-        bar = (
-            user_settings.interface.bar
-            if user_settings.interface.modules.bar_id.media == 0
-            else user_settings.interface.bar2
+        scroll_controller = Gtk.EventControllerScroll.new(
+            Gtk.EventControllerScrollFlags.VERTICAL
         )
-        vertical = bar.vertical
-
-        if self._show_labels and not vertical:
-            self.labels_box.set_visible(True)
-            if bar.density > 0:
-                self.artist_label.set_visible(False)
-                self.icon.set_pixel_size(16)
-                self.icon_container.set_size_request(16, 16)
-                self.play_pause_label.set_size_request(16, 16)
-            else:
-                self.artist_label.set_visible(True)
-                self.icon.set_pixel_size(24)
-                self.icon_container.set_size_request(24, 24)
-                self.play_pause_label.set_size_request(24, 24)
-        else:
-            self.labels_box.set_visible(False)
-            if bar.density > 0:
-                self.icon.set_pixel_size(16)
-                self.icon_container.set_size_request(16, 16)
-                self.play_pause_label.set_size_request(16, 16)
-            else:
-                self.icon.set_pixel_size(24)
-                self.icon_container.set_size_request(24, 24)
-                self.play_pause_label.set_size_request(24, 24)
-
-        self.update_tooltip()
-
-    def on_playback_status_changed(self, player, gparam):
-        status = player.playback_status
-        if status == "Playing" or status == "Paused":
-            self.play_pause_label.set_visible(True)
-            self.overlay_bg.set_visible(True)
-            if status == "Playing":
-                self.play_pause_label.set_label("pause")
-                self.remove_css_class("is-paused")
-            else:
-                self.play_pause_label.set_label("play_arrow")
-                self.add_css_class("is-paused")
-        else:
-            self.play_pause_label.set_visible(False)
-            self.overlay_bg.set_visible(False)
-            self.remove_css_class("is-paused")
-
-    def __init__(self, player: MprisPlayer, show_labels: bool):
-        self.player = player
-        self._show_labels = show_labels
+        scroll_controller.connect("scroll", self.on_scroll)
+        self.add_controller(scroll_controller)
 
         self.icon = widgets.Icon(
-            css_classes=["icon"],
-            valign="center",
             pixel_size=24,
-        )
-
-        self.icon_container = widgets.Box(
-            css_classes=["icon_container"], valign="center", child=[self.icon]
-        )
-        self.icon_container.set_overflow(Gtk.Overflow.HIDDEN)
-
-        self.play_pause_label = widgets.Label(
-            css_classes=["overlay-icon"],
-            style="font-family: 'Material Symbols Outlined', 'Material Icons Outlined';",
             halign="center",
             valign="center",
-        )
-        self.overlay_bg = widgets.Box(
-            css_classes=["overlay-bg"],
-            halign="fill",
-            valign="fill",
-        )
-        self.overlay = widgets.Overlay(
-            valign="center",
-            child=self.icon_container,
-            overlays=[self.overlay_bg, self.play_pause_label],
-            css_classes=["media-overlay"],
+            css_classes=["icon"],
+            overflow=Gtk.Overflow.HIDDEN,
         )
 
-        self.title_label = widgets.Label(
-            css_classes=["title"],
-            valign="end",
-            halign="start",
-            ellipsize="end",
+        self.labels_box = Gtk.Box(
+            orientation=Gtk.Orientation.VERTICAL, valign=Gtk.Align.CENTER
+        )
+        self.title_label = Gtk.Label(
+            halign=Gtk.Align.START,
+            xalign=0,
+            ellipsize=Pango.EllipsizeMode.END,
+            max_width_chars=20,
+            width_chars=20,
+        )
+        self.artist_label = Gtk.Label(
+            halign=Gtk.Align.START,
+            xalign=0,
+            ellipsize=Pango.EllipsizeMode.END,
             max_width_chars=24,
+            width_chars=20,
         )
-        self.artist_label = widgets.Label(
-            css_classes=["artist"],
-            valign="end",
-            halign="start",
-            ellipsize="end",
-            max_width_chars=24,
-        )
+        self.labels_box.append(self.title_label)
+        self.labels_box.append(self.artist_label)
 
-        self.labels_box = widgets.Box(
-            vertical=True,
-            spacing=0,
+        self.controls_box = Gtk.Box(spacing=4, halign="center", valign="center")
+        self.prev_label = widgets.Label(label="skip_previous", css_classes=["m3-icon"])
+        self.play_pause_label = widgets.Label(css_classes=["m3-icon"])
+        self.next_label = widgets.Label(label="skip_next", css_classes=["m3-icon"])
+        self.prev_button = widgets.Button(
+            child=self.prev_label,
+            on_click=lambda _: self.prev(),
+            halign="center",
+            hexpand=False,
             valign="center",
-            vexpand=True,
-            child=[self.title_label, self.artist_label],
+            vexpand=False,
         )
-
-        super().__init__(
-            vertical=False,
-            spacing=5,
+        self.play_pause_button = widgets.Button(
+            child=self.play_pause_label,
+            on_click=lambda _: self.play_pause(),
+            css_classes=["play-pause-button"],
+            halign="center",
+            hexpand=False,
             valign="center",
-            homogeneous=False,
-            vexpand=True,
-            css_classes=[],
-            child=[self.overlay, self.labels_box],
+            vexpand=False,
         )
+        self.next_button = widgets.Button(
+            child=self.next_label,
+            on_click=lambda _: self.next(),
+            halign="center",
+            hexpand=False,
+            valign="center",
+            vexpand=False,
+        )
+        self.controls_box.append(self.prev_button)
+        self.controls_box.append(self.play_pause_button)
+        self.controls_box.append(self.next_button)
 
-        utils.Poll(1000, lambda _: self.update_labels_and_icon())
+        self.append(self.icon)
+        self.append(self.labels_box)
+        self.append(self.controls_box)
 
-        self.player.connect("notify::playback-status", self.on_playback_status_changed)
-        self.on_playback_status_changed(self.player, None)
+        self.add_css_class("media")
+        self.icon.add_css_class("icon")
+        self.title_label.add_css_class("title")
+        self.artist_label.add_css_class("artist")
+        self.controls_box.add_css_class("controls")
+
+        BaseWidget.__init__(self, **kwargs)
+        self.mpris.connect("notify::players", self._update_player)
+        utils.Poll(1000, self._update_player)
+
+        self._update_player()
         self.update_layout()
 
+    @IgnisProperty
+    def vertical(self) -> bool:
+        return self._vertical
 
-class Media:
-    def __init__(self):
-        self.player_count = 0
-        self.main_box = None
-        self.__players = []
-
-    def __setup(self, widget):
-        self.main_box = widget
-        utils.Poll(1000, self.__poll_players)
-        self.__update_players()
+    @vertical.setter
+    def vertical(self, value: bool):
+        self._vertical = value
         self.update_layout()
+
+    @IgnisProperty
+    def density(self) -> int:
+        return self._density
+
+    @density.setter
+    def density(self, value: int):
+        self._density = value
+        self.update_layout()
+
+    @IgnisProperty
+    def show_labels(self) -> bool:
+        return self._show_labels
+
+    @show_labels.setter
+    def show_labels(self, value: bool):
+        self._show_labels = value
+        self.update_layout()
+
+    @IgnisProperty
+    def show_controls(self) -> bool:
+        return self._show_controls
+
+    @show_controls.setter
+    def show_controls(self, value: bool):
+        self._show_controls = value
+        self.update_layout()
+
+    @IgnisProperty
+    def show_artwork(self) -> bool:
+        return self._show_artwork
+
+    @show_artwork.setter
+    def show_artwork(self, value: bool):
+        self._show_artwork = value
+        self.update_layout()
+
+    @IgnisProperty
+    def show_when_no_player(self) -> bool:
+        return self._show_when_no_player
+
+    @show_when_no_player.setter
+    def show_when_no_player(self, value: bool):
+        self._show_when_no_player = value
+        self.update_layout()
+
+    def on_scroll(self, _, _dx, dy):
+        players = self.mpris.players
+        if len(players) < 2:
+            return
+
+        if dy > 0:
+            self._player_index = (self._player_index + 1) % len(players)
+        else:
+            self._player_index = (self._player_index - 1 + len(players)) % len(players)
+
+        new_player = players[self._player_index]
+        if new_player != self._player:
+            if self._player:
+                self._player.disconnect_by_func(self._update_info)
+            self._player = new_player
+            self._player.connect("notify::metadata", self._update_info)
+            self._player.connect("notify::playback-status", self._update_info)
+            self._player.connect("notify::art-url", self._update_info)
+            self._update_info()
+
+    def play_pause(self):
+        if self._player:
+            self._player.play_pause()
+
+    def next(self):
+        if self._player:
+            self._player.next()
+
+    def prev(self):
+        if self._player:
+            self._player.previous()
+
+    def _update_player(self, *args):
+        players = self.mpris.players
+
+        if self._player not in players:
+            if self._player:
+                self._player.disconnect_by_func(self._update_info)
+
+            if players:
+                if self._player_index >= len(players):
+                    self._player_index = 0
+                self._player = players[self._player_index]
+                self._player.connect("notify::metadata", self._update_info)
+                self._player.connect("notify::playback-status", self._update_info)
+                self._player.connect("notify::art-url", self._update_info)
+            else:
+                self._player = None
+        elif players:
+            self._player_index = players.index(self._player)
+
+        self._update_info()
+
+    def _update_info(self, *args):
+        if self._player:
+            self.set_visible(True)
+            self.remove_css_class("placeholder")
+            self.icon.remove_css_class("playing")
+            self.icon.remove_css_class("paused")
+            title = self._player.title or "Unknown Title"
+            artist = self._player.artist or "Unknown Artist"
+            self.title_label.set_label(title)
+            self.artist_label.set_label(artist)
+
+            tooltip_text = f"<b>{title}</b>\n{artist}"
+            self.icon.set_tooltip_markup(tooltip_text)
+            self.labels_box.set_tooltip_markup(tooltip_text)
+
+            if self._player.art_url:
+                self.icon.set_image(self._player.art_url)
+            else:
+                image = utils.get_app_icon_name(self._player.desktop_entry)
+                if image:
+                    self.icon.set_image(image)
+                else:
+                    self.icon.set_image("audio-x-generic-symbolic")
+
+            status = self._player.playback_status
+            is_playing = status == "Playing"
+            self.play_pause_label.set_label("pause" if is_playing else "play_arrow")
+            self.icon.add_css_class("playing" if is_playing else "paused")
+
+            self.prev_button.set_sensitive(self._player.can_go_previous)
+            self.next_button.set_sensitive(self._player.can_go_next)
+            self.play_pause_button.set_sensitive(
+                self._player.can_play or self._player.can_pause
+            )
+        else:
+            self.add_css_class("placeholder")
+            self.title_label.set_label("No Media Playing")
+            self.artist_label.set_label("Play something!")
+            self.icon.set_image("audio-x-generic-symbolic")
+            self.play_pause_label.set_label("play_arrow")
+            self.prev_button.set_sensitive(False)
+            self.next_button.set_sensitive(False)
+            self.play_pause_button.set_sensitive(False)
+            self.icon.set_tooltip_text(None)
+            self.labels_box.set_tooltip_text(None)
+            self.set_visible(True if self._show_when_no_player else False)
+        bar = user_settings.interface.bar if user_settings.interface.modules.bar_id.media == 0 else user_settings.interface.bar2
+        self.set_vertical(bar.vertical)
+        self.set_visible(user_settings.interface.modules.visibility.media)
 
     def update_layout(self):
-        bar = (
-            user_settings.interface.bar
-            if user_settings.interface.modules.bar_id.media == 0
-            else user_settings.interface.bar2
+        self.set_orientation(
+            Gtk.Orientation.VERTICAL if self._vertical else Gtk.Orientation.HORIZONTAL
         )
+        self.icon.set_visible(self._show_artwork)
+        self.labels_box.set_visible(self._show_labels and not self._vertical)
+        self.controls_box.set_visible(self._show_controls)
 
-        if self.main_box:
-            if bar.vertical:
-                self.main_box.set_vertical(True)
-                self.main_box.width_request = -1
-            else:
-                self.main_box.set_vertical(False)
-                self.main_box.width_request = 150 if bar.centered else -1
+        if self._density > 0:
+            self.artist_label.set_visible(False)
+            self.icon.set_pixel_size(16)
+            self.set_spacing(4)
+        elif self._density == 1:
+            self.icon.set_pixel_size(24)
+        else:
+            self.artist_label.set_visible(True)
+            self.icon.set_pixel_size(24)
+            self.set_spacing(8)
 
-            for player in self.__players:
-                player.update_layout()
-
-    def __poll_players(self, _):
-        current_players = len(mpris.players)
-        if current_players != self.player_count:
-            self.player_count = current_players
-            self.__update_players()
-
-    def __update_players(self):
-        if self.main_box and user_settings.interface.modules.visibility.media:
-            has_players = len(mpris.players) > 0
-            self.main_box.set_visible(has_players)
-
-            last_child = self.main_box.get_last_child()
-            while last_child:
-                self.main_box.remove(last_child)
-                last_child = self.main_box.get_last_child()
-
-            self.__players = []
-
-            num_players = len(mpris.players)
-            for index, player_obj in enumerate(mpris.players):
-                self.__add_player(player_obj, show_labels=(index == num_players - 1))
-
-    def __add_player(self, obj: MprisPlayer, show_labels: bool) -> None:
-        player = Player(obj, show_labels)
-        self.__players.append(player)
-
-        player_button = widgets.Button(
-            child=player,
-            vexpand=True,
-            halign="center",
-            on_click=lambda _: obj.play_pause(),
-            css_classes=["media"],
+        self.controls_box.set_orientation(
+            Gtk.Orientation.VERTICAL if self._vertical else Gtk.Orientation.HORIZONTAL
         )
-
-        self.main_box.append(player_button)
-
+        
     def widget(self):
-        return widgets.Box(vertical=False, setup=self.__setup)
+        return self
