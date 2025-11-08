@@ -418,7 +418,7 @@ class ExtraBarCategory(widgets.Box):
                 widgets.Separator(),
                 SwitchRow(
                     title="Show Media Player When Nothing Playing",
-                    description="Toggle Media Player When Nothing Playing",
+                    description="Toggle music player when nothing playing on bar",
                     active=self.options.show_when_no_player,
                     on_change=lambda x,
                     active: self.options.set_show_when_no_player(active),
