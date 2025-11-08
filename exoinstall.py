@@ -24,7 +24,7 @@ class ExoInstaller:
         ENDC = "\033[0m"
         BOLD = "\033[1m"
 
-    REPO_URL = "https://github.com/crystalforceix/Exo.git"
+    REPO_URL = "https://github.com/debuggyo/Exo.git"
 
     def __init__(self):
         self.default_config_dir = os.path.expanduser("~/.config/")
