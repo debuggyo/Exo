@@ -6,7 +6,7 @@ from ignis.services.hyprland import HyprlandService
 from ignis.services.applications import ApplicationsService
 from ignis.gobject import IgnisProperty
 from modules.shared_modules import AppIcon
-import modules.newbar.modules.settings as Settings
+import modules.shared_modules.settings as Settings
 
 class Window(Gtk.Box, BaseWidget):
     __gtype_name__ = "ExoWindow"

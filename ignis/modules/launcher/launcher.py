@@ -1,9 +1,6 @@
-import gi
-
-gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk
 from ignis.services.applications.application import Application
-from ignis import widgets
+from ignis import widgets, utils
 from ignis.window_manager import WindowManager
 from ignis.services.applications import ApplicationsService
 from modules.m3components import Button
@@ -141,7 +138,7 @@ class AppItem(widgets.Button):
 
     def launch(self) -> None:
         self._application.launch(terminal_format="kitty %command%")
-        window_manager.close_window("Launcher")
+        self.get_parent().get_parent().get_parent().get_parent().get_parent().get_parent().get_parent().get_parent().close_launcher()
 
 
 class PinnedAppItem(widgets.Button):
@@ -210,7 +207,7 @@ class PinnedAppItem(widgets.Button):
 
     def launch(self) -> None:
         self._application.launch(terminal_format="kitty %command%")
-        window_manager.close_window("Launcher")
+        self.get_parent().get_parent().get_parent().get_parent().get_parent().get_parent().close_launcher()
 
 
 class Launcher(widgets.Window):
@@ -315,7 +312,7 @@ class Launcher(widgets.Window):
         self._scroll_revealer.set_child(self._scroll_container)
         self._main_content_container.append(self._scroll_revealer)
 
-        actual_launcher_content_box = widgets.Box(
+        self.actual_launcher_content_box = widgets.Box(
             vertical=True,
             spacing=0,
             hexpand=False,
@@ -324,19 +321,19 @@ class Launcher(widgets.Window):
             css_classes=["launcher-window"],
             child=[self._main_content_container],
         )
-        actual_launcher_content_box.width_request = 600
+        self.actual_launcher_content_box.width_request = 600
 
         close_button = widgets.Button(
             vexpand=True,
             hexpand=True,
             can_focus=False,
-            on_click=lambda x: window_manager.close_window("Launcher"),
+            on_click=lambda x: self.close_launcher(),
         )
 
         main_overlay = widgets.Overlay(
             css_classes=["popup-close"],
             child=close_button,
-            overlays=[actual_launcher_content_box],
+            overlays=[self.actual_launcher_content_box],
         )
 
         super().__init__(
@@ -344,7 +341,7 @@ class Launcher(widgets.Window):
             hide_on_close=True,
             visible=False,
             namespace="Launcher",
-            popup=True,
+            popup=False,
             layer="overlay",
             kb_mode="exclusive",
             anchor=["left", "right", "top", "bottom"],
@@ -355,6 +352,11 @@ class Launcher(widgets.Window):
             ),
             child=main_overlay,
         )
+
+        # Custom ESC behaviour
+        key_controller = Gtk.EventControllerKey()
+        self.add_controller(key_controller)
+        key_controller.connect("key-pressed", self.close_popup)
 
     def __update_layout_button_icon(self):
         current_layout = user_settings.interface.launcher.layout
@@ -483,10 +485,12 @@ class Launcher(widgets.Window):
         if self.visible:
             self._entry.grab_focus()
             self._entry.set_position(-1)
+            self.actual_launcher_content_box.add_css_class("open")
         else:
             self._entry.text = ""
             self.__populate_pinned_apps_list()
             self.__search()
+
 
     def __on_accept(self, *args) -> None:
         first_child = self._app_container.get_first_child()
@@ -496,3 +500,19 @@ class Launcher(widgets.Window):
             first_item_in_grid = first_child.get_child_at(0, 0)
             if isinstance(first_item_in_grid, AppItem):
                 first_item_in_grid.launch()
+
+    def close_launcher(self, *args):
+        self.actual_launcher_content_box.remove_css_class("open")
+        def set_invisible():
+            self.set_visible(False)
+        utils.Timeout(300, set_invisible)
+        
+    def close_popup(self, event_controller_key, keyval, keycode, state):
+        if keyval == 65307:  # 65307 = ESC
+            self.close_launcher()
+
+    def toggle_window(self, *args):
+        if not self.visible:
+            self.set_visible(True)
+        else:
+            self.close_launcher()

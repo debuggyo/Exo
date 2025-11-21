@@ -2,7 +2,7 @@ from ignis import widgets, utils
 from modules.m3components import Button, ConnectedButtonGroup, Icon
 from ignis.services.notifications import Notification, NotificationService
 from gi.repository import GLib
-import modules.newbar.modules.settings as Settings
+import modules.shared_modules.settings as Settings
 
 notifications = NotificationService.get_default()
 

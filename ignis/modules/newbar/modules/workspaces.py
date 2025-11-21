@@ -7,7 +7,7 @@ from ignis import widgets
 from ignis.services.niri import NiriService
 from ignis.services.hyprland import HyprlandService
 from modules.shared_modules import AppIcon
-import modules.newbar.modules.settings as settings
+import modules.shared_modules.settings as settings
 
 class WorkspaceStyle(GObject.GEnum):
     IMPULSE = 0

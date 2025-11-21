@@ -14,6 +14,7 @@ from modules.newbar import Bar as NewBar
 from modules.newbar.modules import *
 from ignis.css_manager import CssInfoPath, CssManager
 from ignis import utils, widgets
+from ignis.command_manager import CommandManager
 from scripts import BarStyles, Wallpaper, auto_dark
 from user_settings import user_settings
 
@@ -76,30 +77,29 @@ if not user_settings.appearance.wallcolors.wallpaper_path:
     else:
         print("No wallpaper set and default wallpaper file not found.")
 
-if (
-    user_settings.interface.misc.screen_corners
-    or user_settings.interface.misc.shell_corners
-):
-    Corners.build()
 Settings()
-Launcher()
+launcher = Launcher()
 PowerMenu()
 OSD()
 M3Test()
 
 NotificationPopup(0)
 
-
 # Auto Dark Mode
 utils.Poll(60000, lambda _: auto_dark())
 
-newbar = NewBar(
+# Custom Commands
+command_manager = CommandManager.get_default()
+command_manager.add_command("toggle-launcher", lambda: launcher.toggle_window())
+
+
+bar = NewBar(
     autohide=False,
     autohide_fullscreen=True,
     side="left",
-    floating=True,
+    floating=False,
     centered=False,
-    background="areas",
+    background="full",
     density=1,
     start_background=True,
     center_background=True,
@@ -107,7 +107,7 @@ newbar = NewBar(
     start_module_bg="none",
     center_module_bg="none",
     end_module_bg="none",
-    start_modules=[Window(), Media(show_when_no_player=False)],
+    start_modules=[Window(show_on_empty=False), Media(show_when_no_player=False)],
     center_modules=[
         Workspaces(
             workspace_style="impulse",
@@ -118,38 +118,13 @@ newbar = NewBar(
             bigger_active=True,
         ),
     ],
-    end_modules=[Layout(show_on_single=False), RecordingIndicator(show_always=True), Clock(), Tray()],
+    end_modules=[
+        Layout(show_on_single=False),
+        RecordingIndicator(show_always=True),
+        Clock(),
+        Tray(),
+    ],
 )
 
-# workspaces = NewBar(
-#     bar_id=1,
-#     centered=True,
-#     start_modules=[
-#         Workspaces(
-#             workspace_style="impulse"
-#         ),
-#         Workspaces(
-#             numbers=True,
-#         ),
-#         Workspaces(
-#             numbers=True,
-#             names=False,
-#         )
-#     ],
-#     center_modules=[
-#         Workspaces(
-#             icons=False,
-#             numbers=True,
-#         ),
-#         Workspaces(
-#             icons=False,
-#             names=False,
-#             numbers=True,
-#         )
-#     ],
-#     end_modules=[
-#         Workspaces(
-#             workspace_style="dots"
-#         )
-#     ]
-# )
+if user_settings.interface.misc.screen_corners or user_settings.interface.misc.shell_corners:
+    Corners.build()

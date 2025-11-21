@@ -6,7 +6,7 @@ from ignis.base_widget import BaseWidget
 from ignis.gobject import IgnisProperty
 from ignis import widgets, utils
 from ignis.services.mpris import MprisService, MprisPlayer
-
+import modules.shared_modules.settings as Settings
 
 class Media(Gtk.Box, BaseWidget):
     __gtype_name__ = "ExoMedia"
@@ -102,9 +102,42 @@ class Media(Gtk.Box, BaseWidget):
         self.artist_label.add_css_class("artist")
         self.controls_box.add_css_class("controls")
 
+        self.vertical_label = Settings.Row(title="Bar is vertical", description="Some options have no effect on a vertical bar.")
+        self.artwork_switch = Settings.SwitchRow(icon_name="photo", title="Show Artwork")
+        self.labels_switch = Settings.SwitchRow(icon_name="title", title="Show Labels")
+        self.controls_switch = Settings.SwitchRow(icon_name="play_arrow", title="Show Controls")
+        self.when_no_player_switch = Settings.SwitchRow(icon_name="visibility", title="Always show", description="Show placeholder information when there's no media playing.")
+
         BaseWidget.__init__(self, **kwargs)
         self.mpris.connect("notify::players", self._update_player)
         utils.Poll(1000, self._update_player)
+
+        self.artwork_switch.bind_option(self, "show_artwork")
+        self.labels_switch.bind_option(self, "show_labels")
+        self.controls_switch.bind_option(self, "show_controls")
+        self.when_no_player_switch.bind_option(self, "show_when_no_player")
+
+        self.options = Settings.Window(
+            title="Window Module",
+            namespace=f"WindowModuleOptions-{id(self)}",
+            visible=False,
+            content=[
+                self.vertical_label,
+                widgets.Separator(),
+                self.artwork_switch,
+                widgets.Separator(),
+                self.labels_switch,
+                widgets.Separator(),
+                self.controls_switch,
+                widgets.Separator(),
+                self.when_no_player_switch,
+            ]
+        )
+
+        click_controller = Gtk.GestureClick.new()
+        click_controller.set_button(3)
+        click_controller.connect("pressed", self.open_options)
+        self.add_controller(click_controller)
 
         self._update_player()
         self.update_layout()
@@ -287,3 +320,20 @@ class Media(Gtk.Box, BaseWidget):
         )
 
         self._update_info()
+
+        # Options
+        self.vertical_label.set_visible(self._vertical)
+        if not self._vertical:
+            artwork_insensitive = not self._show_labels and not self._show_controls
+            labels_insensitive = not self._show_artwork and not self._show_controls
+            controls_insensitive = not self._show_labels and not self._show_artwork
+        else:
+            artwork_insensitive = not self._show_controls
+            controls_insensitive = not self._show_artwork
+            labels_insensitive = True
+        self.artwork_switch.set_sensitive(not artwork_insensitive)
+        self.labels_switch.set_sensitive(not labels_insensitive)
+        self.controls_switch.set_sensitive(not controls_insensitive)
+
+    def open_options(self, *args):
+        self.options.set_visible(True)

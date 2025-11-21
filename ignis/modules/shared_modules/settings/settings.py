@@ -506,7 +506,6 @@ class Window(widgets.Window, BaseWidget):
             namespace=namespace,
             visible=False,
             child=main_overlay,
-            popup=True,
             layer="overlay",
             exclusivity="ignore",
             kb_mode="exclusive",
@@ -515,6 +514,13 @@ class Window(widgets.Window, BaseWidget):
         self.add_css_class("popup-close")
 
         BaseWidget.__init__(self, **kwargs)
+
+        self.connect("notify::visible", self.on_visibility_change)
+
+        # Custom ESC behaviour
+        key_controller = Gtk.EventControllerKey()
+        self.add_controller(key_controller)
+        key_controller.connect("key-pressed", self.close_popup)
 
     def _build_content(self):
         child = self.scrollable_content.get_first_child()
@@ -526,8 +532,19 @@ class Window(widgets.Window, BaseWidget):
             for c in self.content:
                 self.scrollable_content.append(c)
 
+    def on_visibility_change(self, *args):
+        if self.visible:
+            self.container.add_css_class("open")
+
+    def close_popup(self, event_controller_key, keyval, keycode, state):
+        if keyval == 65307:  # 65307 = ESC
+            self.close()
+
     def close(self, *args):
-        self.set_visible(False)
+        self.container.remove_css_class("open")
+        def set_invisible():
+            self.set_visible(False)
+        utils.Timeout(300, set_invisible)
 
     @IgnisProperty
     def title(self) -> str:

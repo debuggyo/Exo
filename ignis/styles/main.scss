@@ -35,3 +35,14 @@
 separator {
     background-color: colors.$surface_container_highest;
 }
+
+.background-clock {
+    color: rgba(255, 255, 255, 1);
+    .time {
+        font-weight: 900;
+        font-size: 64pt;
+    }
+    .date {
+        font-size: 16pt;
+    }
+}

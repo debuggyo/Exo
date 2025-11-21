@@ -1,8 +1,9 @@
 import datetime
-from ignis import utils
+from ignis import widgets, utils
 from gi.repository import Gtk
 from ignis.base_widget import BaseWidget
 from ignis.gobject import IgnisProperty
+import modules.shared_modules.settings as Settings
 
 class Clock(Gtk.Box, BaseWidget):
     __gtype_name__ = "ExoClock"
@@ -39,7 +40,33 @@ class Clock(Gtk.Box, BaseWidget):
         self.update_layout()
         utils.Poll(1000, lambda _: self.update_time())
 
+        self.date_switch = Settings.SwitchRow(icon_name="calendar_today", title="Show Date")
+        self.military_time_switch = Settings.SwitchRow(icon_name="24fps_select", title="24 Hour Time")
+        self.american_date_switch = Settings.SwitchRow(icon_name="calendar_month", title="American Date Format", description="Show the month before the day.")
+
         BaseWidget.__init__(self, **kwargs)
+
+        self.date_switch.bind_option(self, "show_date")
+        self.military_time_switch.bind_option(self, "military_time")
+        self.american_date_switch.bind_option(self, "month_before_day")
+
+        self.options = Settings.Window(
+            title="Clock Module",
+            namespace=f"ClockModuleOptions-{id(self)}",
+            visible=False,
+            content=[
+                self.date_switch,
+                widgets.Separator(),
+                self.military_time_switch,
+                widgets.Separator(),
+                self.american_date_switch,
+            ]
+        )
+
+        click_controller = Gtk.GestureClick.new()
+        click_controller.set_button(3)
+        click_controller.connect("pressed", self.open_options)
+        self.add_controller(click_controller)
 
     @IgnisProperty
     def vertical(self) -> bool:
@@ -89,7 +116,6 @@ class Clock(Gtk.Box, BaseWidget):
     def update_layout(self):
         two_line = True if self._density == 0 else False
 
-        self.set_visible(False)
         self.set_orientation(Gtk.Orientation.VERTICAL if self._vertical or two_line else Gtk.Orientation.HORIZONTAL)
         self.date_label.set_visible(True if self._show_date else False)
         self.date_separator.set_visible(True if self._vertical and self._show_date else False)
@@ -108,6 +134,7 @@ class Clock(Gtk.Box, BaseWidget):
         else:
             self.set_spacing(5)
 
+        self.update_time()
 
         # CSS Classes
         if two_line:
@@ -139,3 +166,6 @@ class Clock(Gtk.Box, BaseWidget):
             self.date_label.set_label(now.strftime(date_format))
             if self._vertical:
                 self.month_label.set_label(now.strftime(month_format))
+
+    def open_options(self, *args):
+        self.options.set_visible(True)
