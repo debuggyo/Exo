@@ -21,6 +21,10 @@ class UserSettings(OptionsManager):
             dark_mode: bool = True
             transparency: bool = False
 
+            class BackgroundOptions(OptionsGroup):
+                overview_zoom: bool = True
+                darken_with_windows: bool = True
+
             class AutoDark(OptionsGroup):
                 enabled: bool = False
                 start_hour: int = 22
@@ -28,6 +32,7 @@ class UserSettings(OptionsManager):
                 end_hour: int = 6
                 end_min: int = 0
 
+            background = BackgroundOptions()
             auto_dark = AutoDark()
 
         wallcolors = WallpaperColors()

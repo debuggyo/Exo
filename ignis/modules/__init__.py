@@ -1,3 +1,4 @@
+from .background import Background
 from .bar import Bar
 from .corners import Corners
 from .settings import Settings
@@ -12,6 +13,7 @@ from .controlcenter import ControlCenter
 from .m3components import Button
 
 __all__ = [
+    "Background",
     "Bar",
     "Corners",
     "Settings",

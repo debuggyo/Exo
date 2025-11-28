@@ -1,15 +1,5 @@
 import os
-from modules import (
-    Bar,
-    Corners,
-    Settings,
-    Launcher,
-    PowerMenu,
-    QuickCenter,
-    OSD,
-    NotificationPopup,
-    ControlCenter
-)
+from modules import *
 from modules.newbar import Bar as NewBar
 from modules.newbar.modules import *
 from ignis.css_manager import CssInfoPath, CssManager
@@ -60,7 +50,7 @@ if user_settings.appearance.wallcolors.transparency:
     )
 
 
-QuickCenter()
+# QuickCenter()
 # bar = Bar()
 # BarStyles.set_bar_instance(bar)
 # BarStyles._apply_css(bar.build(), bar_id=0)
@@ -78,6 +68,7 @@ if not user_settings.appearance.wallcolors.wallpaper_path:
         print("No wallpaper set and default wallpaper file not found.")
 
 Settings()
+background = Background()
 launcher = Launcher()
 control_center = ControlCenter()
 PowerMenu()

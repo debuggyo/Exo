@@ -77,6 +77,19 @@ class WallpaperCategory(widgets.Box):
         wallpaper_overlay.add_overlay(self.wallpaper_filename_label)
 
         self.append(wallpaper_overlay)
+        self.append(SwitchRow(
+            title="Overview Zoom",
+            description="Zoom out the wallpaper when the Niri overview is open",
+            active=user_settings.appearance.wallcolors.background.overview_zoom,
+            on_change=lambda x, active: user_settings.appearance.wallcolors.background.set_overview_zoom(active)
+        ))
+        self.append(widgets.Separator())
+        self.append(SwitchRow(
+            title="Darken with windows",
+            description="Darken the wallpaper when there are any windows in the active workspaces",
+            active=user_settings.appearance.wallcolors.background.darken_with_windows,
+            on_change=lambda x, active: user_settings.appearance.wallcolors.background.set_darken_with_windows(active)
+        ))
 
     def _set_and_update_wallpaper(self, path):
         if path:
