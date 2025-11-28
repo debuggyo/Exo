@@ -1,6 +1,6 @@
 from ignis import widgets
 from ignis.gobject import IgnisProperty
-from ignis.window_manager import WindowManager
+from ignis.command_manager import CommandManager
 from ignis.services.network import NetworkService
 from ignis.services.bluetooth import BluetoothService
 from ignis.services.audio import AudioService
@@ -189,7 +189,7 @@ class Tray(Gtk.Box, BaseWidget):
         self.network = NetworkService.get_default()
         self.bluetooth = BluetoothService.get_default()
         self.audio = AudioService.get_default()
-        self.window_manager = WindowManager.get_default()
+        self.command_manager = CommandManager.get_default()
         self.system_tray = SystemTrayService.get_default()
 
         self.tray_items = widgets.Box(spacing=5)
@@ -321,4 +321,4 @@ class Tray(Gtk.Box, BaseWidget):
         self.tray_items.set_visible(True if self.tray_items.child else False)
 
     def on_click(self, *args):
-        self.window_manager.toggle_window("QuickCenter")
+        self.command_manager.run_command("toggle-control-center")

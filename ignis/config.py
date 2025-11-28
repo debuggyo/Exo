@@ -7,8 +7,8 @@ from modules import (
     PowerMenu,
     QuickCenter,
     OSD,
-    M3Test,
     NotificationPopup,
+    ControlCenter
 )
 from modules.newbar import Bar as NewBar
 from modules.newbar.modules import *
@@ -79,9 +79,9 @@ if not user_settings.appearance.wallcolors.wallpaper_path:
 
 Settings()
 launcher = Launcher()
+control_center = ControlCenter()
 PowerMenu()
 OSD()
-M3Test()
 
 NotificationPopup(0)
 
@@ -91,16 +91,16 @@ utils.Poll(60000, lambda _: auto_dark())
 # Custom Commands
 command_manager = CommandManager.get_default()
 command_manager.add_command("toggle-launcher", lambda: launcher.toggle_window())
-
+command_manager.add_command("toggle-control-center", lambda: control_center.toggle_window())
 
 bar = NewBar(
     autohide=False,
     autohide_fullscreen=True,
-    side="left",
+    side="top",
     floating=False,
     centered=False,
     background="full",
-    density=1,
+    density=0,
     start_background=True,
     center_background=True,
     end_background=True,

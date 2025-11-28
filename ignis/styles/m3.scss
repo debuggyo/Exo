@@ -405,7 +405,7 @@ switch {
 
 /* Sliders */
 .m3-slider {
-    background-color: colors.$surface_container;
+    /* background-color: colors.$surface_container; */
     border-radius: 24px;
     padding: 10px 16px;
     .m3-icon {
@@ -429,7 +429,7 @@ switch {
                 min-width: 4px;
                 padding: 0px;
                 margin: -16px 0px;
-                outline: 6px solid colors.$surface_container;
+                outline: 6px solid colors.$background;
                 outline-offset: 0px;
                 border-radius: 20px;
                 background-color: colors.$primary;

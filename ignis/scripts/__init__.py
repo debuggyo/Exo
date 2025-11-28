@@ -4,6 +4,7 @@ from .set_launcher_layout import LauncherLayout
 from .send_notification import send_notification
 from .recorder import recorder
 from .auto_dark import auto_dark
+from .extra_niri import ExtraNiri
 
 __all__ = [
     "Wallpaper",
@@ -12,4 +13,5 @@ __all__ = [
     "send_notification",
     "recorder",
     "auto_dark",
+    "ExtraNiri"
 ]

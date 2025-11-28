@@ -6,7 +6,7 @@ from .powermenu import PowerMenu
 from .notifications import ExoNotification, NotificationPopup
 from .quickcenter import QuickCenter
 from .osd import OSD
-from .m3test import M3Test
+from .controlcenter import ControlCenter
 
 # Material Components
 from .m3components import Button
@@ -21,7 +21,7 @@ __all__ = [
     "NotificationPopup",
     "QuickCenter",
     "OSD",
-    "M3Test",
     # Material Components
     "Button",
+    "ControlCenter"
 ]
