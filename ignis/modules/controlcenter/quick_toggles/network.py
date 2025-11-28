@@ -13,16 +13,15 @@ class NetworkToggle(QuickControl):
             icon="signal_wifi_4_bar",
             on_activate=lambda: self.wifi.set_enabled(True),
             on_deactivate=lambda: self.wifi.set_enabled(False),
-            active=(self.wifi.enabled or self.ethernet.is_connected)
+            active=True
         )
 
-        self.network.wifi.connect("notify::is-connected", self.update)
-        self.network.ethernet.connect("notify::is-connected", self.update)
+        self.network.wifi.connect("notify::is-connected", self.do_update)
+        self.network.ethernet.connect("notify::is-connected", self.do_update)
 
-    def update(self, *args):
+    def do_update(self, *args):
         if self.ethernet.is_connected:
             self.set_icon("settings_ethernet")
-            self.set_on_deactivate(None)
         elif self.wifi.enabled:
             if self.wifi.devices and self.wifi.devices[0].ap:
                 strength = self.wifi.devices[0].ap.strength
@@ -36,7 +35,8 @@ class NetworkToggle(QuickControl):
                     icon = "network_wifi_1_bar"
                 else:
                     icon = "signal_wifi_0_bar"
-                self.set_icon(icon)
+                if icon:
+                    self.set_icon(icon)
             else:
                 self.set_icon("signal_wifi_off")
         else:
