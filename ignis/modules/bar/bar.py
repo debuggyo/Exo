@@ -1,18 +1,20 @@
-from ignis import widgets
-from user_settings import user_settings
-from .widgets import (
-    WindowInfo,
-    Workspaces,
-    Media,
-    SystemInfoTray,
-    Clock,
-    Tasks,
-    Launcher,
-)
 from ignis.css_manager import CssManager
 from ignis.window_manager import WindowManager
 from scripts import BarStyles
 from scripts.recorder import set_indicator
+from user_settings import user_settings
+
+from ignis import widgets
+
+from .widgets import (
+    Clock,
+    Launcher,
+    Media,
+    SystemInfoTray,
+    Tasks,
+    WindowInfo,
+    Workspaces,
+)
 from .widgets.recording_indicator import RecordingIndicator
 
 css_manager = CssManager.get_default()
@@ -96,7 +98,7 @@ class Bar:
         )
 
         self.__wins[0] = widgets.Window(
-            namespace="Bar",
+            namespace="Bar" + str(self.monitor),
             monitor=self.monitor,
             anchor=anchors,
             css_classes=["bar"],
@@ -160,7 +162,7 @@ class Bar:
         )
 
         self.__wins[1] = widgets.Window(
-            namespace="Bar2",
+            namespace="Bar2" + str(self.monitor),
             monitor=self.monitor,
             anchor=anchors,
             css_classes=["bar"],

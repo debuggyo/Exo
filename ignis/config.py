@@ -1,19 +1,22 @@
 import os
+
+from ignis.css_manager import CssInfoPath, CssManager
+from ignis.utils import Utils
 from modules import (
+    OSD,
     Bar,
     Corners,
-    Settings,
     Launcher,
-    PowerMenu,
-    QuickCenter,
-    OSD,
     M3Test,
     NotificationPopup,
+    PowerMenu,
+    QuickCenter,
+    Settings,
 )
-from ignis.css_manager import CssInfoPath, CssManager
-from ignis import utils
 from scripts import BarStyles, Wallpaper, auto_dark
 from user_settings import user_settings
+
+from ignis import utils
 
 Wallpaper.generatePreviews()
 
@@ -46,10 +49,12 @@ if not user_settings.appearance.wallcolors.dark_mode:
     )
 
 QuickCenter()
-bar = Bar()
-BarStyles.set_bar_instance(bar)
-BarStyles._apply_css(bar.build(), bar_id=0)
-BarStyles._apply_css(bar.build2(), bar_id=1)
+
+for i in range(Utils.get_n_monitors()):
+    bar = Bar(i)
+    BarStyles.add_bar_instance(bar)
+    BarStyles._apply_css(bar.build(), bar_id=0)
+    BarStyles._apply_css(bar.build2(), bar_id=1)
 
 BarStyles.setFloating(user_settings.interface.bar.floating, bar_id=0)
 BarStyles.setFloating(user_settings.interface.bar2.floating, bar_id=1)
