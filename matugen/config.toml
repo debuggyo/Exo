@@ -40,3 +40,7 @@ output_path = '~/.config/qt6ct/colors/matugen.conf'
 [templates.vscode] # hyprluna
 input_path = "~/.config/matugen/templates/hyprlunavsc.json"
 output_path = "~/.vscode/extensions/hyprluna.hyprluna-theme-1.0.2/themes/hyprluna.json"
+
+[templates.qt-color-scheme]
+input_path = '~/.config/matugen/templates/Matugen.colors'
+output_path = '~/.local/share/color-schemes/Matugen.colors'
