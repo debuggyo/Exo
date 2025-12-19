@@ -1,14 +1,12 @@
-import gi
-
-gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk
-from ignis.services.applications.application import Application
-from ignis import widgets
-from ignis.window_manager import WindowManager
+from ignis.menu_model import IgnisMenuItem, IgnisMenuModel, IgnisMenuSeparator
 from ignis.services.applications import ApplicationsService
-from modules.m3components import Button
-from ignis.menu_model import IgnisMenuModel, IgnisMenuItem, IgnisMenuSeparator
+from ignis.services.applications.application import Application
+from ignis.window_manager import WindowManager
 from user_settings import user_settings
+
+from ignis import utils, widgets
+from modules.m3components import NewButton
 
 applications = ApplicationsService.get_default()
 window_manager = WindowManager.get_default()
@@ -141,7 +139,7 @@ class AppItem(widgets.Button):
 
     def launch(self) -> None:
         self._application.launch(terminal_format="kitty %command%")
-        window_manager.close_window("Launcher")
+        self.get_parent().get_parent().get_parent().get_parent().get_parent().get_parent().get_parent().get_parent().close_launcher()
 
 
 class PinnedAppItem(widgets.Button):
@@ -210,7 +208,7 @@ class PinnedAppItem(widgets.Button):
 
     def launch(self) -> None:
         self._application.launch(terminal_format="kitty %command%")
-        window_manager.close_window("Launcher")
+        self.get_parent().get_parent().get_parent().get_parent().get_parent().get_parent().close_launcher()
 
 
 class Launcher(widgets.Window):
@@ -262,7 +260,7 @@ class Launcher(widgets.Window):
             hexpand=True,
         )
 
-        self._clear_button = Button.button(
+        self._clear_button = NewButton(
             on_click=self.__clear_search,
             icon="close",
             visible=False,
@@ -272,7 +270,7 @@ class Launcher(widgets.Window):
             css_classes=["clear-button"],
         )
 
-        self._layout_button = Button.button(
+        self._layout_button = NewButton(
             on_click=self.__toggle_layout,
             icon="",
             visible=False,
@@ -315,7 +313,7 @@ class Launcher(widgets.Window):
         self._scroll_revealer.set_child(self._scroll_container)
         self._main_content_container.append(self._scroll_revealer)
 
-        actual_launcher_content_box = widgets.Box(
+        self.actual_launcher_content_box = widgets.Box(
             vertical=True,
             spacing=0,
             hexpand=False,
@@ -324,19 +322,19 @@ class Launcher(widgets.Window):
             css_classes=["launcher-window"],
             child=[self._main_content_container],
         )
-        actual_launcher_content_box.width_request = 600
+        self.actual_launcher_content_box.width_request = 600
 
         close_button = widgets.Button(
             vexpand=True,
             hexpand=True,
             can_focus=False,
-            on_click=lambda x: window_manager.close_window("Launcher"),
+            on_click=lambda x: self.close_launcher(),
         )
 
         main_overlay = widgets.Overlay(
             css_classes=["popup-close"],
             child=close_button,
-            overlays=[actual_launcher_content_box],
+            overlays=[self.actual_launcher_content_box],
         )
 
         super().__init__(
@@ -344,16 +342,22 @@ class Launcher(widgets.Window):
             hide_on_close=True,
             visible=False,
             namespace="Launcher",
-            popup=True,
+            popup=False,
             layer="overlay",
             kb_mode="exclusive",
             anchor=["left", "right", "top", "bottom"],
+            exclusivity="ignore",
             default_width=600,
             setup=lambda self: self.connect(
                 "notify::visible", self.__on_visibility_change
             ),
             child=main_overlay,
         )
+
+        # Custom ESC behaviour
+        key_controller = Gtk.EventControllerKey()
+        self.add_controller(key_controller)
+        key_controller.connect("key-pressed", self.close_popup)
 
     def __update_layout_button_icon(self):
         current_layout = user_settings.interface.launcher.layout
@@ -367,7 +371,7 @@ class Launcher(widgets.Window):
             self._layout_button.get_parent().remove(self._layout_button)
 
         # Rebuild the button with the new icon
-        self._layout_button = Button.button(
+        self._layout_button = NewButton(
             on_click=self.__toggle_layout,
             icon=new_icon,
             size="xs",
@@ -482,6 +486,7 @@ class Launcher(widgets.Window):
         if self.visible:
             self._entry.grab_focus()
             self._entry.set_position(-1)
+            self.actual_launcher_content_box.add_css_class("open")
         else:
             self._entry.text = ""
             self.__populate_pinned_apps_list()
@@ -495,3 +500,21 @@ class Launcher(widgets.Window):
             first_item_in_grid = first_child.get_child_at(0, 0)
             if isinstance(first_item_in_grid, AppItem):
                 first_item_in_grid.launch()
+
+    def close_launcher(self, *args):
+        self.actual_launcher_content_box.remove_css_class("open")
+
+        def set_invisible():
+            self.set_visible(False)
+
+        utils.Timeout(300, set_invisible)
+
+    def close_popup(self, event_controller_key, keyval, keycode, state):
+        if keyval == 65307:  # 65307 = ESC
+            self.close_launcher()
+
+    def toggle_window(self, *args):
+        if not self.visible:
+            self.set_visible(True)
+        else:
+            self.close_launcher()
