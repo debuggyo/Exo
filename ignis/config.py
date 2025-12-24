@@ -1,5 +1,6 @@
 import os
 
+from ignis.utils import Utils
 from ignis.command_manager import CommandManager
 from ignis.css_manager import CssInfoPath, CssManager
 from modules import (
@@ -51,10 +52,12 @@ if not user_settings.appearance.wallcolors.dark_mode:
     )
 
 QuickCenter()
-bar = Bar()
-BarStyles.set_bar_instance(bar)
-BarStyles._apply_css(bar.build(), bar_id=0)
-BarStyles._apply_css(bar.build2(), bar_id=1)
+
+for i in range(Utils.get_n_monitors()):
+    bar = Bar(i)
+    BarStyles.add_bar_instance(bar)
+    BarStyles._apply_css(bar.build(), bar_id=0)
+    BarStyles._apply_css(bar.build2(), bar_id=1)
 
 BarStyles.setFloating(user_settings.interface.bar.floating, bar_id=0)
 BarStyles.setFloating(user_settings.interface.bar2.floating, bar_id=1)
