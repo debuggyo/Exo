@@ -750,7 +750,7 @@ class ExoInstaller:
 
         if desktop_env in ["hyprland", "both"]:
             print("Copying Hyprland config...")
-            hypr_config_dir = os.path.join(self.config_dir, "hypr", "hyprland")
+            hypr_config_dir = os.path.join(self.config_dir, "hypr")
             os.makedirs(hypr_config_dir, exist_ok=True)
             hypr_source = os.path.join(self.source_dir, "exodefaults", "hyprland.conf")
             hypr_dest = os.path.join(hypr_config_dir, "hyprland.conf")

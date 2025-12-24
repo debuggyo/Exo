@@ -1,7 +1,8 @@
 import os
 
-from ignis.css_manager import CssInfoPath, CssManager
 from ignis.utils import Utils
+from ignis.command_manager import CommandManager
+from ignis.css_manager import CssInfoPath, CssManager
 from modules import (
     OSD,
     Bar,
@@ -17,6 +18,8 @@ from scripts import BarStyles, Wallpaper, auto_dark
 from user_settings import user_settings
 
 from ignis import utils
+
+command_manager = CommandManager.get_default()
 
 Wallpaper.generatePreviews()
 
@@ -73,13 +76,14 @@ if (
 ):
     Corners.build()
 Settings()
-Launcher()
+launcher = Launcher()
 PowerMenu()
 OSD()
 M3Test()
 
 NotificationPopup(0)
 
+command_manager.add_command("toggle-launcher", lambda: launcher.toggle_window())
 
 # Auto Dark Mode
 utils.Poll(60000, lambda _: auto_dark())
