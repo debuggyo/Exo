@@ -74,6 +74,7 @@ https://github.com/user-attachments/assets/78e35d82-5fe9-4986-b545-80fc59bc4784
 ### Optional
 
 - **Lock Screen**: [Hyprlock](https://github.com/hyprwm/hyprlock) - Automatically themed by Exo
+  - Locking (not theming) for other screen lockers is supported via dbus events (e.g. with `loginctl lock-session`)
 - **Screen Recording**: `gpu-screen-recorder`
 - **Region Selection**: `slurp` (for region recording)
 
