@@ -104,7 +104,7 @@ binds {
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+T { spawn "kitty"; }
     Mod+D { spawn "ignis" "toggle-window" "Launcher"; }
-    Mod+L { spawn "hyprlock"; }
+    Mod+L { spawn-sh "hyprlock || loginctl lock-session"; }
     Mod+E { spawn "nautilus"; }
     Mod+Escape { spawn "ignis" "toggle-window" "PowerMenu"; }
     Mod+I { spawn "ignis" "toggle-window" "Settings"; }

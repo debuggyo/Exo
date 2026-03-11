@@ -50,7 +50,11 @@ class PowerMenu(widgets.RevealerWindow):
                     label="Reboot",
                     command="reboot || systemctl reboot",
                 ),
-                PowerMenuButton(icon="lock", label="Lock Screen", command="hyprlock"),
+                PowerMenuButton(
+                    icon="lock",
+                    label="Lock Screen",
+                    command="hyprlock || loginctl lock-session",
+                ),
                 PowerMenuButton(
                     icon="logout",
                     label="Log Out",
