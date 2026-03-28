@@ -65,7 +65,7 @@ https://github.com/user-attachments/assets/78e35d82-5fe9-4986-b545-80fc59bc4784
 - **Shell Framework**: [Ignis](https://github.com/ignis-sh/ignis) (git/dev version)
 - **GVC**: [Ignis GVC](https://github.com/ignis-sh/ignis-gvc)
 - **Color Generation**: [Matugen](https://github.com/InioX/matugen)
-- **Wallpaper**: [swww](https://github.com/LGFae/swww)
+- **Wallpaper**: [awww](https://codeberg.org/LGFae/awww)
 - **Icons**: Material Symbols Font
 - **Bluetooth**: `gnome-bluetooth`
 - **GTK Theme**: `adw-gtk3`
@@ -179,7 +179,7 @@ Create `~/.config/matugen/templates/colors.scss` with:
 Create or edit `~/.config/matugen/config.toml` and add:
 ```toml
 [config.wallpaper]
-command = "swww"
+command = "awww"
 arguments = ["img", "--transition-type", "simple"]
 set = true
 
@@ -207,13 +207,13 @@ matugen image /path/to/your/wallpaper
 **For Niri** (`~/.config/niri/config.kdl`):
 ```kdl
 spawn-at-startup "ignis" "init"
-spawn-at-startup "swww-daemon"
+spawn-at-startup "awww-daemon"
 ```
 
 **For Hyprland** (`~/.config/hypr/hyprland.conf`):
 ```conf
 exec-once = ignis init
-exec-once = swww-daemon
+exec-once = awww-daemon
 ```
 
 ---

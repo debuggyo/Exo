@@ -246,4 +246,4 @@ hotkey-overlay {
 }
 
 spawn-at-startup "ignis" "init"
-spawn-at-startup "swww-daemon"
+spawn-at-startup "sh" "-c" "awww-daemon || swww-daemon"

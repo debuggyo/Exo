@@ -246,7 +246,7 @@ class ExoInstaller:
             )
             print("You will need to install the required dependencies manually.")
             print(
-                "Dependencies: python-ignis, ignis-gvc, matugen, swww, gnome-bluetooth, adw-gtk-theme, dart-sass, material-symbols-font"
+                "Dependencies: python-ignis, ignis-gvc, matugen, awww, gnome-bluetooth, adw-gtk-theme, dart-sass, material-symbols-font"
             )
             return False
 
@@ -335,7 +335,7 @@ class ExoInstaller:
                 "ignis-gvc",
                 "ttf-material-symbols-variable-git",
                 "matugen-bin",
-                "swww",
+                "awww",
                 "gnome-bluetooth-3.0",
                 "adw-gtk-theme",
                 "dart-sass",
@@ -607,15 +607,15 @@ class ExoInstaller:
                     )
         shutil.rmtree(gvc_temp_dir)
 
-        if not shutil.which("swww"):
-            print("\nswww not found, attempting to build from source...")
+        if not shutil.which("awww"):
+            print("\nawww not found, attempting to build from source...")
             temp_dir = tempfile.mkdtemp()
-            swww_repo_url = "https://github.com/LGFae/swww.git"
-            swww_repo_dir = os.path.join(temp_dir, "swww")
+            awww_repo_url = "https://codeberg.org/LGFae/awww.git"
+            awww_repo_dir = os.path.join(temp_dir, "awww")
 
-            print(f"Cloning {swww_repo_url} to {swww_repo_dir}...")
+            print(f"Cloning {awww_repo_url} to {awww_repo_dir}...")
             result = self.run_command(
-                ["git", "clone", swww_repo_url, swww_repo_dir], cwd=temp_dir
+                ["git", "clone", awww_repo_url, awww_repo_dir], cwd=temp_dir
             )
             if result and result.returncode == 0:
                 env = os.environ.copy()
@@ -629,13 +629,13 @@ class ExoInstaller:
                         f"{self.Colors.RED}wayland-protocols.pc not found. Please install wayland-protocols-devel.{self.Colors.ENDC}"
                     )
 
-                print("Building swww with cargo...")
+                print("Building awww with cargo...")
                 result = self.run_command(
-                    ["cargo", "build", "--release"], cwd=swww_repo_dir, env=env
+                    ["cargo", "build", "--release"], cwd=awww_repo_dir, env=env
                 )
                 if result and result.returncode == 0:
-                    for binary in ["swww", "swww-daemon"]:
-                        src = os.path.join(swww_repo_dir, "target", "release", binary)
+                    for binary in ["awww", "awww-daemon"]:
+                        src = os.path.join(awww_repo_dir, "target", "release", binary)
                         dest = os.path.join("/usr/local/bin", binary)
                         if os.path.exists(src):
                             copy_result = self.run_command(["sudo", "cp", src, dest])
@@ -652,20 +652,20 @@ class ExoInstaller:
                                 f"{self.Colors.RED}Binary {binary} not found after build.{self.Colors.ENDC}"
                             )
                     print(
-                        f"{self.Colors.YELLOW}Optional: Autocompletion scripts are available in the completions directory of the swww repo.{self.Colors.ENDC}"
+                        f"{self.Colors.YELLOW}Optional: Autocompletion scripts are available in the completions directory of the awww repo.{self.Colors.ENDC}"
                     )
                 else:
                     print(
-                        f"{self.Colors.RED}Error building swww with cargo.{self.Colors.ENDC}"
+                        f"{self.Colors.RED}Error building awww with cargo.{self.Colors.ENDC}"
                     )
             else:
                 print(
-                    f"{self.Colors.RED}Error cloning swww repository.{self.Colors.ENDC}"
+                    f"{self.Colors.RED}Error cloning awww repository.{self.Colors.ENDC}"
                 )
 
             shutil.rmtree(temp_dir)
         else:
-            print("swww found in PATH.")
+            print("awww found in PATH.")
 
     def check_desktop(self):
         self.print_header("Checking Desktop Environment")
@@ -1213,7 +1213,7 @@ class ExoInstaller:
         print("If you wish to remove them, you can do so with your package manager.")
         print("Dependencies to consider removing:")
         print(
-            "- Niri or Hyprland, python-ignis-git, ignis-gvc, matugen, swww, gnome-bluetooth, adw-gtk-theme, dart-sass"
+            "- Niri or Hyprland, python-ignis-git, ignis-gvc, matugen, awww, gnome-bluetooth, adw-gtk-theme, dart-sass"
         )
 
 
