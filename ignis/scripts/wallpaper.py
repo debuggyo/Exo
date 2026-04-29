@@ -33,13 +33,13 @@ class Wallpaper:
         if colorScheme in schemes:
             asyncio.create_task(
                 utils.exec_sh_async(
-                    f"matugen image -t scheme-{colorScheme} '{path}' -m '{mode}'"
+                    f"matugen image -t scheme-{colorScheme} '{path}' -m '{mode}' --prefer saturation"
                 )
             )
         else:
             asyncio.create_task(
                 utils.exec_sh_async(
-                    f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'"
+                    f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}' --prefer saturation"
                 )
             )
 
@@ -68,13 +68,13 @@ class Wallpaper:
         if colorScheme in schemes:
             asyncio.create_task(
                 utils.exec_sh_async(
-                    f"matugen image -t scheme-{colorScheme} '{path}' -m '{mode}'"
+                    f"matugen image -t scheme-{colorScheme} '{path}' -m '{mode}' --prefer saturation"
                 )
             )
         else:
             asyncio.create_task(
                 utils.exec_sh_async(
-                    f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'"
+                    f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}' --prefer saturation"
                 )
             )
 
@@ -116,7 +116,7 @@ class Wallpaper:
         if colorScheme in schemes:
             asyncio.create_task(
                 utils.exec_sh_async(
-                    f"matugen image -t scheme-{colorScheme} '{path}' -m '{mode}'"
+                    f"matugen image -t scheme-{colorScheme} '{path}' -m '{mode}' --prefer saturation"
                 )
             )
             asyncio.create_task(
@@ -127,7 +127,7 @@ class Wallpaper:
         else:
             asyncio.create_task(
                 utils.exec_sh_async(
-                    f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}'"
+                    f"matugen image -t scheme-tonal-spot '{path}' -m '{mode}' --prefer saturation"
                 )
             )
             asyncio.create_task(
@@ -168,12 +168,12 @@ class Wallpaper:
 
             tasks_palette = []
             for scheme in schemes:
-                command = f"matugen image -t scheme-{scheme} '{path}' -m {current_mode} --json hex --dry-run"
+                command = f"matugen image -t scheme-{scheme} '{path}' -m {current_mode} --prefer saturation --json hex --dry-run"
                 tasks_palette.append(utils.exec_sh_async(command))
 
             tasks_theme = []
             for mode in ["light", "dark"]:
-                command = f"matugen image -t scheme-{current_scheme} '{path}' -m {mode} --json hex --dry-run"
+                command = f"matugen image -t scheme-{current_scheme} '{path}' -m {mode} --prefer saturation --json hex --dry-run"
                 tasks_theme.append(utils.exec_sh_async(command))
 
             all_results = await asyncio.gather(*(tasks_palette + tasks_theme))
@@ -200,6 +200,8 @@ class Wallpaper:
                             for color_name, values in data["colors"].items():
                                 if current_mode in values:
                                     color_value = values[current_mode]
+                                    if isinstance(color_value, dict):
+                                        color_value = color_value.get("color") or color_value.get("hex") or next(iter(color_value.values()))
                                     variable_name = f"palette-{scheme}-{color_name.replace('_', '-')}"
                                     scss_content += (
                                         f"${variable_name}: {color_value};\n"
@@ -228,6 +230,8 @@ class Wallpaper:
                             for color_name, values in data["colors"].items():
                                 if mode in values:
                                     color_value = values[mode]
+                                    if isinstance(color_value, dict):
+                                        color_value = color_value.get("color") or color_value.get("hex") or next(iter(color_value.values()))
                                     variable_name = (
                                         f"theme-{mode}-{color_name.replace('_', '-')}"
                                     )
