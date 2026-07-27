@@ -11,7 +11,10 @@ import sys
 import subprocess
 import shutil
 import hashlib
+import json
+import tarfile
 import tempfile
+import urllib.request
 
 
 class ExoInstaller:
@@ -25,6 +28,10 @@ class ExoInstaller:
         BOLD = "\033[1m"
 
     REPO_URL = "https://github.com/debuggyo/Exo.git"
+    ADW_GTK3_REPO = "lassekongo83/adw-gtk3"
+    # zypper reports "reboot needed", "restart needed" and "repositories
+    # skipped" with a non-zero status even though the install itself worked.
+    ZYPPER_OK_RETURNCODES = (102, 103, 106)
 
     def __init__(self):
         self.default_config_dir = os.path.expanduser("~/.config/")
@@ -137,7 +144,7 @@ class ExoInstaller:
             self.config_dir = self.default_config_dir
             self.run()
 
-    def run_command(self, cmd, **kwargs):
+    def run_command(self, cmd, ok_returncodes=None, **kwargs):
         if self.dry_run:
             print(
                 f"{self.Colors.YELLOW}[DRY RUN] Would execute: {' '.join(cmd)}{self.Colors.ENDC}"
@@ -147,6 +154,12 @@ class ExoInstaller:
             try:
                 return subprocess.run(cmd, check=True, **kwargs)
             except (subprocess.CalledProcessError, FileNotFoundError) as e:
+                if (
+                    ok_returncodes
+                    and isinstance(e, subprocess.CalledProcessError)
+                    and e.returncode in ok_returncodes
+                ):
+                    return subprocess.CompletedProcess(cmd, 0)
                 print(
                     f"{self.Colors.RED}Error executing command: {e}{self.Colors.ENDC}"
                 )
@@ -213,8 +226,25 @@ class ExoInstaller:
         except IOError:
             return None
 
+    def read_os_release(self):
+        values = {}
+        try:
+            with open("/etc/os-release") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith("#") or "=" not in line:
+                        continue
+                    key, _, value = line.partition("=")
+                    values[key.strip()] = value.strip().strip("\"'")
+        except IOError:
+            pass
+        return values
+
     def detect_distro(self):
         self.print_header("Distro Check")
+        os_release = self.read_os_release()
+        os_ids = f"{os_release.get('ID', '')} {os_release.get('ID_LIKE', '')}"
+
         if os.path.exists("/etc/arch-release"):
             self.distro = "arch"
             print(
@@ -224,6 +254,11 @@ class ExoInstaller:
             self.distro = "fedora"
             print(
                 f"{self.Colors.GREEN}Detected Fedora-based distribution.{self.Colors.ENDC}"
+            )
+        elif "suse" in os_ids:
+            self.distro = "opensuse"
+            print(
+                f"{self.Colors.GREEN}Detected openSUSE-based distribution.{self.Colors.ENDC}"
             )
         elif os.path.exists("/etc/lsb-release"):
             try:
@@ -255,6 +290,8 @@ class ExoInstaller:
             self.package_manager = "pacman"
         elif self.distro == "fedora":
             self.package_manager = "dnf"
+        elif self.distro == "opensuse":
+            self.package_manager = "zypper"
         elif self.distro == "ubuntu":
             self.package_manager = "apt"
 
@@ -317,6 +354,117 @@ class ExoInstaller:
                 os.chdir("..")
             return False
 
+    def install_ignis_via_pip(self):
+        print("\nInstalling ignis via pip...")
+        result = self.run_command(
+            [
+                "pip",
+                "install",
+                "--user",
+                "git+https://github.com/ignis-sh/ignis.git",
+            ]
+        )
+        if result is None or (hasattr(result, "returncode") and result.returncode != 0):
+            print(f"{self.Colors.RED}Failed to install ignis via pip.{self.Colors.ENDC}")
+
+    def install_matugen_via_cargo(self):
+        print("\nInstalling matugen via cargo...")
+        result = self.run_command(["cargo", "install", "matugen"])
+        if result is None or (hasattr(result, "returncode") and result.returncode != 0):
+            print(
+                f"{self.Colors.RED}Failed to install matugen via cargo.{self.Colors.ENDC}"
+            )
+            return
+
+        cargo_bin = os.path.expanduser("~/.cargo/bin")
+        if cargo_bin not in os.environ.get("PATH", "").split(os.pathsep):
+            print(
+                f"{self.Colors.YELLOW}Reminder: {cargo_bin} is not in your PATH. Add it to use 'matugen' globally.{self.Colors.ENDC}"
+            )
+
+    def install_material_symbols_font(self):
+        print("\nInstalling required fonts...")
+        font_file = "MaterialSymbolsOutlined[FILL,GRAD,opsz,wght].ttf"
+        font_dir = "/usr/share/fonts/material-symbols-icons"
+
+        result = self.run_command(
+            [
+                "wget",
+                "https://github.com/google/material-design-icons/raw/refs/heads/master/variablefont/MaterialSymbolsOutlined%5BFILL,GRAD,opsz,wght%5D.ttf",
+            ]
+        )
+        if result is None or (hasattr(result, "returncode") and result.returncode != 0):
+            print(f"{self.Colors.RED}Failed to download the font.{self.Colors.ENDC}")
+            return
+
+        result = self.run_command(["sudo", "mkdir", "-p", font_dir])
+        if result is None or (hasattr(result, "returncode") and result.returncode != 0):
+            print(
+                f"{self.Colors.RED}Failed to create the folder for the font.{self.Colors.ENDC}"
+            )
+            return
+
+        result = self.run_command(["sudo", "mv", font_file, font_dir])
+        if result is None or (hasattr(result, "returncode") and result.returncode != 0):
+            print(f"{self.Colors.RED}Failed to install the font.{self.Colors.ENDC}")
+            return
+
+        self.run_command(["fc-cache", "-v"])
+
+    def install_adw_gtk3_theme(self):
+        # adw-gtk3 is not packaged in the official openSUSE repositories, so it
+        # is pulled straight from its GitHub releases into the user's themes.
+        print("\nInstalling the adw-gtk3 theme...")
+        themes_dir = os.path.expanduser("~/.local/share/themes")
+
+        if self.dry_run:
+            print(
+                f"{self.Colors.YELLOW}[DRY RUN] Would install the latest adw-gtk3 release into {themes_dir}{self.Colors.ENDC}"
+            )
+            return
+
+        if os.path.isdir(os.path.join(themes_dir, "adw-gtk3")):
+            print("adw-gtk3 is already installed.")
+            return
+
+        try:
+            with urllib.request.urlopen(
+                f"https://api.github.com/repos/{self.ADW_GTK3_REPO}/releases/latest",
+                timeout=30,
+            ) as response:
+                release = json.load(response)
+            archive_url = next(
+                asset["browser_download_url"]
+                for asset in release.get("assets", [])
+                if asset["name"].endswith(".tar.xz")
+            )
+        except Exception as e:
+            print(
+                f"{self.Colors.RED}Could not find an adw-gtk3 release to download: {e}{self.Colors.ENDC}"
+            )
+            print(
+                f"{self.Colors.YELLOW}Install it manually from https://github.com/{self.ADW_GTK3_REPO}{self.Colors.ENDC}"
+            )
+            return
+
+        try:
+            os.makedirs(themes_dir, exist_ok=True)
+            with tempfile.TemporaryDirectory() as temp_dir:
+                archive_path = os.path.join(temp_dir, "adw-gtk3.tar.xz")
+                urllib.request.urlretrieve(archive_url, archive_path)
+                with tarfile.open(archive_path) as archive:
+                    try:
+                        archive.extractall(themes_dir, filter="data")
+                    except TypeError:  # Python versions without extraction filters
+                        archive.extractall(themes_dir)
+            print(
+                f"{self.Colors.GREEN}Installed adw-gtk3 to {themes_dir}.{self.Colors.ENDC}"
+            )
+        except Exception as e:
+            print(
+                f"{self.Colors.RED}Failed to install adw-gtk3: {e}{self.Colors.ENDC}"
+            )
+
     def install_dependencies(self):
         self.print_header("Installing Dependencies")
 
@@ -366,6 +514,37 @@ class ExoInstaller:
                 "wayland-protocols-devel",
                 "python3-devel",
             ],
+            "opensuse": [
+                "gcc",
+                "make",
+                "meson",
+                "ninja",
+                "pkgconf-pkg-config",
+                "scdoc",
+                "vala",
+                "cargo",
+                "wget",
+                "npm-default",
+                "python3-pip",
+                "python3-devel",
+                "python3-cairo-devel",
+                "cairo-devel",
+                "glib2-devel",
+                "gobject-introspection-devel",
+                "typelib-1_0-Gtk-4_0",
+                "typelib-1_0-GdkPixbuf-2_0",
+                "typelib-1_0-Gtk4LayerShell-1_0",
+                "typelib-1_0-GnomeBluetooth-3_0",
+                "typelib-1_0-NM-1_0",
+                "libpulse-devel",
+                "libgee-devel",
+                "libxkbcommon-devel",
+                "wayland-devel",
+                "wayland-protocols-devel",
+                "libdisplay-info-devel",
+                "libliftoff-devel",
+                "liblz4-devel",
+            ],
             "ubuntu": [
                 "python3-pip",
                 "cargo",
@@ -408,59 +587,25 @@ class ExoInstaller:
                         f"{self.Colors.RED}Failed to install some packages with dnf.{self.Colors.ENDC}"
                     )
 
-                print("\nInstalling ignis via pip...")
+                self.install_ignis_via_pip()
+                self.install_matugen_via_cargo()
+                self.install_material_symbols_font()
+            elif self.distro == "opensuse":
                 result = self.run_command(
-                    [
-                        "pip",
-                        "install",
-                        "--user",
-                        "git+https://github.com/ignis-sh/ignis.git",
-                    ]
+                    ["sudo", "zypper", "--non-interactive", "install"] + packages,
+                    ok_returncodes=self.ZYPPER_OK_RETURNCODES,
                 )
                 if result is None or (
                     hasattr(result, "returncode") and result.returncode != 0
                 ):
                     print(
-                        f"{self.Colors.RED}Failed to install ignis via pip.{self.Colors.ENDC}"
+                        f"{self.Colors.RED}Failed to install some packages with zypper.{self.Colors.ENDC}"
                     )
 
-                print("\nInstalling matugen via cargo...")
-                result = self.run_command(["cargo", "install", "matugen"])
-                if result is None or (
-                    hasattr(result, "returncode") and result.returncode != 0
-                ):
-                    print(
-                        f"{self.Colors.RED}Failed to install matugen via cargo.{self.Colors.ENDC}"
-                    )
-                else:
-                    self.run_command(["export", "PATH=\"$PATH:~/.cargo/bin\""])
-                
-                print("\n Installing required fonts...")
-                result = self.run_command(["wget", "https://github.com/google/material-design-icons/raw/refs/heads/master/variablefont/MaterialSymbolsOutlined%5BFILL,GRAD,opsz,wght%5D.ttf"])
-                if result is None or (
-                    hasattr(result, "returncode") and result.returncode != 0
-                ):
-                    print(
-                        f"{self.Colors.RED}Failed to download the font.{self.Colors.ENDC}"
-                    )
-                else:
-                    result = self.run_command(["sudo", "mkdir", "-p", "/usr/share/fonts/material-symbols-icons"])
-                    if result is None or (
-                        hasattr(result, "returncode") and result.returncode != 0
-                    ):
-                        print(
-                            f"{self.Colors.RED}Failed to create the folder for the font.{self.Colors.ENDC}"
-                        )
-                    else:
-                        result = self.run_command(["sudo", "mv", "MaterialSymbolsOutlined[FILL,GRAD,opsz,wght].ttf", "/usr/share/fonts/material-symbols-icons"])
-                        if result is None or (
-                            hasattr(result, "returncode") and result.returncode != 0
-                        ):
-                            print(
-                                f"{self.Colors.RED}Failed to install the font.{self.Colors.ENDC}"
-                            )
-                        else:
-                            self.run_command(["fc-cache", "-v"])
+                self.install_ignis_via_pip()
+                self.install_matugen_via_cargo()
+                self.install_material_symbols_font()
+                self.install_adw_gtk3_theme()
             elif self.distro == "ubuntu":
                 result = self.run_command(["sudo", "apt", "update"])
                 if result is None or (
@@ -477,37 +622,15 @@ class ExoInstaller:
                         f"{self.Colors.RED}Failed to install some packages with apt.{self.Colors.ENDC}"
                     )
 
-                print("\nInstalling ignis via pip...")
-                result = self.run_command(
-                    [
-                        "pip",
-                        "install",
-                        "--user",
-                        "git+https://github.com/ignis-sh/ignis.git",
-                    ]
-                )
-                if result is None or (
-                    hasattr(result, "returncode") and result.returncode != 0
-                ):
-                    print(
-                        f"{self.Colors.RED}Failed to install ignis via pip.{self.Colors.ENDC}"
-                    )
-
-                print("\nInstalling matugen via cargo...")
-                result = self.run_command(["cargo", "install", "matugen"])
-                if result is None or (
-                    hasattr(result, "returncode") and result.returncode != 0
-                ):
-                    print(
-                        f"{self.Colors.RED}Failed to install matugen via cargo.{self.Colors.ENDC}"
-                    )
+                self.install_ignis_via_pip()
+                self.install_matugen_via_cargo()
 
         else:
             print(
                 f"{self.Colors.YELLOW}No automatic dependency installation for your distribution.{self.Colors.ENDC}"
             )
 
-        if self.distro in ["fedora", "ubuntu"]:
+        if self.distro in ["fedora", "opensuse", "ubuntu"]:
             print("\nChecking for dart-sass...")
             if not shutil.which("sass"):
                 print(
@@ -695,24 +818,26 @@ class ExoInstaller:
         choice = self.get_user_choice("Select an option: ", ["1", "2", "3", "q"])
 
         install_cmd = ["sudo", self.package_manager]
-        if self.distro == "fedora":
-            install_cmd.extend(["install", "-y"])
+        install_kwargs = {}
+        if self.distro == "arch":
+            install_cmd.extend(["-S", "--noconfirm"])
+        elif self.distro == "opensuse":
+            install_cmd.extend(["--non-interactive", "install"])
+            install_kwargs["ok_returncodes"] = self.ZYPPER_OK_RETURNCODES
         else:
-            install_cmd.extend(
-                ["-S", "--noconfirm"] if self.distro == "arch" else ["install", "-y"]
-            )
+            install_cmd.extend(["install", "-y"])
 
         if choice == "1":
             print("Installing Niri...")
-            if self.run_command(install_cmd + ["niri"]):
+            if self.run_command(install_cmd + ["niri"], **install_kwargs):
                 return "niri"
         elif choice == "2":
             print("Installing Hyprland...")
-            if self.run_command(install_cmd + ["hyprland"]):
+            if self.run_command(install_cmd + ["hyprland"], **install_kwargs):
                 return "hyprland"
         elif choice == "3":
             print("Installing Niri and Hyprland...")
-            if self.run_command(install_cmd + ["niri", "hyprland"]):
+            if self.run_command(install_cmd + ["niri", "hyprland"], **install_kwargs):
                 return "both"
         elif choice == "q":
             print("Quitting.")
