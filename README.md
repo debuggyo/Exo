@@ -81,6 +81,7 @@ https://github.com/user-attachments/assets/78e35d82-5fe9-4986-b545-80fc59bc4784
 
 - **Arch-based:** Most dependencies are available in the AUR. Use your preferred AUR helper (e.g., `yay -S <package_name>`). Ignis is available as `python-ignis-git`.
 - **Fedora-based:** Use `dnf install <package_name>`. Some packages may have different names (e.g., `gnome-bluetooth-libs` instead of `gnome-bluetooth`).
+- **openSUSE-based:** Use `zypper install <package_name>`. Some packages may have different names (e.g., `typelib-1_0-GnomeBluetooth-3_0` instead of `gnome-bluetooth`). Matugen, swww, Ignis, `dart-sass`, `adw-gtk3` and the Material Symbols font are not in the official repositories and are installed from source/upstream releases by the installer.
 - **Ubuntu-based:** Use `apt install <package_name>`. Some packages may have different names (e.g., `libgnome-bluetooth-3.0-13` instead of `gnome-bluetooth`).
 
 ---
@@ -89,15 +90,16 @@ https://github.com/user-attachments/assets/78e35d82-5fe9-4986-b545-80fc59bc4784
 
 ### Automatic Installation (Recommended)
 
-The installer script automatically handles cloning, dependency installation, and configuration for Arch-based, Fedora-based, and Ubuntu-based distributions.
+The installer script automatically handles cloning, dependency installation, and configuration for Arch-based, Fedora-based, openSUSE-based, and Ubuntu-based distributions.
 
 Exo works best on **Arch** and many dependencies are known to have troubles installing on other distros, use at your own risk.
 
 ```bash
 # Install prerequisites
-sudo apt install curl git python3  # For Debian/Ubuntu
-sudo dnf install curl git python3  # For Fedora
-sudo pacman -S curl git python3    # For Arch
+sudo apt install curl git python3     # For Debian/Ubuntu
+sudo dnf install curl git python3     # For Fedora
+sudo zypper install curl git python3  # For openSUSE
+sudo pacman -S curl git python3       # For Arch
 
 # Download and run installer
 curl -sSL https://raw.githubusercontent.com/debuggyo/Exo/main/exoinstall.py -o exoinstall.py && python3 exoinstall.py
