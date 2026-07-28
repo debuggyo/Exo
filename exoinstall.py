@@ -225,6 +225,11 @@ class ExoInstaller:
             print(
                 f"{self.Colors.GREEN}Detected Fedora-based distribution.{self.Colors.ENDC}"
             )
+        elif os.path.exists("/etc/debian_version"):
+            self.distro = "debian"
+            print(
+                f"{self.Colors.GREEN}Detected Debian distribution.{self.Colors.ENDC}"
+            )
         elif os.path.exists("/etc/lsb-release"):
             try:
                 with open("/etc/lsb-release") as f:
@@ -250,13 +255,15 @@ class ExoInstaller:
             )
             return False
 
+
     def get_package_manager(self):
         if self.distro == "arch":
             self.package_manager = "pacman"
         elif self.distro == "fedora":
             self.package_manager = "dnf"
-        elif self.distro == "ubuntu":
+        elif self.distro in ["ubuntu", "debian"]:
             self.package_manager = "apt"
+
 
     def check_aur_helper(self):
         self.print_header("Checking for AUR Helper")
@@ -316,6 +323,18 @@ class ExoInstaller:
             if os.getcwd().endswith(yay_bin_dir):
                 os.chdir("..")
             return False
+
+    def check_pkgconfig_file(self, pc_name):
+        paths = [
+            "/usr/lib64/pkgconfig",
+            "/usr/lib/pkgconfig",
+            "/usr/share/pkgconfig",
+            "/usr/lib/x86_64-linux-gnu/pkgconfig"
+        ]
+        for path in paths:
+            if os.path.exists(os.path.join(path, pc_name)):
+                return path
+        return None
 
     def install_dependencies(self):
         self.print_header("Installing Dependencies")
@@ -381,6 +400,38 @@ class ExoInstaller:
                 "wayland-dev",
                 "libdisplay-info-dev",
                 "libliftoff-dev",
+            ],
+            "debian": [
+                "python3-pip",
+                "cargo",
+                "libgnome-bluetooth-3.0-13",
+                "fonts-material-design-icons-iconfont",
+                "meson",
+                "ninja-build",
+                "pkg-config",
+                "scdoc",
+                "libxkbcommon-dev",
+                "libdisplay-info-dev",
+                "libliftoff-dev",
+                "pkg-config",
+                "npm",
+                "build-essential",
+                "wayland-protocols",
+                "libgirepository1.0-dev",
+                "gobject-introspection",
+                "git",
+                "tar",
+                "libcairo2-dev",
+                "python3-dev",
+                "libpulse-dev",
+                "liblz4-dev",
+                "libwayland-dev",
+                "libgtk4-layer-shell-dev",
+                "gir1.2-glib-2.0",
+                "gir1.2-gtk-4.0",
+                "network-manager",
+                "gir1.2-nm-1.0",
+                "gir1.2-gnomebluetooth-3.0"
             ],
         }
 
@@ -461,7 +512,7 @@ class ExoInstaller:
                             )
                         else:
                             self.run_command(["fc-cache", "-v"])
-            elif self.distro == "ubuntu":
+            elif self.distro in ["ubuntu", "debian"]:
                 result = self.run_command(["sudo", "apt", "update"])
                 if result is None or (
                     hasattr(result, "returncode") and result.returncode != 0
@@ -484,6 +535,7 @@ class ExoInstaller:
                         "install",
                         "--user",
                         "git+https://github.com/ignis-sh/ignis.git",
+                        "--break-system-packages"
                     ]
                 )
                 if result is None or (
@@ -507,7 +559,10 @@ class ExoInstaller:
                 f"{self.Colors.YELLOW}No automatic dependency installation for your distribution.{self.Colors.ENDC}"
             )
 
-        if self.distro in ["fedora", "ubuntu"]:
+        if self.distro == "debian": 
+            self.install_adw_gtk_theme()
+
+        if self.distro in ["fedora", "ubuntu", "debian"]:
             print("\nChecking for dart-sass...")
             if not shutil.which("sass"):
                 print(
@@ -552,19 +607,8 @@ class ExoInstaller:
         gvc_repo_dir = os.path.join(gvc_temp_dir, "ignis-gvc")
         self.run_command(["git", "clone", gvc_repo_url, gvc_repo_dir])
 
-        def check_pkgconfig_file(pc_name):
-            paths = [
-                "/usr/lib64/pkgconfig",
-                "/usr/lib/pkgconfig",
-                "/usr/share/pkgconfig",
-            ]
-            for path in paths:
-                if os.path.exists(os.path.join(path, pc_name)):
-                    return path
-            return None
-
         env = os.environ.copy()
-        pc_path = check_pkgconfig_file("gobject-introspection-1.0.pc")
+        pc_path = self.check_pkgconfig_file("gobject-introspection-1.0.pc")
         if pc_path:
             env["PKG_CONFIG_PATH"] = f"{pc_path}:{env.get('PKG_CONFIG_PATH', '')}"
         else:
@@ -607,6 +651,11 @@ class ExoInstaller:
                     )
         shutil.rmtree(gvc_temp_dir)
 
+        if self.distro == "debian": 
+            self.install_ignis_gvc_debian()
+            self.install_awww_debian()
+            return
+
         if not shutil.which("swww"):
             print("\nswww not found, attempting to build from source...")
             temp_dir = tempfile.mkdtemp()
@@ -619,7 +668,7 @@ class ExoInstaller:
             )
             if result and result.returncode == 0:
                 env = os.environ.copy()
-                pc_path = check_pkgconfig_file("wayland-protocols.pc")
+                pc_path = self.check_pkgconfig_file("wayland-protocols.pc")
                 if pc_path:
                     env["PKG_CONFIG_PATH"] = (
                         f"{pc_path}:{env.get('PKG_CONFIG_PATH', '')}"
@@ -666,6 +715,151 @@ class ExoInstaller:
             shutil.rmtree(temp_dir)
         else:
             print("swww found in PATH.")
+    
+    def install_awww_debian(self):
+        # Evitamos reinstalar si ya existen los binarios en el sistema
+        if shutil.which("swww") or shutil.which("awww"):
+            print("awww/swww found in PATH. Skipping build.")
+            return True
+
+        print("\nawww/swww not found, attempting to build awww from Codeberg for Debian...")
+        temp_dir = tempfile.mkdtemp()
+        awww_repo_url = "https://codeberg.org/LGFae/awww.git"
+        awww_repo_dir = os.path.join(temp_dir, "awww")
+
+        print(f"Cloning {awww_repo_url} to {awww_repo_dir}...")
+        result = self.run_command(
+            ["git", "clone", awww_repo_url, awww_repo_dir], cwd=temp_dir
+        )
+        if result and result.returncode == 0:
+            env = os.environ.copy()
+            pc_path = self.check_pkgconfig_file("wayland-protocols.pc")
+            if pc_path:
+                env["PKG_CONFIG_PATH"] = f"{pc_path}:{env.get('PKG_CONFIG_PATH', '')}"
+            else:
+                print(
+                    f"{self.Colors.RED}wayland-protocols.pc not found. Please install wayland-protocols.{self.Colors.ENDC}"
+                )
+
+            print("Building awww with cargo...")
+            result = self.run_command(
+                ["cargo", "build", "--release"], cwd=awww_repo_dir, env=env
+            )
+            if result and result.returncode == 0:
+                # Iteramos sobre los nombres de los nuevos binarios oficiales
+                for binary in ["awww", "awww-daemon"]:
+                    src = os.path.join(awww_repo_dir, "target", "release", binary)
+                    dest = os.path.join("/usr/local/bin", binary)
+                    
+                    if os.path.exists(src):
+                        # Copiamos el binario nativo (awww o awww-daemon)
+                        copy_result = self.run_command(["sudo", "cp", src, dest])
+                        if copy_result and copy_result.returncode == 0:
+                            print(f"{self.Colors.GREEN}Installed {binary} to /usr/local/bin.{self.Colors.ENDC}")
+                            
+                            # Generamos el enlace simbólico clásico (swww o swww-daemon) apuntando al nuevo binario
+                            legacy_binary = binary.replace("awww", "swww")
+                            legacy_dest = os.path.join("/usr/local/bin", legacy_binary)
+                            print(f"Creating compatibility symlink: {legacy_binary} -> {binary}")
+                            self.run_command(["sudo", "ln", "-sf", dest, legacy_dest])
+                        else:
+                            print(f"{self.Colors.RED}Failed to copy {binary} to /usr/local/bin.{self.Colors.ENDC}")
+                    else:
+                        print(f"{self.Colors.RED}Binary {binary} not found after build.{self.Colors.ENDC}")
+            else:
+                print(f"{self.Colors.RED}Error building awww with cargo.{self.Colors.ENDC}")
+        else:
+            print(f"{self.Colors.RED}Error cloning awww repository.{self.Colors.ENDC}")
+
+        shutil.rmtree(temp_dir)
+        return True
+
+    def install_ignis_gvc_debian(self):
+        self.print_header("Compiling and Installing ignis-gvc")
+
+        temp_dir = tempfile.mkdtemp()
+        gvc_repo_url = "https://github.com/ignis-sh/ignis-gvc"
+        gvc_repo_dir = os.path.join(temp_dir, "ignis-gvc")
+
+        print(f"Cloning {gvc_repo_url}...")
+        result = self.run_command(
+            ["git", "clone", gvc_repo_url, gvc_repo_dir], cwd=temp_dir
+        )
+        
+        if result and result.returncode == 0:
+            print("Running meson setup...")
+            setup_result = self.run_command(
+                ["meson", "setup", "build", "--prefix=/usr"], cwd=gvc_repo_dir
+            )
+            
+            if setup_result and setup_result.returncode == 0:
+                print("Running meson compile...")
+                compile_result = self.run_command(
+                    ["meson", "compile", "-C", "build"], cwd=gvc_repo_dir
+                )
+                
+                if compile_result and compile_result.returncode == 0:
+                    print("Running meson install...")
+                    install_result = self.run_command(
+                        ["sudo", "meson", "install", "-C", "build"], cwd=gvc_repo_dir
+                    )
+                else:
+                    print(f"{self.Colors.RED}Error: meson compile failed.{self.Colors.ENDC}")
+            else:
+                print(f"{self.Colors.RED}Error: meson setup failed.{self.Colors.ENDC}")
+        else:
+            print(f"{self.Colors.RED}Error: git clone failed.{self.Colors.ENDC}")
+
+        shutil.rmtree(temp_dir)
+        return True
+    
+
+    def install_adw_gtk_theme(self):
+        self.print_header("Installing adw-gtk3 Theme")
+        
+        import shutil
+        themes_dir = os.path.expanduser("~/.local/share/themes")
+        url = "https://github.com/lassekongo83/adw-gtk3/releases/download/v6.5/adw-gtk3v6.5.tar.xz"
+        tar_path = os.path.join(themes_dir, "adw-gtk3v6.5.tar.xz")
+
+        # 1. Asegurar la carpeta base de temas
+        if not self.dry_run:
+            os.makedirs(themes_dir, exist_ok=True)
+        else:
+            print(f"{self.Colors.YELLOW}[DRY RUN] Would create directory: {themes_dir}{self.Colors.ENDC}")
+
+        # 2. Reemplazar carpetas viejas si ya existen para actualizar limpiamente
+        for old_dir in ["adw-gtk3", "adw-gtk3-dark"]:
+            target = os.path.join(themes_dir, old_dir)
+            if os.path.exists(target):
+                if not self.dry_run:
+                    print(f"Removing old theme directory to replace it: {target}")
+                    shutil.rmtree(target)
+                else:
+                    print(f"{self.Colors.YELLOW}[DRY RUN] Would remove old theme directory: {target}{self.Colors.ENDC}")
+
+        # 3. Descargar el archivo .tar.xz usando tu método run_command
+        download_cmd = ["curl", "-L", "-o", tar_path, url]
+        print(f"Downloading theme from GitHub...")
+        if self.run_command(download_cmd) is None:
+            print(f"{self.Colors.RED}Failed to download the theme.{self.Colors.ENDC}")
+            return False
+
+        # 4. Extraer el archivo .tar.xz usando tu método run_command
+        extract_cmd = ["tar", "-xvf", tar_path, "-C", themes_dir]
+        print(f"Extracting theme to {themes_dir}...")
+        if self.run_command(extract_cmd) is None:
+            print(f"{self.Colors.RED}Failed to extract the theme.{self.Colors.ENDC}")
+            return False
+
+        # 5. Limpieza del archivo comprimido temporal
+        if not self.dry_run:
+            if os.path.exists(tar_path):
+                os.remove(tar_path)
+
+        print(f"{self.Colors.GREEN}adw-gtk3 theme installed and replaced successfully!{self.Colors.ENDC}")
+        return True
+
 
     def check_desktop(self):
         self.print_header("Checking Desktop Environment")
