@@ -722,10 +722,6 @@ class ExoInstaller:
     def add_danklinux_repository_debian(self):
         self.print_header("Adding DankLinux Repository")
 
-        # Agregado al script: Instalamos de forma obligatoria el paquete gnupg
-        print("Ensuring gnupg is installed on Debian...")
-        subprocess.run("sudo apt install -y gnupg", shell=True, check=True)
-
         repo_list_path = "/etc/apt/sources.list.d/danklinux.list"
         keyring_path = "/etc/apt/keyrings/danklinux.gpg"
 
@@ -734,14 +730,19 @@ class ExoInstaller:
             return True
 
         print("DankLinux repository not found. Adding to the system...")
-        import subprocess
 
         if not self.dry_run:
-            try:
-                # Aseguramos que la carpeta de llaveros de apt exista
-                subprocess.run("sudo mkdir -p /etc/apt/keyrings", shell=True, check=True)
+            print("Ensuring gnupg is installed on Debian...")
+            if self.run_command(["sudo", "apt", "update"]) is None or \
+               self.run_command(["sudo", "apt", "install", "-y", "gnupg"]) is None:
+                print(f"{self.Colors.RED}Failed to install gnupg.{self.Colors.ENDC}")
+                return False
 
-                # Descargamos e instalamos la clave GPG (Release.key) de OpenSUSE
+            if self.run_command(["sudo", "mkdir", "-p", "/etc/apt/keyrings"]) is None:
+                return False
+
+            try:
+                import subprocess
                 print("Downloading and processing GPG key...")
                 gpg_cmd = (
                     "curl -fsSL https://download.opensuse.org/repositories/home:AvengeMedia:danklinux/Debian_Testing/Release.key | "
@@ -749,29 +750,27 @@ class ExoInstaller:
                 )
                 subprocess.run(gpg_cmd, shell=True, check=True)
 
-                # Agregamos el archivo sources.list usando tee
                 print("Writing repository list file...")
                 list_cmd = (
                     f'echo "deb [signed-by={keyring_path}] https://download.opensuse.org/repositories/home:/AvengeMedia:/danklinux/Debian_Testing/ /" | '
                     f"sudo tee {repo_list_path} > /dev/null"
                 )
                 subprocess.run(list_cmd, shell=True, check=True)
-
-                # Actualizamos los índices de apt para registrar el nuevo repositorio
-                print("Updating apt package lists...")
-                subprocess.run("sudo apt update", shell=True, check=True)
-
-                print(f"{self.Colors.GREEN}DankLinux repository added successfully!{self.Colors.ENDC}")
-            except subprocess.CalledProcessError as e:
-                print(f"{self.Colors.RED}Error adding DankLinux repository: {e}{self.Colors.ENDC}")
+            except (subprocess.CalledProcessError, FileNotFoundError) as e:
+                print(f"{self.Colors.RED}Error executing repository shell command: {e}{self.Colors.ENDC}")
                 return False
+
+            print("Updating apt package lists...")
+            if self.run_command(["sudo", "apt", "update"]) is None:
+                return False
+
+            print(f"{self.Colors.GREEN}DankLinux repository added successfully!{self.Colors.ENDC}")
         else:
-            print(f"{self.Colors.YELLOW}[DRY RUN] Would download key to {keyring_path} and create {repo_list_path}{self.Colors.ENDC}")
+            print(f"{self.Colors.YELLOW}[DRY RUN] Would install gnupg, download key to {keyring_path} and create {repo_list_path}{self.Colors.ENDC}")
 
         return True
     
     def install_awww_debian(self):
-        # Evitamos reinstalar si ya existen los binarios en el sistema
         if shutil.which("swww") or shutil.which("awww"):
             print("awww/swww found in PATH. Skipping build.")
             return True
