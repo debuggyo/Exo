@@ -435,6 +435,9 @@ class ExoInstaller:
             ],
         }
 
+        if self.distro == "debian":
+            self.add_danklinux_repository_debian()
+
         if self.distro in dependencies:
             packages = dependencies[self.distro]
             print(
@@ -715,6 +718,53 @@ class ExoInstaller:
             shutil.rmtree(temp_dir)
         else:
             print("swww found in PATH.")
+
+    def add_danklinux_repository_debian(self):
+        self.print_header("Adding DankLinux Repository")
+
+        repo_list_path = "/etc/apt/sources.list.d/danklinux.list"
+        keyring_path = "/etc/apt/keyrings/danklinux.gpg"
+
+        if os.path.exists(repo_list_path):
+            print("DankLinux repository already exists. Skipping installation.")
+            return True
+
+        print("DankLinux repository not found. Adding to the system...")
+        import subprocess
+
+        if not self.dry_run:
+            try:
+                # Aseguramos que la carpeta de llaveros de apt exista
+                subprocess.run("sudo mkdir -p /etc/apt/keyrings", shell=True, check=True)
+
+                # Descargamos e instalamos la clave GPG (Release.key) de OpenSUSE
+                print("Downloading and processing GPG key...")
+                gpg_cmd = (
+                    "curl -fsSL https://download.opensuse.org/repositories/home:AvengeMedia:danklinux/Debian_Testing/Release.key | "
+                    f"sudo gpg --dearmor -o {keyring_path}"
+                )
+                subprocess.run(gpg_cmd, shell=True, check=True)
+
+                # Agregamos el archivo sources.list usando tee
+                print("Writing repository list file...")
+                list_cmd = (
+                    f'echo "deb [signed-by={keyring_path}] https://download.opensuse.org/repositories/home:/AvengeMedia:/danklinux/Debian_Testing/ /" | '
+                    f"sudo tee {repo_list_path} > /dev/null"
+                )
+                subprocess.run(list_cmd, shell=True, check=True)
+
+                # Actualizamos los índices de apt para registrar el nuevo repositorio
+                print("Updating apt package lists...")
+                subprocess.run("sudo apt update", shell=True, check=True)
+
+                print(f"{self.Colors.GREEN}DankLinux repository added successfully!{self.Colors.ENDC}")
+            except subprocess.CalledProcessError as e:
+                print(f"{self.Colors.RED}Error adding DankLinux repository: {e}{self.Colors.ENDC}")
+                return False
+        else:
+            print(f"{self.Colors.YELLOW}[DRY RUN] Would download key to {keyring_path} and create {repo_list_path}{self.Colors.ENDC}")
+
+        return True
     
     def install_awww_debian(self):
         # Evitamos reinstalar si ya existen los binarios en el sistema
