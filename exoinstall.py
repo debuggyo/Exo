@@ -942,6 +942,7 @@ class ExoInstaller:
         choice = self.get_user_choice("Select an option: ", ["1", "2", "3", "q"])
 
         install_cmd = ["sudo", self.package_manager]
+
         if self.distro == "fedora":
             install_cmd.extend(["install", "-y"])
         else:
@@ -951,6 +952,10 @@ class ExoInstaller:
 
         if choice == "1":
             print("Installing Niri...")
+
+            if self.distro == "debian":
+                install_cmd.extend(["--no-install-recommends"])
+
             if self.run_command(install_cmd + ["niri"]):
                 return "niri"
         elif choice == "2":
