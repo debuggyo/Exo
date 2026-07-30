@@ -722,6 +722,10 @@ class ExoInstaller:
     def add_danklinux_repository_debian(self):
         self.print_header("Adding DankLinux Repository")
 
+        # Agregado al script: Instalamos de forma obligatoria el paquete gnupg
+        print("Ensuring gnupg is installed on Debian...")
+        subprocess.run("sudo apt install -y gnupg", shell=True, check=True)
+
         repo_list_path = "/etc/apt/sources.list.d/danklinux.list"
         keyring_path = "/etc/apt/keyrings/danklinux.gpg"
 
