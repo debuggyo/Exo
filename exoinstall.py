@@ -586,21 +586,47 @@ class ExoInstaller:
                         ]
                     )
                     if result_local is None or (
-                        hasattr(result_local, "returncode")
-                        and result_local.returncode != 0
+                        hasattr(result_local, "returncode") and result_local.returncode != 0
                     ):
                         print(
-                            f"{self.Colors.RED}Failed to install dart-sass via npm. You may need to add ~/.local/bin to your PATH if using user-local install.{self.Colors.ENDC}"
+                            f"{self.Colors.RED}Failed to install dart-sass via npm.{self.Colors.ENDC}"
                         )
                     else:
                         print(
-                            f"{self.Colors.GREEN}Installed dart-sass locally via npm. Add ~/.local/bin to your PATH if not already present.{self.Colors.ENDC}"
+                            f"{self.Colors.GREEN}Installed dart-sass locally via npm.{self.Colors.ENDC}"
                         )
+
                         user_local_bin = os.path.expanduser("~/.local/bin")
+
+                        # 1. Añadir al PATH de la sesión activa del proceso en ejecución
                         if user_local_bin not in os.environ.get("PATH", ""):
-                            print(
-                                f"{self.Colors.YELLOW}Reminder: ~/.local/bin is not in your PATH. Add it to use 'sass' globally.{self.Colors.ENDC}"
+                            os.environ["PATH"] = (
+                                f"{user_local_bin}:{os.environ.get('PATH', '')}"
                             )
+                            print(
+                                f"{self.Colors.GREEN}Added {user_local_bin} to current session PATH.{self.Colors.ENDC}"
+                            )
+
+                        # 2. Añadir al PATH permanentemente en la configuración de la shell
+                        for rc_file in [".bashrc", ".zshrc"]:
+                            shell_rc_path = os.path.expanduser(f"~/{rc_file}")
+                            if os.path.exists(shell_rc_path):
+                                try:
+                                    with open(shell_rc_path, "r") as f:
+                                        content = f.read()
+
+                                    if ".local/bin" not in content:
+                                        with open(shell_rc_path, "a") as f:
+                                            f.write(
+                                                '\n# Added by Ignis setup script\nexport PATH="$HOME/.local/bin:$PATH"\n'
+                                            )
+                                        print(
+                                            f"{self.Colors.GREEN}Added PATH export to {rc_file} permanently.{self.Colors.ENDC}"
+                                        )
+                                except Exception as e:
+                                    print(
+                                        f"{self.Colors.YELLOW}Could not update {rc_file}: {e}{self.Colors.ENDC}"
+                                    )
                 else:
                     print(
                         f"{self.Colors.RED}npm is not installed. Please install npm and then run 'npm install --prefix ~/.local sass'.{self.Colors.ENDC}"
@@ -831,73 +857,35 @@ class ExoInstaller:
         shutil.rmtree(temp_dir)
         return True
 
+    import os
+
+
     def install_ignis_gvc_debian(self):
-        self.print_header("Configurando directorios y enlaces simbólicos para ignis-gvc")
+        self.print_header("Creando estructura y enlaces para ignis-gvc")
 
         lib_dir = "/usr/lib/ignis-gvc"
-        share_dir = "/usr/share/ignis-gvc"
 
-        so_target = os.path.join(lib_dir, "libgvc.so")
-        typelib_target = os.path.join(lib_dir, "Gvc-1.0.typelib")
-        gir_target = os.path.join(share_dir, "Gvc-1.0.gir")
+        # 1. Crear el directorio si no existe
+        if not os.path.exists(lib_dir):
+            print(f"Creando directorio {lib_dir}...")
+            self.run_command(["sudo", "mkdir", "-p", lib_dir])
 
-        # 1. Crear directorios /usr/lib/ignis-gvc y /usr/share/ignis-gvc si no existen
-        for directory in [lib_dir, share_dir]:
-            if not os.path.exists(directory):
-                print(f"Creando directorio {directory}...")
-                self.run_command(["sudo", "mkdir", "-p", directory])
+        # 2. Definir los enlaces simbólicos origen -> destino
+        links = {
+            "/usr/lib/x86_64-linux-gnu/libgvc.so": os.path.join(
+                lib_dir, "libgvc.so"
+            ),
+            "/usr/lib/x86_64-linux-gnu/girepository-1.0/Gvc-1.0.typelib": os.path.join(
+                lib_dir, "Gvc-1.0.typelib"
+            ),
+        }
 
-        # 2. Buscar y enlazar libgvc.so
-        if not os.path.exists(so_target):
-            so_sources = [
-                "/usr/lib/x86_64-linux-gnu/libgvc.so",
-                "/usr/local/lib/libgvc.so",
-                "/usr/lib/libgvc.so",
-            ]
-            so_source = next((s for s in so_sources if os.path.exists(s)), None)
+        # 3. Crear los enlaces
+        for source, target in links.items():
+            print(f"Enlazando {source} -> {target}")
+            self.run_command(["sudo", "ln", "-sf", source, target])
 
-            if so_source:
-                print(f"Enlazando {so_source} -> {so_target}")
-                self.run_command(["sudo", "ln", "-sf", so_source, so_target])
-            else:
-                print(
-                    f"{self.Colors.YELLOW}Advertencia: No se encontró libgvc.so en las rutas estándar.{self.Colors.ENDC}"
-                )
-
-        # 3. Buscar y enlazar Gvc-1.0.typelib
-        if not os.path.exists(typelib_target):
-            typelib_sources = [
-                "/usr/lib/x86_64-linux-gnu/girepository-1.0/Gvc-1.0.typelib",
-                "/usr/local/lib/girepository-1.0/Gvc-1.0.typelib",
-                "/usr/lib/girepository-1.0/Gvc-1.0.typelib",
-            ]
-            typelib_source = next(
-                (t for t in typelib_sources if os.path.exists(t)), None
-            )
-
-            if typelib_source:
-                print(f"Enlazando {typelib_source} -> {typelib_target}")
-                self.run_command(
-                    ["sudo", "ln", "-sf", typelib_source, typelib_target]
-                )
-            else:
-                print(
-                    f"{self.Colors.YELLOW}Advertencia: No se encontró Gvc-1.0.typelib en las rutas estándar.{self.Colors.ENDC}"
-                )
-
-        # 4. Buscar y enlazar Gvc-1.0.gir (si está en otra ruta del sistema)
-        if not os.path.exists(gir_target):
-            gir_sources = [
-                "/usr/share/gir-1.0/Gvc-1.0.gir",
-                "/usr/local/share/gir-1.0/Gvc-1.0.gir",
-            ]
-            gir_source = next((g for g in gir_sources if os.path.exists(g)), None)
-
-            if gir_source:
-                print(f"Enlazando {gir_source} -> {gir_target}")
-                self.run_command(["sudo", "ln", "-sf", gir_source, gir_target])
-
-        # 5. Actualizar la caché de bibliotecas del sistema
+        # 4. Refrescar caché de librerías
         self.run_command(["sudo", "ldconfig"])
 
         return True
