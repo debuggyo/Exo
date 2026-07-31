@@ -434,7 +434,9 @@ class ExoInstaller:
                 "gir1.2-gnomebluetooth-3.0",
                 "gir1.2-gtk-3.0",
                 "gir1.2-freedesktop",
-                "gir1.2-gdkpixbuf-2.0"
+                "gir1.2-gdkpixbuf-2.0",
+                "python3-cairo",
+                "gir1.2-cairo-1.0"
             ],
         }
 
