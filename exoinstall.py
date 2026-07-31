@@ -586,7 +586,8 @@ class ExoInstaller:
                         ]
                     )
                     if result_local is None or (
-                        hasattr(result_local, "returncode") and result_local.returncode != 0
+                        hasattr(result_local, "returncode")
+                        and result_local.returncode != 0
                     ):
                         print(
                             f"{self.Colors.RED}Failed to install dart-sass via npm.{self.Colors.ENDC}"
@@ -596,9 +597,41 @@ class ExoInstaller:
                             f"{self.Colors.GREEN}Installed dart-sass locally via npm.{self.Colors.ENDC}"
                         )
 
-                        user_local_bin = os.path.expanduser("~/.local/bin")
+                        # 1. Resolver la ubicación del ejecutable (evaluando ambas rutas posibles)
+                        possible_sass_paths = [
+                            os.path.expanduser("~/.local/bin/sass"),
+                            os.path.expanduser("~/.local/node_modules/.bin/sass"),
+                        ]
+                        npm_sass_binary = next(
+                            (
+                                path
+                                for path in possible_sass_paths
+                                if os.path.exists(path)
+                            ),
+                            None,
+                        )
 
-                        # 1. Añadir al PATH de la sesión activa del proceso en ejecución
+                        # 2. Enlazar globalmente en /usr/local/bin/sass para greetd/systemd
+                        if npm_sass_binary:
+                            print(
+                                f"{self.Colors.GREEN}Linking {npm_sass_binary} -> /usr/local/bin/sass{self.Colors.ENDC}"
+                            )
+                            self.run_command(
+                                [
+                                    "sudo",
+                                    "ln",
+                                    "-sf",
+                                    npm_sass_binary,
+                                    "/usr/local/bin/sass",
+                                ]
+                            )
+                        else:
+                            print(
+                                f"{self.Colors.YELLOW}Warning: Sass installed but binary not found in expected locations.{self.Colors.ENDC}"
+                            )
+
+                        # 3. Añadir ~/.local/bin al PATH de la sesión activa
+                        user_local_bin = os.path.expanduser("~/.local/bin")
                         if user_local_bin not in os.environ.get("PATH", ""):
                             os.environ["PATH"] = (
                                 f"{user_local_bin}:{os.environ.get('PATH', '')}"
@@ -607,7 +640,7 @@ class ExoInstaller:
                                 f"{self.Colors.GREEN}Added {user_local_bin} to current session PATH.{self.Colors.ENDC}"
                             )
 
-                        # 2. Añadir al PATH permanentemente en la configuración de la shell
+                        # 4. Añadir al PATH permanentemente en la configuración de la shell
                         for rc_file in [".bashrc", ".zshrc"]:
                             shell_rc_path = os.path.expanduser(f"~/{rc_file}")
                             if os.path.exists(shell_rc_path):
