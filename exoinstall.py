@@ -872,10 +872,10 @@ class ExoInstaller:
 
         # 2. Definir los enlaces simbólicos origen -> destino
         links = {
-            "/usr/lib/x86_64-linux-gnu/libgvc.so": os.path.join(
+            "/usr/lib/x86_64-linux-gnu/ignis-gvc/libgvc.so": os.path.join(
                 lib_dir, "libgvc.so"
             ),
-            "/usr/lib/x86_64-linux-gnu/girepository-1.0/Gvc-1.0.typelib": os.path.join(
+            "/usr/lib/x86_64-linux-gnu/ignis-gvc/Gvc-1.0.typelib": os.path.join(
                 lib_dir, "Gvc-1.0.typelib"
             ),
         }
