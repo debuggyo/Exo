@@ -431,7 +431,10 @@ class ExoInstaller:
                 "gir1.2-gtk-4.0",
                 "network-manager",
                 "gir1.2-nm-1.0",
-                "gir1.2-gnomebluetooth-3.0"
+                "gir1.2-gnomebluetooth-3.0",
+                "gir1.2-gtk-3.0",
+                "gir1.2-freedesktop",
+                "gir1.2-gdkpixbuf-2.0"
             ],
         }
 
