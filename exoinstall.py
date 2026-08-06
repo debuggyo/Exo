@@ -225,6 +225,11 @@ class ExoInstaller:
             print(
                 f"{self.Colors.GREEN}Detected Fedora-based distribution.{self.Colors.ENDC}"
             )
+        elif os.path.exists("/etc/debian_version"):
+            self.distro = "debian"
+            print(
+                f"{self.Colors.GREEN}Detected Debian distribution.{self.Colors.ENDC}"
+            )
         elif os.path.exists("/etc/lsb-release"):
             try:
                 with open("/etc/lsb-release") as f:
@@ -250,13 +255,15 @@ class ExoInstaller:
             )
             return False
 
+
     def get_package_manager(self):
         if self.distro == "arch":
             self.package_manager = "pacman"
         elif self.distro == "fedora":
             self.package_manager = "dnf"
-        elif self.distro == "ubuntu":
+        elif self.distro in ["ubuntu", "debian"]:
             self.package_manager = "apt"
+
 
     def check_aur_helper(self):
         self.print_header("Checking for AUR Helper")
@@ -316,6 +323,18 @@ class ExoInstaller:
             if os.getcwd().endswith(yay_bin_dir):
                 os.chdir("..")
             return False
+
+    def check_pkgconfig_file(self, pc_name):
+        paths = [
+            "/usr/lib64/pkgconfig",
+            "/usr/lib/pkgconfig",
+            "/usr/share/pkgconfig",
+            "/usr/lib/x86_64-linux-gnu/pkgconfig"
+        ]
+        for path in paths:
+            if os.path.exists(os.path.join(path, pc_name)):
+                return path
+        return None
 
     def install_dependencies(self):
         self.print_header("Installing Dependencies")
@@ -382,7 +401,75 @@ class ExoInstaller:
                 "libdisplay-info-dev",
                 "libliftoff-dev",
             ],
+            "debian": [
+                "python3-pip",
+                "cargo",
+                "libgnome-bluetooth-3.0-13",
+                "fonts-material-design-icons-iconfont",
+                "meson",
+                "ninja-build",
+                "pkg-config",
+                "scdoc",
+                "libxkbcommon-dev",
+                "libdisplay-info-dev",
+                "libliftoff-dev",
+                "pkg-config",
+                "npm",
+                "build-essential",
+                "wayland-protocols",
+                "libgirepository1.0-dev",
+                "gobject-introspection",
+                "git",
+                "tar",
+                "libcairo2-dev",
+                "python3-dev",
+                "libpulse-dev",
+                "liblz4-dev",
+                "libwayland-dev",
+                "libgtk4-layer-shell-dev",
+                "gir1.2-glib-2.0",
+                "gir1.2-gtk-4.0",
+                "network-manager",
+                "gir1.2-nm-1.0",
+                "gir1.2-gnomebluetooth-3.0",
+                "gir1.2-gtk-3.0",
+                "gir1.2-freedesktop",
+                "gir1.2-gdkpixbuf-2.0",
+                "python3-cairo",
+                "gir1.2-cairo-1.0"
+            ],
         }
+
+        if self.distro == "debian":
+            self.add_danklinux_repository_debian()
+
+        print("\n Installing required fonts...")
+        result = self.run_command(["wget", "https://github.com/google/material-design-icons/raw/refs/heads/master/variablefont/MaterialSymbolsOutlined%5BFILL,GRAD,opsz,wght%5D.ttf"])
+
+        if result is None or (
+            hasattr(result, "returncode") and result.returncode != 0
+        ):
+            print(
+                f"{self.Colors.RED}Failed to download the font.{self.Colors.ENDC}"
+            )
+        else:
+            result = self.run_command(["sudo", "mkdir", "-p", "/usr/share/fonts/material-symbols-icons"])
+            if result is None or (
+                hasattr(result, "returncode") and result.returncode != 0
+            ):
+                print(
+                    f"{self.Colors.RED}Failed to create the folder for the font.{self.Colors.ENDC}"
+                )
+            else:
+                result = self.run_command(["sudo", "mv", "MaterialSymbolsOutlined[FILL,GRAD,opsz,wght].ttf", "/usr/share/fonts/material-symbols-icons"])
+                if result is None or (
+                    hasattr(result, "returncode") and result.returncode != 0
+                ):
+                    print(
+                        f"{self.Colors.RED}Failed to install the font.{self.Colors.ENDC}"
+                    )
+                else:
+                    self.run_command(["fc-cache", "-v"])
 
         if self.distro in dependencies:
             packages = dependencies[self.distro]
@@ -435,33 +522,7 @@ class ExoInstaller:
                 else:
                     self.run_command(["export", "PATH=\"$PATH:~/.cargo/bin\""])
                 
-                print("\n Installing required fonts...")
-                result = self.run_command(["wget", "https://github.com/google/material-design-icons/raw/refs/heads/master/variablefont/MaterialSymbolsOutlined%5BFILL,GRAD,opsz,wght%5D.ttf"])
-                if result is None or (
-                    hasattr(result, "returncode") and result.returncode != 0
-                ):
-                    print(
-                        f"{self.Colors.RED}Failed to download the font.{self.Colors.ENDC}"
-                    )
-                else:
-                    result = self.run_command(["sudo", "mkdir", "-p", "/usr/share/fonts/material-symbols-icons"])
-                    if result is None or (
-                        hasattr(result, "returncode") and result.returncode != 0
-                    ):
-                        print(
-                            f"{self.Colors.RED}Failed to create the folder for the font.{self.Colors.ENDC}"
-                        )
-                    else:
-                        result = self.run_command(["sudo", "mv", "MaterialSymbolsOutlined[FILL,GRAD,opsz,wght].ttf", "/usr/share/fonts/material-symbols-icons"])
-                        if result is None or (
-                            hasattr(result, "returncode") and result.returncode != 0
-                        ):
-                            print(
-                                f"{self.Colors.RED}Failed to install the font.{self.Colors.ENDC}"
-                            )
-                        else:
-                            self.run_command(["fc-cache", "-v"])
-            elif self.distro == "ubuntu":
+            elif self.distro in ["ubuntu", "debian"]:
                 result = self.run_command(["sudo", "apt", "update"])
                 if result is None or (
                     hasattr(result, "returncode") and result.returncode != 0
@@ -484,6 +545,7 @@ class ExoInstaller:
                         "install",
                         "--user",
                         "git+https://github.com/ignis-sh/ignis.git",
+                        "--break-system-packages"
                     ]
                 )
                 if result is None or (
@@ -501,13 +563,18 @@ class ExoInstaller:
                     print(
                         f"{self.Colors.RED}Failed to install matugen via cargo.{self.Colors.ENDC}"
                     )
+                else:
+                    self.run_command(["export", "PATH=\"$PATH:~/.cargo/bin\""])
 
         else:
             print(
                 f"{self.Colors.YELLOW}No automatic dependency installation for your distribution.{self.Colors.ENDC}"
             )
 
-        if self.distro in ["fedora", "ubuntu"]:
+        if self.distro == "debian": 
+            self.install_adw_gtk_theme()
+
+        if self.distro in ["fedora", "ubuntu", "debian"]:
             print("\nChecking for dart-sass...")
             if not shutil.which("sass"):
                 print(
@@ -528,17 +595,76 @@ class ExoInstaller:
                         and result_local.returncode != 0
                     ):
                         print(
-                            f"{self.Colors.RED}Failed to install dart-sass via npm. You may need to add ~/.local/bin to your PATH if using user-local install.{self.Colors.ENDC}"
+                            f"{self.Colors.RED}Failed to install dart-sass via npm.{self.Colors.ENDC}"
                         )
                     else:
                         print(
-                            f"{self.Colors.GREEN}Installed dart-sass locally via npm. Add ~/.local/bin to your PATH if not already present.{self.Colors.ENDC}"
+                            f"{self.Colors.GREEN}Installed dart-sass locally via npm.{self.Colors.ENDC}"
                         )
+
+                        # 1. Resolver la ubicación del ejecutable (evaluando ambas rutas posibles)
+                        possible_sass_paths = [
+                            os.path.expanduser("~/.local/bin/sass"),
+                            os.path.expanduser("~/.local/node_modules/.bin/sass"),
+                        ]
+                        npm_sass_binary = next(
+                            (
+                                path
+                                for path in possible_sass_paths
+                                if os.path.exists(path)
+                            ),
+                            None,
+                        )
+
+                        # 2. Enlazar globalmente en /usr/local/bin/sass para greetd/systemd
+                        if npm_sass_binary:
+                            print(
+                                f"{self.Colors.GREEN}Linking {npm_sass_binary} -> /usr/local/bin/sass{self.Colors.ENDC}"
+                            )
+                            self.run_command(
+                                [
+                                    "sudo",
+                                    "ln",
+                                    "-sf",
+                                    npm_sass_binary,
+                                    "/usr/local/bin/sass",
+                                ]
+                            )
+                        else:
+                            print(
+                                f"{self.Colors.YELLOW}Warning: Sass installed but binary not found in expected locations.{self.Colors.ENDC}"
+                            )
+
+                        # 3. Añadir ~/.local/bin al PATH de la sesión activa
                         user_local_bin = os.path.expanduser("~/.local/bin")
                         if user_local_bin not in os.environ.get("PATH", ""):
-                            print(
-                                f"{self.Colors.YELLOW}Reminder: ~/.local/bin is not in your PATH. Add it to use 'sass' globally.{self.Colors.ENDC}"
+                            os.environ["PATH"] = (
+                                f"{user_local_bin}:{os.environ.get('PATH', '')}"
                             )
+                            print(
+                                f"{self.Colors.GREEN}Added {user_local_bin} to current session PATH.{self.Colors.ENDC}"
+                            )
+
+                        # 4. Añadir al PATH permanentemente en la configuración de la shell
+                        for rc_file in [".bashrc", ".zshrc"]:
+                            shell_rc_path = os.path.expanduser(f"~/{rc_file}")
+                            if os.path.exists(shell_rc_path):
+                                try:
+                                    with open(shell_rc_path, "r") as f:
+                                        content = f.read()
+
+                                    if ".local/bin" not in content:
+                                        with open(shell_rc_path, "a") as f:
+                                            f.write(
+                                                '\n# Added by Ignis setup script\nexport PATH="$HOME/.local/bin:$PATH"\n'
+                                            )
+                                        print(
+                                            f"{self.Colors.GREEN}Added PATH export to {rc_file} permanently.{self.Colors.ENDC}"
+                                        )
+                                except Exception as e:
+                                    print(
+                                        f"{self.Colors.YELLOW}Could not update {rc_file}: {e}{self.Colors.ENDC}"
+                                    )
                 else:
                     print(
                         f"{self.Colors.RED}npm is not installed. Please install npm and then run 'npm install --prefix ~/.local sass'.{self.Colors.ENDC}"
@@ -552,19 +678,8 @@ class ExoInstaller:
         gvc_repo_dir = os.path.join(gvc_temp_dir, "ignis-gvc")
         self.run_command(["git", "clone", gvc_repo_url, gvc_repo_dir])
 
-        def check_pkgconfig_file(pc_name):
-            paths = [
-                "/usr/lib64/pkgconfig",
-                "/usr/lib/pkgconfig",
-                "/usr/share/pkgconfig",
-            ]
-            for path in paths:
-                if os.path.exists(os.path.join(path, pc_name)):
-                    return path
-            return None
-
         env = os.environ.copy()
-        pc_path = check_pkgconfig_file("gobject-introspection-1.0.pc")
+        pc_path = self.check_pkgconfig_file("gobject-introspection-1.0.pc")
         if pc_path:
             env["PKG_CONFIG_PATH"] = f"{pc_path}:{env.get('PKG_CONFIG_PATH', '')}"
         else:
@@ -607,6 +722,11 @@ class ExoInstaller:
                     )
         shutil.rmtree(gvc_temp_dir)
 
+        if self.distro == "debian": 
+            self.install_ignis_gvc_debian()
+            self.install_awww_debian()
+            return
+
         if not shutil.which("swww"):
             print("\nswww not found, attempting to build from source...")
             temp_dir = tempfile.mkdtemp()
@@ -619,7 +739,7 @@ class ExoInstaller:
             )
             if result and result.returncode == 0:
                 env = os.environ.copy()
-                pc_path = check_pkgconfig_file("wayland-protocols.pc")
+                pc_path = self.check_pkgconfig_file("wayland-protocols.pc")
                 if pc_path:
                     env["PKG_CONFIG_PATH"] = (
                         f"{pc_path}:{env.get('PKG_CONFIG_PATH', '')}"
@@ -667,6 +787,195 @@ class ExoInstaller:
         else:
             print("swww found in PATH.")
 
+    def add_danklinux_repository_debian(self):
+        self.print_header("Adding DankLinux Repository")
+
+        repo_list_path = "/etc/apt/sources.list.d/danklinux.list"
+        keyring_path = "/etc/apt/keyrings/danklinux.gpg"
+
+        if os.path.exists(repo_list_path):
+            print("DankLinux repository already exists. Skipping installation.")
+            return True
+
+        print("DankLinux repository not found. Adding to the system...")
+
+        if not self.dry_run:
+            print("Ensuring gnupg is installed on Debian...")
+            if self.run_command(["sudo", "apt", "update"]) is None or \
+               self.run_command(["sudo", "apt", "install", "-y", "gnupg"]) is None:
+                print(f"{self.Colors.RED}Failed to install gnupg.{self.Colors.ENDC}")
+                return False
+
+            if self.run_command(["sudo", "mkdir", "-p", "/etc/apt/keyrings"]) is None:
+                return False
+
+            try:
+                import subprocess
+                print("Downloading and processing GPG key...")
+                gpg_cmd = (
+                    "curl -fsSL https://download.opensuse.org/repositories/home:AvengeMedia:danklinux/Debian_Testing/Release.key | "
+                    f"sudo gpg --dearmor -o {keyring_path}"
+                )
+                subprocess.run(gpg_cmd, shell=True, check=True)
+
+                print("Writing repository list file...")
+                list_cmd = (
+                    f'echo "deb [signed-by={keyring_path}] https://download.opensuse.org/repositories/home:/AvengeMedia:/danklinux/Debian_Testing/ /" | '
+                    f"sudo tee {repo_list_path} > /dev/null"
+                )
+                subprocess.run(list_cmd, shell=True, check=True)
+            except (subprocess.CalledProcessError, FileNotFoundError) as e:
+                print(f"{self.Colors.RED}Error executing repository shell command: {e}{self.Colors.ENDC}")
+                return False
+
+            print("Updating apt package lists...")
+            if self.run_command(["sudo", "apt", "update"]) is None:
+                return False
+
+            print(f"{self.Colors.GREEN}DankLinux repository added successfully!{self.Colors.ENDC}")
+        else:
+            print(f"{self.Colors.YELLOW}[DRY RUN] Would install gnupg, download key to {keyring_path} and create {repo_list_path}{self.Colors.ENDC}")
+
+        return True
+    
+    def install_awww_debian(self):
+        if shutil.which("swww") or shutil.which("awww"):
+            print("awww/swww found in PATH. Skipping build.")
+            return True
+
+        print("\nawww/swww not found, attempting to build awww from Codeberg for Debian...")
+        temp_dir = tempfile.mkdtemp()
+        awww_repo_url = "https://codeberg.org/LGFae/awww.git"
+        awww_repo_dir = os.path.join(temp_dir, "awww")
+
+        print(f"Cloning {awww_repo_url} to {awww_repo_dir}...")
+        result = self.run_command(
+            ["git", "clone", awww_repo_url, awww_repo_dir], cwd=temp_dir
+        )
+        if result and result.returncode == 0:
+            env = os.environ.copy()
+            pc_path = self.check_pkgconfig_file("wayland-protocols.pc")
+            if pc_path:
+                env["PKG_CONFIG_PATH"] = f"{pc_path}:{env.get('PKG_CONFIG_PATH', '')}"
+            else:
+                print(
+                    f"{self.Colors.RED}wayland-protocols.pc not found. Please install wayland-protocols.{self.Colors.ENDC}"
+                )
+
+            print("Building awww with cargo...")
+            result = self.run_command(
+                ["cargo", "build", "--release"], cwd=awww_repo_dir, env=env
+            )
+            if result and result.returncode == 0:
+                # Iteramos sobre los nombres de los nuevos binarios oficiales
+                for binary in ["awww", "awww-daemon"]:
+                    src = os.path.join(awww_repo_dir, "target", "release", binary)
+                    dest = os.path.join("/usr/local/bin", binary)
+                    
+                    if os.path.exists(src):
+                        # Copiamos el binario nativo (awww o awww-daemon)
+                        copy_result = self.run_command(["sudo", "cp", src, dest])
+                        if copy_result and copy_result.returncode == 0:
+                            print(f"{self.Colors.GREEN}Installed {binary} to /usr/local/bin.{self.Colors.ENDC}")
+                            
+                            # Generamos el enlace simbólico clásico (swww o swww-daemon) apuntando al nuevo binario
+                            legacy_binary = binary.replace("awww", "swww")
+                            legacy_dest = os.path.join("/usr/local/bin", legacy_binary)
+                            print(f"Creating compatibility symlink: {legacy_binary} -> {binary}")
+                            self.run_command(["sudo", "ln", "-sf", dest, legacy_dest])
+                        else:
+                            print(f"{self.Colors.RED}Failed to copy {binary} to /usr/local/bin.{self.Colors.ENDC}")
+                    else:
+                        print(f"{self.Colors.RED}Binary {binary} not found after build.{self.Colors.ENDC}")
+            else:
+                print(f"{self.Colors.RED}Error building awww with cargo.{self.Colors.ENDC}")
+        else:
+            print(f"{self.Colors.RED}Error cloning awww repository.{self.Colors.ENDC}")
+
+        shutil.rmtree(temp_dir)
+        return True
+
+    import os
+
+
+    def install_ignis_gvc_debian(self):
+        self.print_header("Creando estructura y enlaces para ignis-gvc")
+
+        lib_dir = "/usr/lib/ignis-gvc"
+
+        # 1. Crear el directorio si no existe
+        if not os.path.exists(lib_dir):
+            print(f"Creando directorio {lib_dir}...")
+            self.run_command(["sudo", "mkdir", "-p", lib_dir])
+
+        # 2. Definir los enlaces simbólicos origen -> destino
+        links = {
+            "/usr/lib/x86_64-linux-gnu/ignis-gvc/libgvc.so": os.path.join(
+                lib_dir, "libgvc.so"
+            ),
+            "/usr/lib/x86_64-linux-gnu/ignis-gvc/Gvc-1.0.typelib": os.path.join(
+                lib_dir, "Gvc-1.0.typelib"
+            ),
+        }
+
+        # 3. Crear los enlaces
+        for source, target in links.items():
+            print(f"Enlazando {source} -> {target}")
+            self.run_command(["sudo", "ln", "-sf", source, target])
+
+        # 4. Refrescar caché de librerías
+        self.run_command(["sudo", "ldconfig"])
+
+        return True
+    
+
+    def install_adw_gtk_theme(self):
+        self.print_header("Installing adw-gtk3 Theme")
+        
+        import shutil
+        themes_dir = os.path.expanduser("~/.local/share/themes")
+        url = "https://github.com/lassekongo83/adw-gtk3/releases/download/v6.5/adw-gtk3v6.5.tar.xz"
+        tar_path = os.path.join(themes_dir, "adw-gtk3v6.5.tar.xz")
+
+        # 1. Asegurar la carpeta base de temas
+        if not self.dry_run:
+            os.makedirs(themes_dir, exist_ok=True)
+        else:
+            print(f"{self.Colors.YELLOW}[DRY RUN] Would create directory: {themes_dir}{self.Colors.ENDC}")
+
+        # 2. Reemplazar carpetas viejas si ya existen para actualizar limpiamente
+        for old_dir in ["adw-gtk3", "adw-gtk3-dark"]:
+            target = os.path.join(themes_dir, old_dir)
+            if os.path.exists(target):
+                if not self.dry_run:
+                    print(f"Removing old theme directory to replace it: {target}")
+                    shutil.rmtree(target)
+                else:
+                    print(f"{self.Colors.YELLOW}[DRY RUN] Would remove old theme directory: {target}{self.Colors.ENDC}")
+
+        # 3. Descargar el archivo .tar.xz usando tu método run_command
+        download_cmd = ["curl", "-L", "-o", tar_path, url]
+        print(f"Downloading theme from GitHub...")
+        if self.run_command(download_cmd) is None:
+            print(f"{self.Colors.RED}Failed to download the theme.{self.Colors.ENDC}")
+            return False
+
+        # 4. Extraer el archivo .tar.xz usando tu método run_command
+        extract_cmd = ["tar", "-xvf", tar_path, "-C", themes_dir]
+        print(f"Extracting theme to {themes_dir}...")
+        if self.run_command(extract_cmd) is None:
+            print(f"{self.Colors.RED}Failed to extract the theme.{self.Colors.ENDC}")
+            return False
+
+        # 5. Limpieza del archivo comprimido temporal
+        if not self.dry_run:
+            if os.path.exists(tar_path):
+                os.remove(tar_path)
+
+        print(f"{self.Colors.GREEN}adw-gtk3 theme installed and replaced successfully!{self.Colors.ENDC}")
+        return True
+
+
     def check_desktop(self):
         self.print_header("Checking Desktop Environment")
         installed_desktops = []
@@ -695,6 +1004,7 @@ class ExoInstaller:
         choice = self.get_user_choice("Select an option: ", ["1", "2", "3", "q"])
 
         install_cmd = ["sudo", self.package_manager]
+
         if self.distro == "fedora":
             install_cmd.extend(["install", "-y"])
         else:
@@ -704,6 +1014,10 @@ class ExoInstaller:
 
         if choice == "1":
             print("Installing Niri...")
+
+            if self.distro == "debian":
+                install_cmd.extend(["--no-install-recommends"])
+
             if self.run_command(install_cmd + ["niri"]):
                 return "niri"
         elif choice == "2":
