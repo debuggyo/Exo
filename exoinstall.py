@@ -225,6 +225,11 @@ class ExoInstaller:
             print(
                 f"{self.Colors.GREEN}Detected Fedora-based distribution.{self.Colors.ENDC}"
             )
+        elif os.path.exists("/etc/os-release"):
+            self.distro = "void"
+            print(
+                f"{self.Colors.GREEN}Detected voidlinux distribution.{self.Colors.ENDC}"
+            )
         elif os.path.exists("/etc/lsb-release"):
             try:
                 with open("/etc/lsb-release") as f:
@@ -330,6 +335,31 @@ class ExoInstaller:
             return
 
         dependencies = {
+            "void": [
+                "python3-ignis",
+                "dart-sass",
+                "material-fonts-for-exo",
+                "adw-gtk3-for-exo",
+                "gnome-bluetooth-devel",
+                "gtk4-layer-shell-devel",
+                "gtk4-devel",
+                "python3-devel",
+                "font-material-design-icons-ttf",
+                "ttf-material-icons",
+                "gsettings-desktop-schemas-devel",
+                "pulseaudio-devel",
+                "pulseaudio",
+                "libpulseaudio",
+                "glib-devel",
+                "glib",
+                "base-devel",
+                "meson",
+                "python3-pip",
+                "gobject-introspection",
+                "matugen",
+                "swww",
+                "wget",
+            ],
             "arch": [
                 "python-ignis-git",
                 "ignis-gvc",
@@ -399,6 +429,30 @@ class ExoInstaller:
                     print(
                         f"{self.Colors.RED}Failed to install some packages with AUR helper.{self.Colors.ENDC}"
                     )
+            elif self.distro == "void":
+                repo_line = "repository=https://morvoxa.github.io/exo-shell-void/x86_64\n"
+                self.run_command(
+                    ["sudo", "sh", "-c", f"echo '{repo_line}' > /etc/xbps.d/exo.conf"]
+                )
+                desktop_entry = """[Desktop Entry]
+                Name=Niri Wayland(Exo Shell)
+                Comment=Lightweight custom shell environment with Niri
+                Exec=dbus-run-session niri --session
+                Type=Application
+                DesktopNames=Niri;ExoShell;
+                """
+                self.run_command(["sudo", "mkdir", "-p", "/usr/share/wayland-sessions"])
+                self.run_command(
+                    ["sudo", "sh", "-c", f"echo '{desktop_entry}' > /usr/share/wayland-sessions/exo-shell.desktop"]
+                )
+                result = self.run_command(["sudo", "xbps-install", "-Sy"] + packages)
+                if result is None or (
+                    hasattr(result, "returncode") and result.returncode != 0
+                ):
+                    print(
+                        f"{self.Colors.RED}Failed to install some packages with xbps.{self.Colors.ENDC}"
+                    )
+
             elif self.distro == "fedora":
                 result = self.run_command(["sudo", "dnf", "install", "-y"] + packages)
                 if result is None or (
